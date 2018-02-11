@@ -21,30 +21,27 @@ struct BfpArray {
 template <typename T>
 BfpArray<T> add(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB){
 	BfpArray<T> retBfpArray;
-	std::vector<T> retElements;
+    std::vector<T> retElements;
+	retBfpArray.exponent = bfpArrayA.exponent;
 
 	std::vector<bool> carryAB;
 	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
 	 	// carry(A+B) = (sign(A) XOR sign(A+B)) AND (sign(B) XOR sign(A+B))
-		carryAB.push_back((std::signbit(bfpArrayA.elements[i]) ^ std::signbit(bfpArrayA.elements[i] + bfpArrayB.elements[i])) &
-		                  (std::signbit(bfpArrayB.elements[i]) ^ std::signbit(bfpArrayA.elements[i] + bfpArrayB.elements[i])));
-		std::cout << bfpArrayA.elements[i] + bfpArrayB.elements[i] << std::endl;
+		carryAB.push_back((std::signbit(bfpArrayA.elements[i]) ^ std::signbit((T) (bfpArrayA.elements[i] + bfpArrayB.elements[i]))) &
+		                  (std::signbit(bfpArrayB.elements[i]) ^ std::signbit((T) (bfpArrayA.elements[i] + bfpArrayB.elements[i]))));
 	}
 
 	int exponentDiff = bfpArrayA.exponent - bfpArrayB.exponent;
-	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
-		retElements.push_back((carryAB[i] * pow(2, bfpArrayA.exponent)) + bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff));
-	}
-
-	// check if we had a carry and therefore needs to move the exponent
-	// may be bad cause if statement
-	retBfpArray.exponent = bfpArrayA.exponent;
 	int carry = 0;
 	if (accumulate(carryAB.begin(), carryAB.end(), carry)){
-		std::cout << "VI ER HER!!" << std::endl;
 		retBfpArray.exponent++;
-		for (int i = 0; i < retElements.size(); i++) {
-			retElements[i] = retElements[i] >> 1;
+		for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+			// std::cout << (carryAB[i] * pow(2, sizeof(T)*8) + bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) << std::endl;
+			retElements.push_back((bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) >> 1);
+		}
+	} else {
+		for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+			retElements.push_back(bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff));
 		}
 	}
 
@@ -59,28 +56,45 @@ void print(BfpArray<T> bfpArrayA) {
 	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
 		std::string binary = std::bitset< sizeof(T)*8 >(bfpArrayA.elements[i]).to_string(); //to binary
 		std::string twocomp = std::bitset< sizeof(T)*8 >(~bfpArrayA.elements[i] + 1).to_string();
-		// " " << twocomp
-    	std::cout<< i << ": " << bfpArrayA.elements[i] << " " << binary << "\n";
+    	std::cout<< i << ":\t" << bfpArrayA.elements[i] << "\t" << bfpArrayA.elements[i] * pow(2, bfpArrayA.exponent) << "\t" << binary << "\n";
+	}
+}
+
+template <typename T>
+void test(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB, BfpArray<T> bfpArrayC) {
+	bool testRes = true;
+	std::cout << "Test: " << std::endl;
+	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+		if (!(bfpArrayA.elements[i] * pow(2, bfpArrayA.exponent) + 
+			  bfpArrayB.elements[i] * pow(2, bfpArrayB.exponent) == bfpArrayC.elements[i] * pow(2, bfpArrayC.exponent))) {
+			std::cout << "i: " << i << "\t" << bfpArrayA.elements[i] * pow(2, bfpArrayA.exponent) + bfpArrayB.elements[i] * pow(2, bfpArrayB.exponent) << " not " << bfpArrayC.elements[i] * pow(2, bfpArrayC.exponent) << std::endl;
+			testRes = false;
+		}
+	}
+	if (testRes) {
+		std::cout << "Test Passed" << std::endl;
+	} else {
+		std::cout << "Test Failed" << std::endl;
 	}
 }
 
 
 int main() {
-    std::vector<T16> vect1 {32767, 1, 1, 1, 1};
+    std::vector<T16> vect1 {10, 20, -40, 32767, 2};
     BfpArray<T16> bfp1;
     bfp1.exponent = 2;
     bfp1.elements = vect1;
-	
 
-	std::vector<T16> vect2 {1, 2, 2, 2, 2};
+	std::vector<T16> vect2 {2, -30, -50, 2, 4};
     BfpArray<T16> bfp2;
-    bfp2.exponent = 2;
+    bfp2.exponent = 1;
     bfp2.elements = vect2;
     BfpArray<T16> bfp3 = add(bfp1, bfp2);
     // print(bfp1);
     print(bfp1);
     print(bfp2);
     print(bfp3);
+    test(bfp1, bfp2, bfp3);
     // for (int elem : bfp3.elements) {
 
     // }
