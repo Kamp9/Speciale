@@ -71,6 +71,25 @@ BfpArray<T> add(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB){
 
 
 template <typename T>
+BfpArray<T> multiply(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB){
+	BfpArray<T> retBfpArray;
+    std::vector<T> retElements;
+	retBfpArray.exponent = bfpArrayA.exponent + bfpArrayB.exponent;
+
+	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+		retElements.push_back(bfpArrayA.elements[i] * bfpArrayB.elements[i]);
+	}
+
+	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+		retElements.push_back(bfpArrayA.elements[i] * bfpArrayB.elements[i]);
+	}
+
+	retBfpArray.elements = retElements;
+	return retBfpArray;
+}
+
+
+template <typename T>
 void print(BfpArray<T> bfpArrayA) {
 	std::cout<< "BfpArray e: " << bfpArrayA.exponent <<"\n";
 	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
@@ -79,6 +98,7 @@ void print(BfpArray<T> bfpArrayA) {
     	std::cout<< i << ":\t" << bfpArrayA.elements[i] << "\t" << bfpArrayA.elements[i] * pow(2, bfpArrayA.exponent) << "\t" << binary << "\n";
 	}
 }
+
 
 template <typename T>
 void test(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB, BfpArray<T> bfpArrayC) {
@@ -102,7 +122,7 @@ void test(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB, BfpArray<T> bfpArrayC) {
 int main() {
     std::vector<T16> vect1 {10, 20, -40, 32767, 2};
     BfpArray<T16> bfp1;
-    bfp1.exponent = 1;
+    bfp1.exponent = 2;
     bfp1.elements = vect1;
 
 	std::vector<T16> vect2 {2, -30, -50, 2, 4};
