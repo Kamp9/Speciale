@@ -90,12 +90,10 @@ int main() {
     bfp2.exponent = 1;
     bfp2.elements = vect2;
     BfpArray<T16> bfp3 = add(bfp1, bfp2);
-    // print(bfp1);
+
     print(bfp1);
     print(bfp2);
     print(bfp3);
     test(bfp1, bfp2, bfp3);
-    // for (int elem : bfp3.elements) {
 
-    // }
 }
