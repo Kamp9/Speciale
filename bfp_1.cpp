@@ -18,12 +18,14 @@ struct BfpArray {
 };
 
 
+// Should the expoent be able to decrease?
 template <typename T>
 BfpArray<T> add(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB){
 	BfpArray<T> retBfpArray;
     std::vector<T> retElements;
 	retBfpArray.exponent = bfpArrayA.exponent;
 
+	// make vector of carrybits from A + B
 	std::vector<bool> carryAB;
 	for (int i = 0; i < bfpArrayA.elements.size(); i++) {
 	 	// carry(A+B) = (sign(A) XOR sign(A+B)) AND (sign(B) XOR sign(A+B))
@@ -33,15 +35,33 @@ BfpArray<T> add(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB){
 
 	int exponentDiff = bfpArrayA.exponent - bfpArrayB.exponent;
 	int carry = 0;
-	if (accumulate(carryAB.begin(), carryAB.end(), carry)){
-		retBfpArray.exponent++;
-		for (int i = 0; i < bfpArrayA.elements.size(); i++) {
-			// std::cout << (carryAB[i] * pow(2, sizeof(T)*8) + bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) << std::endl;
-			retElements.push_back((bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) >> 1);
+
+	// check if the sum of carryAB is larger than 0
+	if (accumulate(carryAB.begin(), carryAB.end(), carry)) {
+		// check if e_A >= e_B
+		if (exponentDiff >= 0) {
+			retBfpArray.exponent++;
+			for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+				// std::cout << (carryAB[i] * pow(2, sizeof(T)*8) + bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) << std::endl;
+				retElements.push_back((bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) >> 1);
+			}
+		} else {
+			retBfpArray.exponent = bfpArrayB.exponent + 1;
+			for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+				// std::cout << (carryAB[i] * pow(2, sizeof(T)*8) + bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff)) << std::endl;
+				retElements.push_back((bfpArrayB.elements[i] + (bfpArrayA.elements[i] >> abs(exponentDiff))) >> 1);
+			}
 		}
 	} else {
-		for (int i = 0; i < bfpArrayA.elements.size(); i++) {
-			retElements.push_back(bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff));
+		// check if e_A >= e_B
+		if (exponentDiff >= 0) {
+			for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+				retElements.push_back(bfpArrayA.elements[i] + (bfpArrayB.elements[i] >> exponentDiff));
+			}
+		} else {
+			for (int i = 0; i < bfpArrayA.elements.size(); i++) {
+				retElements.push_back(bfpArrayB.elements[i] + (bfpArrayA.elements[i] >> abs(exponentDiff)));
+			}			
 		}
 	}
 
@@ -82,18 +102,20 @@ void test(BfpArray<T> bfpArrayA, BfpArray<T> bfpArrayB, BfpArray<T> bfpArrayC) {
 int main() {
     std::vector<T16> vect1 {10, 20, -40, 32767, 2};
     BfpArray<T16> bfp1;
-    bfp1.exponent = 2;
+    bfp1.exponent = 1;
     bfp1.elements = vect1;
 
 	std::vector<T16> vect2 {2, -30, -50, 2, 4};
     BfpArray<T16> bfp2;
-    bfp2.exponent = 1;
+    bfp2.exponent = 2;
     bfp2.elements = vect2;
     BfpArray<T16> bfp3 = add(bfp1, bfp2);
+    
+    std::cout << bfp3.exponent << std::endl;
 
     print(bfp1);
     print(bfp2);
     print(bfp3);
-    test(bfp1, bfp2, bfp3);
+    // test(bfp1, bfp2, bfp3);
 
 }
