@@ -145,7 +145,7 @@ template <typename T> void check_add(const T& A, const T& B)
   auto ABfloat    = A.to_float() + B.to_float();
 
   vector<bool> sA(10), sB(10);
-  for(int i=0;i<10;i++){ sA[i] = signbit(A[i])>>9; sB[i] = signbit(B[i])>>9; }
+  for(int i=0;i<10;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
 
   cout << "\nFloating point:\n"
        << Afloat << " +\n" << Bfloat << " =\n" << ABfloat << "\n\n";
@@ -170,7 +170,7 @@ template <typename T> void check_add(const T& A, const T& B)
 
   cout << "signs:\n"
        << sA << "\n"
-       << sA << "\n\n";
+       << sB << "\n\n";
 
 }
 
