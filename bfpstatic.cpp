@@ -74,8 +74,11 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
   
   BFPStatic<T,N>  AB;
   bitset<N>  carryAB;
+  int msbAB[N];
   bool carry = false;
-  
+  int msb        = numeric_limits<T>::digits - 1;
+  int carry_mask = (1<<(msb+1));
+
   // Make sure that e_A >= e_B
   if(A.exponent < B.exponent) return B+A;
   int exp_diff = A.exponent - B.exponent;
@@ -83,29 +86,28 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
   // Compute machine-word addition, carry-bit vector, and whether the carry bit was set.
   // TODO: Needs to be done more carefully for signed values.
   for(size_t i=0;i<N;i++){
-    AB[i]      = A[i] + (B[i]>>exp_diff);  
-    carryAB[i] = (signbit(A[i]) ^ signbit(AB[i])) & (signbit(B[i]) ^ signbit(AB[i]));
-    carry     |= carryAB[i];
+    int64_t ABi = A[i] + (B[i]>>exp_diff);
+    T       abi = ABi;
 
-    printf("%d: %d + (%d >> %d) = %d + %d = %d [(%d ^ %d) ^ (%d ^ %d) = %d]\n",
-	   int(i), A[i],B[i],exp_diff,A[i],(B[i]>>exp_diff),AB[i],
-	   int(signbit(A[i])),int(signbit(AB[i])),int(signbit(B[i])),int(signbit(AB[i])),int(carryAB[i]));
+    // TODO: Sort out msbAB vs carryAB
+    msbAB[i]   = (ABi & carry_mask)>>1;
+    carryAB[i] = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+    carry     |= carryAB[i];
   }
 
+  //  cerr << "msbAB:\n" << vector<int>(msbAB,msbAB+N) << "\n";
+  
   AB.exponent = A.exponent + carry;
 
-  // If any carry bit was set, we need to shift out the lsb, and set the msb to the carry
-  // TODO: How does this work for signed ints?
-  int msb = numeric_limits<T>::digits - 1;	
-
-  if(carry){
+  if(carry)
     for(size_t i=0;i<N;i++){
-      int64_t ABi = A[i]+(B[i]>>exp_diff);
-      //      printf("%d: %d+%d = %d -> %d\n",int(i),A[i],B[i],int(ABi),sign_product);
-      // TODO: Make sure last term is correct.
-      AB[i] = ((ABi >> 1) | (carryAB[i] << msb)) + (signbit(A[i]) == signbit(B[i])) * (ABi&1);
+      int64_t ABi = A[i] + (B[i]>>exp_diff);
+      AB[i]       = (ABi>>1) | msbAB[i]; // +s
     }
-  }
+  else
+    for(size_t i=0;i<N;i++)
+      AB[i] = A[i] + (B[i]>>exp_diff); // +s
+
   return AB;
 }
 
@@ -142,6 +144,9 @@ template <typename T> void check_add(const T& A, const T& B)
   auto AB = A+B;
   auto ABfloat    = A.to_float() + B.to_float();
 
+  vector<bool> sA(10), sB(10);
+  for(int i=0;i<10;i++){ sA[i] = signbit(A[i])>>9; sB[i] = signbit(B[i])>>9; }
+
   cout << "\nFloating point:\n"
        << Afloat << " +\n" << Bfloat << " =\n" << ABfloat << "\n\n";
 
@@ -163,15 +168,23 @@ template <typename T> void check_add(const T& A, const T& B)
        << "Error compared to rounded exact:\n"
        << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
+  cout << "signs:\n"
+       << sA << "\n"
+       << sA << "\n\n";
+
 }
-  
+
 int main()
 {
-  BFPStatic<int8_t,10> Afp{{{20.25, 4.5, 29.75, 6.75, 20.5, 18.5, 20.25, 0.25, 27., 21.}}};
-  BFPStatic<int8_t,10> A{{81, 18, 119, 27, 82, 74, 81, 1, 108, 84},-2};
+  // Test af forskellige cases:
+  // 1) A og B er disjunkte:
+  BFPStatic<int8_t,10> Afp{{{-20.25, 4.5, 29.75, 6.75, 20.5, 18.5, 20.25, 0.25, 27., 21.}}};
+  BFPStatic<int8_t,10> A{{-81, 18, 119, 27, 82, 74, 81, 1, 108, 84},-2};
   BFPStatic<int8_t,10> B{{-39, -79, 98, -104, 4, 6, 57, 23, 75, 88},-2};
 
+
   check_add(A,A);
+  check_add(Afp,Afp);
   check_add(A,B);
   
   return 0; 
