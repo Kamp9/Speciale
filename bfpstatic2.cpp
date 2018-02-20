@@ -10,6 +10,10 @@
 #include <cinttypes>
 #include <stdio.h>
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+
+
 using namespace std;
 
 typedef int8_t   T8;
@@ -265,13 +269,13 @@ template <typename T> void check_add(const T& A, const T& B)
 template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp() {
     array<T,N> elems;
-    srand((unsigned)time(NULL));
-    auto range = numeric_limits<T>::max();    
+    boost::random::mt19937 rng;
+    rng.seed(time(NULL));
+    boost::random::uniform_int_distribution<T> rand(numeric_limits<T>::min(), numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
-        // is rand() large enough?
-        elems[i] = rand() % (range * 2) - (range + 1);
+        elems[i] = rand(rng);
     }
-    int exponent = rand() % range;
+    int exponent = rand(rng) % numeric_limits<T>::digits;
     return BFPStatic<T,N>(elems, exponent);
 }
 
