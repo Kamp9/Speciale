@@ -10,10 +10,6 @@
 #include <cinttypes>
 #include <stdio.h>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-
-
 using namespace std;
 
 typedef int8_t   T8;
@@ -71,7 +67,9 @@ struct BFPStatic: public std::array<T,N>
     double power = pow(2.0,-exponent);
 
     for(int i=0;i<N;i++){
-      assert(V[i]*power >= std::numeric_limits<T>::min() && V[i]*power <= std::numeric_limits<T>::max());
+        cout << V[i]*power << endl;
+      assert(V[i]*power >= std::numeric_limits<T>::min());
+      assert(V[i]*power <= std::numeric_limits<T>::max());
       A[i] = round(V[i]*power);
     }
   }
@@ -100,9 +98,8 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
   bitset<N> carryAB;
   int msbAB[N];
   bool carry = false;
-  int msb        = numeric_limits<T>::digits - 1;
-  int carry_mask = (1<<(msb+1));
-
+  int msb        = numeric_limits<T>::digits;
+  int carry_mask = 1 << (msb + 1);
   int exp_diff = A.exponent - B.exponent;
 
   // Compute machine-word addition, carry-bit vector, and whether the carry bit was set.
@@ -116,8 +113,6 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     carryAB[i] = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     carry     |= carryAB[i];
   }
-
-  //  cerr << "msbAB:\n" << vector<int>(msbAB,msbAB+N) << "\n";
   
   AB.exponent = A.exponent + carry;
 
@@ -169,7 +164,6 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     int shifts = msb * 2 + 1 - log2_64(max);
 
     for (size_t i = 0; i < N; i++) {
-        cout << (signAB[i] << (msb+1)) << endl;
         AB[i] = ((A[i] * (B[i] >> exp_diff)) >> shifts) | (signAB[i] << (msb+1));
     }
 
@@ -266,18 +260,48 @@ template <typename T> void check_add(const T& A, const T& B)
        << sB << "\n\n";
 }
 
-template <typename T, size_t N>
-BFPStatic<T,N> gen_bfp() {
-    array<T,N> elems;
-    boost::random::mt19937 rng;
-    rng.seed(time(NULL));
-    boost::random::uniform_int_distribution<T> rand(numeric_limits<T>::min(), numeric_limits<T>::max());
-    for(size_t i = 0; i < N; i++){
-        elems[i] = rand(rng);
-    }
-    int exponent = rand(rng) % numeric_limits<T>::digits;
-    return BFPStatic<T,N>(elems, exponent);
+
+template <typename T> void check_multi(const T& A, const T& B)
+{
+  assert(A.size() == B.size());
+  size_t N = A.size();
+  cout << "******************** Checking multiplication of: ********************\n"
+       << A << " +\n" << B << " = \n\n"
+       << A.to_float() << " +\n"  << B.to_float() << "\n\n";
+
+  auto Afloat = A.to_float(), Bfloat = B.to_float();
+  auto AB = A*B;
+  auto ABfloat = A.to_float() * B.to_float();
+
+  vector<bool> sA(N), sB(N);
+  for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
+
+  cout << "\nFloating point:\n"
+       << Afloat << " +\n" << Bfloat << " =\n" << ABfloat << "\n\n";
+
+  cout << "Floating point in BFP-representation:\n"
+       << T(Afloat) << " +\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
+
+  cout << "Result of BFP-multiplication:\n"
+       << AB << "\n"
+       << T(ABfloat) << " wanted.\n\n";
+
+  cout << "Result of BFP-multiplication converted to floating point:\n"
+       << AB.to_float() << "\n"
+       << ABfloat << " exact,\n"
+       << T(ABfloat).to_float() << " wanted.\n\n";
+    
+  cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+
+  cout << "signs:\n"
+       << sA << "\n"
+       << sB << "\n\n";
 }
+
 
 
 // int main()

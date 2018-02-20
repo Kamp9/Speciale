@@ -8,22 +8,31 @@
 
 using namespace std;
 
+template <typename T, size_t N>
+BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
+    array<T,N> elems;
+    boost::random::uniform_int_distribution<T> rand(numeric_limits<T>::min(), numeric_limits<T>::max());
+    for(size_t i = 0; i < N; i++){
+        elems[i] = rand(rng);
+    }
+    // int exponent = rand(rng) % numeric_limits<T>::digits;
+
+    // assert(V[i]*power >= std::numeric_limits<T>::min());
+    // assert(V[i]*power <= std::numeric_limits<T>::max());
+    return BFPStatic<T,N>(elems, 0);
+}
 
 
 int main(){
-    // Test af forskellige cases:
-    // 1) A og B er disjunkte:
-    BFPStatic<int8_t,4> Afp{{{-20.25, 4.5, 29.75, 6.75}}};
-    BFPStatic<int8_t,4> Bfp{{{-20.25, 4.5, 29.75, 6.75}}};
+    boost::random::mt19937 rng;
+    rng.seed(time(NULL));
 
-    BFPStatic<int8_t,4> A{{3, 18, 119, 27}, 0};
-    BFPStatic<int8_t,4> B{{2, -79, 98, -104}, 0};
-    BFPStatic<int64_t, 100> ABC = gen_bfp<int64_t, 100>();
-
-    cout << ABC.to_float() << endl;
-    // check_add(A,A);
+    BFPStatic<int8_t, 10> A = gen_bfp<int8_t, 10>(rng);
+    BFPStatic<int8_t, 10> B = gen_bfp<int8_t, 10>(rng);
+    
+    check_add(A,B);
     // check_add(Afp,Afp);
-    // check_add(A,B);
+    // check_multi(A,B);
 
     return 0;
 }
