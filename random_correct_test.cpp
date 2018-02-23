@@ -15,22 +15,29 @@ BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
     for(size_t i = 0; i < N; i++){
         elems[i] = rand(rng);
     }
-    // int exponent = rand(rng) % numeric_limits<T>::digits;
-
-    // assert(V[i]*power >= std::numeric_limits<T>::min());
-    // assert(V[i]*power <= std::numeric_limits<T>::max());
     return BFPStatic<T,N>(elems, 0);
 }
+
 
 
 int main(){
     boost::random::mt19937 rng;
     rng.seed(time(NULL));
 
-    BFPStatic<int8_t, 10> A = gen_bfp<int8_t, 10>(rng);
-    BFPStatic<int8_t, 10> B = gen_bfp<int8_t, 10>(rng);
+    auto A = gen_bfp<int8_t, 4>(rng);
+    auto B = gen_bfp<int8_t, 4>(rng);
     
+    BFPStatic<int8_t, 3> C{{-128, -128, -128}, 0};
+    BFPStatic<int8_t, 3> D{{-128, -128, -128}, 0};
+    auto CD = C+D;
+    // auto Q = BFPStatic<int8_t, 3>(C.to_float());
+    // cout << Q << endl;
+    // check_add(A,A);
     check_add(A,B);
+    
+    BFPStatic<int8_t, 4> ERR{{-100,73,10,20}, 1};
+    cout << BFPStatic<int8_t, 4>(ERR.to_float()).to_float() << endl;
+    // check<plus>(A,B);
     // check_add(Afp,Afp);
     // check_multi(A,B);
 
