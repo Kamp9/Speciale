@@ -14,11 +14,7 @@
 
 using namespace std;
 
-typedef int8_t   T8;
-typedef int16_t  T16;
-typedef int32_t  T32;
-typedef int64_t  T64;
-
+// library functions for faster computation times
 int log2_64 (uint64_t value) {
     const int tab64[64] = {
     63,  0, 58,  1, 59, 47, 53,  2,
@@ -45,7 +41,7 @@ template <typename T> ostream &operator<<(ostream &s, const vector<T> &xs){
     return s;
 }
 
-
+// BFPStatic definition
 template <typename T, size_t N>
 struct BFPStatic: public std::array<T,N>{
     int exponent;
@@ -59,16 +55,16 @@ struct BFPStatic: public std::array<T,N>{
 
         exponent=std::numeric_limits<T>::min();
         for(int i=0;i<N;i++){
-            int e_V  = rint(log2(fabs(V[i])));
+            int e_V  = floor(log2(fabs(V[i])));
             exponent = std::max(exponent,e_V);
         }
-
         exponent -= std::numeric_limits<T>::digits - 1;
+
         double power = pow(2.0,-exponent);
         for(int i=0;i<N;i++){
             assert(V[i]*power >= std::numeric_limits<T>::min());
             assert(V[i]*power <= std::numeric_limits<T>::max());
-            A[i] = floor(V[i]*power); // round(V[i]*power);
+            A[i] = floor(V[i]*power);
         }
     }
 
@@ -86,17 +82,16 @@ struct BFPStatic: public std::array<T,N>{
     }
 };
 
+// BFPStatic operators +, -, *, and /
 template <typename T,size_t N>
 BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-  // Make sure that e_A >= e_B
+    // Make sure that e_A >= e_B
     if(A.exponent < B.exponent) return B+A;
 
     BFPStatic<T,N> AB;
     bitset<N> carryAB;
-    // int msbAB[N];
     bool carry = false;
-    int msb = 1 << (numeric_limits<T>::digits - 1);
-    // int carry_mask = 1 << (msb + 1);
+    int msb = 1 << (numeric_limits<T>::digits);
     int exp_diff = A.exponent - B.exponent;
 
     // Compute machine-word addition, carry-bit vector, and whether the carry bit was set.
@@ -104,19 +99,17 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     for(size_t i=0;i<N;i++){
         int64_t ABi = A[i] + (B[i]>>exp_diff);
         T       abi = ABi;
-
-        // TODO: Sort out msbAB vs carryAB
-        // msbAB[i]   = (ABi & carry_mask)>>1;
-        carryAB[i] = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-        carry     |= carryAB[i];
+        carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+        carry      |= carryAB[i];
     }
-  
+
     AB.exponent = A.exponent + carry;
 
-    if(carry)
+    if(carry){
         for(size_t i=0;i<N;i++){
             AB[i] = ((A[i] + (B[i]>>exp_diff)) | carryAB[i] << msb) >> 1; // +s
         }
+    }
     else
         for(size_t i=0;i<N;i++)
             AB[i] = A[i] + (B[i]>>exp_diff); // +s
@@ -128,10 +121,10 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 // Should this be implemented like operator+ instead of using it, in order to save a loop over N?
 template <typename T,size_t N>
 BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-    BFPStatic<T,N> nA;
-    for (size_t i = 0; i < N; i++){ nA[i] = -1 * A[i]; }
-    nA.exponent = A.exponent;
-    return nA + B;
+    BFPStatic<T,N> nB;
+    for (size_t i = 0; i < N; i++){ nB[i] = -1 * B[i]; }
+    nB.exponent = B.exponent;
+    return A + nB;
 }
 
 
@@ -147,14 +140,14 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     int exp_diff = A.exponent - B.exponent;
     for (size_t i = 0; i < N; i++) {
         // Find result signbit for AB
-        // A[i] >> (sizeof(T) * 8 - 1 is equivalent to signbit(A[i])
-        signAB[i] = (A[i] >> (sizeof(T) * 8 - 1)) ^ (B[i] >> (sizeof(T) * 8 - 1));
-
+        signAB[i] = (A[i] >> signbit(A[i])) ^ (B[i] >> signbit(B[i]));
+        // multiply numbers with e_A >= e_B
         uint64_t ABi = abs(A[i]) * (abs(B[i]) >> exp_diff);
-        // ABi - ((ABi - max) & ((ABi - max) >> (sizeof(T) * 8 - 1))) is equivalent to std::max(ABi, max)
+        // find the maximal value of all multiplications
         max = std::max(ABi, max);
     }
-    int shifts = msb * 2 + 1 - log2_64(max);
+    int shifts = log2_64(max) - std::numeric_limits<T>::digits + 1;
+    // int shifts = msb * 2 + 1 - log2_64(max);
 
     for (size_t i = 0; i < N; i++) {
         AB[i] = ((A[i] * (B[i] >> exp_diff)) >> shifts) | (signAB[i] << (msb+1));
@@ -196,20 +189,20 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 }
 
 
-
-template <typename T> vector<double> operator+(const vector<T> &A, const vector<T> &B){
+// Vector operations +, -, *, and /
+template <typename T> vector<T> operator+(const vector<T> &A, const vector<T> &B){
     assert(A.size() == B.size());
-    vector<double> AB(A.size());
+    vector<T> AB(A.size());
 
-    for(int i=0;i<AB.size();i++){
+    for(int i=0;i<AB.size();i++)
         AB[i] = A[i] + B[i];
-    }
+
     return AB;
 }
 
-template <typename T> vector<double> operator-(const vector<T> &A, const vector<T> &B){
+template <typename T> vector<T> operator-(const vector<T> &A, const vector<T> &B){
     assert(A.size() == B.size());
-    vector<double> AB(A.size());
+    vector<T> AB(A.size());
 
     for(int i=0;i<AB.size();i++)
         AB[i] = A[i] - B[i];
@@ -217,31 +210,30 @@ template <typename T> vector<double> operator-(const vector<T> &A, const vector<
     return AB;
 }
 
-// template <typename T> vector<double> operator*(const vector<T> &A, const vector<T> &B){
-//     assert(A.size() == B.size());
-//     vector<T> AB(A.size());
+template <typename T> vector<T> operator*(const vector<T> &A, const vector<T> &B){
+    assert(A.size() == B.size());
+    vector<T> AB(A.size());
 
-//     for(int i=0;i<AB.size();i++)
-//         AB[i] = A[i] * B[i];
+    for(int i=0;i<AB.size();i++)
+        AB[i] = A[i] * B[i];
 
-//     return AB;
-// }
+    return AB;
+}
 
-// template <typename T> vector<double> operator/(const vector<T> &A, const vector<T> &B){
-//     assert(A.size() == B.size());
-//     vector<T> AB(A.size());
+template <typename T> vector<T> operator/(const vector<T> &A, const vector<T> &B){
+    assert(A.size() == B.size());
+    vector<T> AB(A.size());
 
-//     for(int i=0;i<AB.size();i++)
-//         AB[i] = A[i] / B[i];
+    for(int i=0;i<AB.size();i++)
+        AB[i] = A[i] / B[i];
 
-//     return AB;
-// }
+    return AB;
+}
 
 
-
-template <typename T> void check_add(const T& A, const T& B)
-{
-  assert(A.size() == B.size());
+// BFPstatic checkers for operations +, -, *, and /
+template <typename T> void check_add(const T& A, const T& B){
+    assert(A.size() == B.size());
   size_t N = A.size();
   cout << "******************** Checking addition of: ********************\n"
        << A << " +\n" << B << " = \n\n"
@@ -280,28 +272,65 @@ template <typename T> void check_add(const T& A, const T& B)
        << sB << "\n\n";
 }
 
-
-
-template <typename T> void check_multi(const T& A, const T& B)
-{
+template <typename T> void check_sub(const T& A, const T& B){
   assert(A.size() == B.size());
   size_t N = A.size();
-  cout << "******************** Checking multiplication of: ********************\n"
-       << A << " +\n" << B << " = \n\n"
-       << A.to_float() << " +\n"  << B.to_float() << "\n\n";
+  cout << "******************** Checking subtraction of: ********************\n"
+       << A << " -\n" << B << " = \n\n"
+       << A.to_float() << " -\n" << B.to_float() << "\n\n";
 
   auto Afloat = A.to_float(), Bfloat = B.to_float();
-  auto AB = A*B;
-  auto ABfloat = A.to_float() * B.to_float();
+  auto AB = A-B;
+  auto ABfloat = A.to_float() - B.to_float();
 
   vector<bool> sA(N), sB(N);
   for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
 
   cout << "\nFloating point:\n"
-       << Afloat << " +\n" << Bfloat << " =\n" << ABfloat << "\n\n";
+       << Afloat << " -\n" << Bfloat << " =\n" << ABfloat << "\n\n";
 
   cout << "Floating point in BFP-representation:\n"
-       << T(Afloat) << " +\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
+       << T(Afloat) << " -\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
+
+  cout << "Result of BFP-subtraction:\n"
+       << AB << "\n"
+       << T(ABfloat) << " wanted.\n\n";
+
+  cout << "Result of BFP-subtraction converted to floating point:\n"
+       << AB.to_float() << "\n"
+       << ABfloat << " exact,\n"
+       << T(ABfloat).to_float() << " wanted.\n\n";
+    
+  cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+
+  cout << "signs:\n"
+       << sA << "\n"
+       << sB << "\n\n";
+}
+
+template <typename T> void check_mul(const T& A, const T& B){
+  assert(A.size() == B.size());
+  size_t N = A.size();
+  cout << "******************** Checking multiplication of: ********************\n"
+       << A << " *\n" << B << " = \n\n"
+       << A.to_float() << " *\n"  << B.to_float() << "\n\n";
+
+  auto Afloat = A.to_float(), Bfloat = B.to_float();
+  auto AB = A*B;
+  auto ABfloat = A.to_float() * B.to_float();
+  cout << T(ABfloat) << endl;
+  vector<bool> sA(N), sB(N);
+  for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
+
+  cout << "\nFloating point:\n"
+       << Afloat << " *\n" << Bfloat << " =\n" << ABfloat << "\n\n";
+
+  cout << "Floating point in BFP-representation:\n"
+       << T(Afloat) << " *\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
 
   cout << "Result of BFP-multiplication:\n"
        << AB << "\n"
@@ -323,23 +352,42 @@ template <typename T> void check_multi(const T& A, const T& B)
        << sB << "\n\n";
 }
 
+template <typename T> void check_div(const T& A, const T& B){
+  assert(A.size() == B.size());
+  size_t N = A.size();
+  cout << "******************** Checking division of: ********************\n"
+       << A << " /\n" << B << " = \n\n"
+       << A.to_float() << " /\n"  << B.to_float() << "\n\n";
 
+  auto Afloat = A.to_float(), Bfloat = B.to_float();
+  auto AB = A/B;
+  auto ABfloat = A.to_float() / B.to_float();
 
-// int main()
-// {
-//   // Test af forskellige cases:
-//   // 1) A og B er disjunkte:
-//   BFPStatic<int8_t,4> Afp{{{-20.25, 4.5, 29.75, 6.75}}};
-//   BFPStatic<int8_t,4> Bfp{{{-20.25, 4.5, 29.75, 6.75}}};
-  
-//   BFPStatic<int8_t,4> A{{3, 18, 119, 27}, 0};
-//   BFPStatic<int8_t,4> B{{2, -79, 98, -104}, 0};
+  vector<bool> sA(N), sB(N);
+  for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
 
-//   BFPStatic<int8_t,4> C = A * B;
-//   cout << C << endl;
-//   // check_add(A,A);
-//   // check_add(Afp,Afp);
-//   // check_add(A,B);
-  
-//   return 0;
-// }
+  cout << "\nFloating point:\n"
+       << Afloat << " /\n" << Bfloat << " =\n" << ABfloat << "\n\n";
+
+  cout << "Floating point in BFP-representation:\n"
+       << T(Afloat) << " /\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
+
+  cout << "Result of BFP-division:\n"
+       << AB << "\n"
+       << T(ABfloat) << " wanted.\n\n";
+
+  cout << "Result of BFP-division converted to floating point:\n"
+       << AB.to_float() << "\n"
+       << ABfloat << " exact,\n"
+       << T(ABfloat).to_float() << " wanted.\n\n";
+    
+  cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+
+  cout << "signs:\n"
+       << sA << "\n"
+       << sB << "\n\n";
+}
