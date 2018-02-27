@@ -147,20 +147,20 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> AB;
     uint64_t exp = 0;
     int exp_diff = A.exponent - B.exponent;
-    
     for (size_t i = 0; i < N; i++) {
-        uint64_t ABi = (abs(A[i]) << exp_diff) * (abs(B[i]));
+        uint64_t ABi = uint64_t(std::abs(A[i]) << exp_diff) * std::abs(B[i]);
         exp = max(exp, ABi);
     }
     // could check that shifts is not 0    
     int shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
-    // cout << ceil(log2(exp)) << endl;
-    // cout << numeric_limits<T>::digits << endl;
-    // cout << exp << endl;
-    // cout << shifts << endl;
+
+    cout << ceil(log2(exp)) << endl;
+    cout << numeric_limits<T>::digits << endl;
+    cout << exp << endl;
+    cout << shifts << endl;
 
     for (size_t i = 0; i < N; i++){
-        AB[i] = ((A[i] << exp_diff) * B[i]) >> shifts;
+        AB[i] = (uint64_t(A[i] << exp_diff) * B[i]) >> shifts;
     }
     AB.exponent = A.exponent + B.exponent + shifts - exp_diff;
 

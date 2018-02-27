@@ -15,7 +15,7 @@ BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
     for(size_t i = 0; i < N; i++){
         elems[i] = rand_elem(rng);
     }
-    boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_exp(0, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
     BFPStatic<T,N> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
@@ -27,14 +27,14 @@ int main(){
     boost::random::mt19937 rng;
     rng.seed(time(NULL));
 
-    auto A = gen_bfp<int8_t, 3>(rng);
-    auto B = gen_bfp<int8_t, 3>(rng);
+    auto A = gen_bfp<int16_t, 100>(rng);
+    auto B = gen_bfp<int16_t, 100>(rng);
 
     // BFPStatic<int8_t, 5> C{{-61, -71, 80, 1, 1}, 5};
     // BFPStatic<int8_t, 5> D{{120, -2, -121, 1, 1}, 10};
 
-    // BFPStatic<int8_t, 1> E{{-124},5};
-    // BFPStatic<int8_t, 1> F{{50},10};
+    // BFPStatic<int16_t, 1> E{{-31179},1};
+    // BFPStatic<int16_t, 1> F{{30007},8};
 
     // vector<double> v{-203161600};
     // BFPStatic<int8_t, 1> V = BFPStatic<int8_t, 1>(v);
