@@ -53,17 +53,17 @@ struct BFPStatic: public std::array<T,N>{
     
         std::array<T,N> &A(*this);
 
-        exponent=std::numeric_limits<T>::min();
-        for(int i=0;i<N;i++){
-            int e_V  = floor(log2(fabs(V[i])));
+        exponent = std::numeric_limits<T>::min();
+        for(int i = 0; i < N ;i++){
+            int e_V  = ceil(log2(fabs(V[i])));
             exponent = std::max(exponent,e_V);
         }
-        exponent -= std::numeric_limits<T>::digits - 1;
+        exponent -= std::numeric_limits<T>::digits;
 
         double power = pow(2.0,-exponent);
         for(int i=0;i<N;i++){
-            assert(V[i]*power >= std::numeric_limits<T>::min());
-            assert(V[i]*power <= std::numeric_limits<T>::max());
+            assert(floor(V[i]*power) >= std::numeric_limits<T>::min());
+            assert(floor(V[i]*power) <= std::numeric_limits<T>::max());
             A[i] = floor(V[i]*power);
         }
     }
@@ -91,7 +91,7 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> AB;
     bitset<N> carryAB;
     bool carry = false;
-    int msb = 1 << (numeric_limits<T>::digits);
+    int msb = 1 << numeric_limits<T>::digits; // should this be larger, e.i more bits?
     int exp_diff = A.exponent - B.exponent;
 
     // Compute machine-word addition, carry-bit vector, and whether the carry bit was set.
@@ -104,34 +104,73 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     }
 
     AB.exponent = A.exponent + carry;
-
-    if(carry){
-        for(size_t i=0;i<N;i++){
+    if(carry)
+        for(size_t i=0;i<N;i++)
             AB[i] = ((A[i] + (B[i]>>exp_diff)) | carryAB[i] << msb) >> 1; // +s
-        }
-    }
     else
         for(size_t i=0;i<N;i++)
             AB[i] = A[i] + (B[i]>>exp_diff); // +s
-
     return AB;
 }
 
 
+
 // Should this be implemented like operator+ instead of using it, in order to save a loop over N?
+// Should this be inplace instead? Cannot since BFPStatic is read only
 template <typename T,size_t N>
 BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> nB;
     for (size_t i = 0; i < N; i++){ nB[i] = -1 * B[i]; }
     nB.exponent = B.exponent;
-    return A + nB;
+
+    if(A.exponent < B.exponent)
+        return A + nB;
+    else
+        return nB + A;
 }
 
+
+// exponent=std::numeric_limits<T>::min();
+// for(int i=0;i<N;i++){
+//     int e_V  = ceil(log2(fabs(V[i])));
+//     exponent = std::max(exponent,e_V);
+// }
+// exponent -= std::numeric_limits<T>::digits;
+
+// double power = pow(2.0,-exponent);
 
 template <typename T,size_t N>
 BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     // Make sure that e_A >= e_B
     if(A.exponent < B.exponent) return B*A;
+
+    BFPStatic<T,N> AB;
+    uint64_t exp = 0;
+    int exp_diff = A.exponent - B.exponent;
+    
+    for (size_t i = 0; i < N; i++) {
+        uint64_t ABi = (abs(A[i]) << exp_diff) * (abs(B[i]));
+        exp = max(exp, ABi);
+    }
+    // could check that shifts is not 0    
+    int shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
+    // cout << ceil(log2(exp)) << endl;
+    // cout << numeric_limits<T>::digits << endl;
+    // cout << exp << endl;
+    // cout << shifts << endl;
+
+    for (size_t i = 0; i < N; i++){
+        AB[i] = ((A[i] << exp_diff) * B[i]) >> shifts;
+    }
+    AB.exponent = A.exponent + B.exponent + shifts - exp_diff;
+
+    return AB;
+}
+
+template <typename T,size_t N>
+BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
+    // Make sure that e_A >= e_B
+    if(A.exponent < B.exponent) return B/A;
 
     BFPStatic<T,N> AB;
     bitset<N> signAB;
@@ -141,44 +180,13 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     for (size_t i = 0; i < N; i++) {
         // Find result signbit for AB
         signAB[i] = (A[i] >> signbit(A[i])) ^ (B[i] >> signbit(B[i]));
-        // multiply numbers with e_A >= e_B
-        uint64_t ABi = abs(A[i]) * (abs(B[i]) >> exp_diff);
-        // find the maximal value of all multiplications
-        max = std::max(ABi, max);
-    }
-    int shifts = log2_64(max) - std::numeric_limits<T>::digits + 1;
-    // int shifts = msb * 2 + 1 - log2_64(max);
-
-    for (size_t i = 0; i < N; i++) {
-        AB[i] = ((A[i] * (B[i] >> exp_diff)) >> shifts) | (signAB[i] << (msb+1));
-    }
-
-    AB.exponent = A.exponent + B.exponent + shifts;
-
-    return AB;
-}
-
-template <typename T,size_t N>
-BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-    // Make sure that e_A >= e_B
-    // if(A.exponent < B.exponent) return B*A;
-
-    BFPStatic<T,N> AB;
-    bitset<N> signAB;
-    int msb = numeric_limits<T>::digits;
-    uint64_t max = 0;
-    int exp_diff = A.exponent - B.exponent;
-    for (size_t i = 0; i < N; i++) {
-        // Find result signbit for AB
-        // A[i] >> (sizeof(T) * 8 - 1 is equivalent to signbit(A[i])
-        signAB[i] = (A[i] >> (sizeof(T) * 8 - 1)) ^ (B[i] >> (sizeof(T) * 8 - 1));
 
         uint64_t ABi = abs(A[i]) / (abs(B[i]) >> exp_diff);
         // ABi - ((ABi - max) & ((ABi - max) >> (sizeof(T) * 8 - 1))) is equivalent to std::max(ABi, max)
         max = std::max(ABi, max);
     }
-    int shifts = msb * 2 + 1 - log2_64(max);
 
+    int shifts = log2_64(max) - std::numeric_limits<T>::digits + 1;
     for (size_t i = 0; i < N; i++) {
         AB[i] = ((A[i] / (B[i] >> exp_diff)) >> shifts) | (signAB[i] << (msb+1));
     }
@@ -322,7 +330,11 @@ template <typename T> void check_mul(const T& A, const T& B){
   auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A*B;
   auto ABfloat = A.to_float() * B.to_float();
-  cout << T(ABfloat) << endl;
+  // cout << "JOHN" << endl;
+  // cout << A.to_float() << endl;
+  // cout << B.to_float() << endl;
+  // cout << AB << endl;
+  // cout << T(ABfloat) << endl;
   vector<bool> sA(N), sB(N);
   for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
 
