@@ -94,8 +94,6 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     int msb = 1 << numeric_limits<T>::digits; // should this be larger, e.i more bits?
     int exp_diff = A.exponent - B.exponent;
 
-    // Compute machine-word addition, carry-bit vector, and whether the carry bit was set.
-    // TODO: Needs to be done more carefully for signed values.
     for(size_t i=0;i<N;i++){
         int64_t ABi = A[i] + (B[i]>>exp_diff);
         T       abi = ABi;
@@ -106,10 +104,10 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     AB.exponent = A.exponent + carry;
     if(carry)
         for(size_t i=0;i<N;i++)
-            AB[i] = ((A[i] + (B[i]>>exp_diff)) | carryAB[i] << msb) >> 1; // +s
+            AB[i] = ((A[i] + (B[i]>>exp_diff)) | carryAB[i] << msb) >> 1;
     else
         for(size_t i=0;i<N;i++)
-            AB[i] = A[i] + (B[i]>>exp_diff); // +s
+            AB[i] = A[i] + (B[i]>>exp_diff);
     return AB;
 }
 
@@ -167,11 +165,15 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
 
         if(shifts >= 0)
-            for(size_t i = 0; i < N; i++)
-                AB[i] = ((A[i] << exp_diff) / (B[i] << shifts));
+            for(size_t i = 0; i < N; i++){
+                int64_t ABi = ((A[i] << exp_diff) / (B[i] << shifts));
+                AB[i] = ABi - signbit(ABi);
+            }
         else
-            for(size_t i = 0; i < N; i++)
-                AB[i] = ((A[i] << exp_diff) << abs(shifts)) / B[i];
+            for(size_t i = 0; i < N; i++){
+                int64_t ABi = ((A[i] << exp_diff) << abs(shifts)) / B[i];
+                AB[i] = ABi - signbit(ABi);
+            }
 
     }else{
         int exp_diff = B.exponent - A.exponent;
@@ -182,7 +184,8 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
         shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
         for(size_t i = 0; i < N; i++){
-            AB[i] = (A[i] << abs(shifts)) / (B[i] << exp_diff);
+            int64_t ABi = (A[i] << abs(shifts)) / (B[i] << exp_diff);
+            AB[i] = ABi - signbit(ABi);
         }
 
     }
