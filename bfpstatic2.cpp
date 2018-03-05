@@ -129,16 +129,6 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         return nB + A;
 }
 
-
-// exponent=std::numeric_limits<T>::min();
-// for(int i=0;i<N;i++){
-//     int e_V  = ceil(log2(fabs(V[i])));
-//     exponent = std::max(exponent,e_V);
-// }
-// exponent -= std::numeric_limits<T>::digits;
-
-// double power = pow(2.0,-exponent);
-
 template <typename T,size_t N>
 BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     // Make sure that e_A >= e_B
@@ -148,17 +138,12 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     uint64_t exp = 0;
     int exp_diff = A.exponent - B.exponent;
     for (size_t i = 0; i < N; i++) {
-        uint64_t ABi = uint64_t(std::abs(A[i]) << exp_diff) * std::abs(B[i]);
+        uint64_t ABi = uint64_t(std::abs(A[i]) << exp_diff) * std::abs(B[i]); // can we avoid taking abs two times?
         exp = max(exp, ABi);
     }
     // could check that shifts is not 0    
     int shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
-
-    cout << ceil(log2(exp)) << endl;
-    cout << numeric_limits<T>::digits << endl;
-    cout << exp << endl;
     cout << shifts << endl;
-
     for (size_t i = 0; i < N; i++){
         AB[i] = (uint64_t(A[i] << exp_diff) * B[i]) >> shifts;
     }
@@ -170,29 +155,42 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 template <typename T,size_t N>
 BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     // Make sure that e_A >= e_B
-    if(A.exponent < B.exponent) return B/A;
-
     BFPStatic<T,N> AB;
-    bitset<N> signAB;
-    int msb = numeric_limits<T>::digits;
-    uint64_t max = 0;
-    int exp_diff = A.exponent - B.exponent;
-    for (size_t i = 0; i < N; i++) {
-        // Find result signbit for AB
-        signAB[i] = (A[i] >> signbit(A[i])) ^ (B[i] >> signbit(B[i]));
+    int shifts = 0;
+    if(A.exponent >= B.exponent){
+        float exp = 0;
 
-        uint64_t ABi = abs(A[i]) / (abs(B[i]) >> exp_diff);
-        // ABi - ((ABi - max) & ((ABi - max) >> (sizeof(T) * 8 - 1))) is equivalent to std::max(ABi, max)
-        max = std::max(ABi, max);
+        int exp_diff = A.exponent - B.exponent;
+        for (size_t i = 0; i < N; i++) {
+            auto ABi = float(std::abs(A[i]) << exp_diff) / std::abs(B[i]);
+            exp = max(exp, ABi);
+        }
+        shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
+        cout << "1" << endl;
+        cout << shifts << endl;
+        if(shifts >= 0)
+            for(size_t i = 0; i < N; i++)
+                AB[i] = ((A[i] << exp_diff) / (B[i] << shifts));
+        else
+            for(size_t i = 0; i < N; i++)
+                AB[i] = ((A[i] << exp_diff) << abs(shifts)) / B[i];
+
+    }else{
+        float exp = 0;
+        int exp_diff = B.exponent - A.exponent;
+        for(size_t i = 0; i < N; i++) {
+            auto ABi = float(std::abs(A[i])) / (std::abs(B[i]) << exp_diff);
+            exp = max(exp, ABi);
+        }
+
+        shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
+        cout << "2" << endl;
+        cout << shifts << endl;
+
+        for(size_t i = 0; i < N; i++)
+            AB[i] = (A[i] << abs(shifts)) / (B[i] << exp_diff);
     }
-
-    int shifts = log2_64(max) - std::numeric_limits<T>::digits + 1;
-    for (size_t i = 0; i < N; i++) {
-        AB[i] = ((A[i] / (B[i] >> exp_diff)) >> shifts) | (signAB[i] << (msb+1));
-    }
-
-    AB.exponent = A.exponent - B.exponent + shifts;
-
+    AB.exponent = shifts;
     return AB;
 }
 
@@ -330,11 +328,7 @@ template <typename T> void check_mul(const T& A, const T& B){
   auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A*B;
   auto ABfloat = A.to_float() * B.to_float();
-  // cout << "JOHN" << endl;
-  // cout << A.to_float() << endl;
-  // cout << B.to_float() << endl;
-  // cout << AB << endl;
-  // cout << T(ABfloat) << endl;
+
   vector<bool> sA(N), sB(N);
   for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
 
@@ -372,7 +366,7 @@ template <typename T> void check_div(const T& A, const T& B){
        << A.to_float() << " /\n"  << B.to_float() << "\n\n";
 
   auto Afloat = A.to_float(), Bfloat = B.to_float();
-  auto AB = A/B;
+  auto AB = A / B;
   auto ABfloat = A.to_float() / B.to_float();
 
   vector<bool> sA(N), sB(N);
