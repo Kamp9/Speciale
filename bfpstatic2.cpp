@@ -141,9 +141,8 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         uint64_t ABi = uint64_t(std::abs(A[i]) << exp_diff) * std::abs(B[i]); // can we avoid taking abs two times?
         exp = max(exp, ABi);
     }
-    // could check that shifts is not 0    
+    // could check that shifts is not 0
     int shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
-    cout << shifts << endl;
     for (size_t i = 0; i < N; i++){
         AB[i] = (uint64_t(A[i] << exp_diff) * B[i]) >> shifts;
     }
@@ -157,17 +156,16 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     // Make sure that e_A >= e_B
     BFPStatic<T,N> AB;
     int shifts = 0;
+    double exp = 0;
     if(A.exponent >= B.exponent){
-        float exp = 0;
 
         int exp_diff = A.exponent - B.exponent;
         for (size_t i = 0; i < N; i++) {
-            auto ABi = float(std::abs(A[i]) << exp_diff) / std::abs(B[i]);
+            double ABi = double(std::abs(A[i]) << exp_diff) / std::abs(B[i]);
             exp = max(exp, ABi);
         }
         shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
-        cout << "1" << endl;
-        cout << shifts << endl;
+
         if(shifts >= 0)
             for(size_t i = 0; i < N; i++)
                 AB[i] = ((A[i] << exp_diff) / (B[i] << shifts));
@@ -176,19 +174,17 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
                 AB[i] = ((A[i] << exp_diff) << abs(shifts)) / B[i];
 
     }else{
-        float exp = 0;
         int exp_diff = B.exponent - A.exponent;
         for(size_t i = 0; i < N; i++) {
-            auto ABi = float(std::abs(A[i])) / (std::abs(B[i]) << exp_diff);
+            double ABi = double(std::abs(A[i])) / (std::abs(B[i]) << exp_diff);
             exp = max(exp, ABi);
         }
 
         shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
-        cout << "2" << endl;
-        cout << shifts << endl;
-
-        for(size_t i = 0; i < N; i++)
+        for(size_t i = 0; i < N; i++){
             AB[i] = (A[i] << abs(shifts)) / (B[i] << exp_diff);
+        }
+
     }
     AB.exponent = shifts;
     return AB;

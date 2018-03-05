@@ -45,26 +45,13 @@ int main(){
     auto A = gen_bfp_no_0<int8_t, 5>(rng);
     auto B = gen_bfp_no_0<int8_t, 5>(rng);
 
+    // BFPStatic<int8_t, 5> C{{30638,26684,-12140,27759,16812},-10};
+    // BFPStatic<int8_t, 5> D{{20393,-9791,-7414,-20592,30398},9};
+
     // BFPStatic<int8_t, 5> C{{65,-47,-45,27,-69},-6};
     // BFPStatic<int8_t, 5> D{{-88,38,112,4,84},1};
-    // cout << D.to_float() << endl;
-    // BFPStatic<int16_t, 1> E{{-31179},1};
-    // BFPStatic<int16_t, 1> F{{30007},8};
 
-    // vector<double> v{-203161600};
-    // BFPStatic<int8_t, 1> V = BFPStatic<int8_t, 1>(v);
-    // cout << V << endl;
-    // auto CD = C+D;
-    // auto Q = BFPStatic<int8_t, 3>(C.to_float());
-    // cout << Q << endl;
-    // check_add(A,A);
     check_div(A,B);
-
-    // + 0 5 5 6 6 6 7 7
-    // - 0 1 2 2 3 4 5 5 5
-    // check<plus>(A,B);
-    // check_add(Afp,Afp);
-    // check_multi(A,B);
 
     return 0;
 }
