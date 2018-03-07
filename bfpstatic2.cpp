@@ -38,7 +38,7 @@ struct BFPStatic: public std::array<T,N>{
 
         exponent = std::numeric_limits<T>::min();
         for(int i = 0; i < N ;i++){
-            int e_V  = ceil(log2(fabs(V[i])));
+            int e_V  = floor(log2(fabs(V[i])))+1; // TODO: Tjek.
             exponent = std::max(exponent,e_V);
         }
         exponent -= std::numeric_limits<T>::digits;
