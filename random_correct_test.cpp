@@ -56,10 +56,11 @@ int main(){
     // BFPStatic<int8_t, 5> C{{65,-47,-45,27,-69},-6};
     // BFPStatic<int8_t, 5> D{{-88,38,112,4,84},1};
 
-    // BFPStatic<int8_t, 5> C{{-32,-119,126,-94,-124},-7};
-    // BFPStatic<int8_t, 5> D{{32,51,28,-56,59},-1};
-    BFPStatic<int8_t, 5> C{{-59,-59,102,-76,-34},-7};
-    BFPStatic<int8_t, 5> D{{71,3,-45,103,-5},-8};
+    BFPStatic<int8_t, 5> C{{-32,-119,126,-94,-124},-7};
+    BFPStatic<int8_t, 5> D{{32,51,28,-56,59},-1};
+
+    BFPStatic<int8_t, 5> Cpos{{32,119,126,94,124},-7};
+    BFPStatic<int8_t, 5> Dpos{{32,51,28,56,59},-1};
 
     // BFPStatic<int8_t,10> A{{-81, 18, 119, 27, 82, 74, 81, 1, 108, 85},-1};
     // BFPStatic<int8_t,10> B{{-39, -79, 98, -104, 4, 6, 57, 23, 75, 88},-2};
@@ -68,7 +69,7 @@ int main(){
     // check_add(Afp,Afp);
     //    check_add(A,B);
   
-    check_add(A,B);
+    check_add(Cpos,Dpos);
     // check_sub(A,B);
     //    check_mul(A,B);
     // check_div(A,B);
