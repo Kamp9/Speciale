@@ -19,8 +19,8 @@ void print_bit_rep(double doubleValue){
 	}
 }
 
-// Langsom O(n)-version af floor(log2(x)) for heltal
-template <typename T> int msb(T value)
+// Langsom O(n)-version af floor(log2(x)) for heltal: mest betydende satte bit
+template <typename T> int floor_log2(T value)
 {
   int i=0;
   while(value > 0){
