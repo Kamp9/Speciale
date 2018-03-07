@@ -11,7 +11,8 @@ using namespace std;
 template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
     array<T,N> elems;
-    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(0, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         elems[i] = rand_elem(rng);
     }
@@ -24,7 +25,8 @@ BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
 template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp_no_0(boost::random::mt19937 &rng) {
     array<T,N> elems;
-    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(0, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         auto re = rand_elem(rng);
         while(re == 0)
@@ -64,11 +66,11 @@ int main(){
     // cout << (-40.5 + -9.75) << endl;
     // check_add(A,A);
     // check_add(Afp,Afp);
-    check_add(A,B);
+    //    check_add(A,B);
   
-    // check_add(A,B);
+    check_add(A,B);
     // check_sub(A,B);
-    // check_mul(A,B);
+    //    check_mul(A,B);
     // check_div(A,B);
 
     return 0;

@@ -12,7 +12,7 @@
 #include <functional>
 #include <typeinfo>
 
-#include "bfplib.cpp"
+#include "bfplib.hh"
 
 using namespace std;
 
@@ -115,20 +115,19 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
 template <typename T,size_t N>
 BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-    // Make sure that e_A >= e_B
-    if(A.exponent < B.exponent) return B*A;
+    BFPStatic<T,N>  AB;
+    typedef int64_t Tx2;
+    Tx2 max_value = 0;
 
-    BFPStatic<T,N> AB;
-    __int128_t exp = 0;
-    int exp_diff = A.exponent - B.exponent;
     for (size_t i = 0; i < N; i++) {
-        __int128_t ABi = __int128_t(std::abs(A[i])) * std::abs(B[i]); // can we avoid taking abs two times?
-        exp = max(exp, ABi);
+      Tx2 ABi = Tx2(A[i]) * B[i];
+      max_value = max(max_value, std::abs(ABi));
     }
+
     // could check that shifts is not 0
-    int shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
+    int shifts = msb(max_value) - numeric_limits<T>::digits;
     for (size_t i = 0; i < N; i++){
-        AB[i] = (__int128_t(A[i]) * B[i]) >> shifts;
+        AB[i] = (Tx2(A[i]) * B[i]) >> shifts;
     }
     AB.exponent = A.exponent + B.exponent + shifts;
 
@@ -148,7 +147,7 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
             exp = max(exp, ABi);
         }
 
-        shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
+        shifts = msb(exp) - numeric_limits<T>::digits;
         for(size_t i = 0; i < N; i++){
             __int128_t ABi = ((__int128_t(A[i]) << (numeric_limits<T>::digits + 1)) / B[i]) >> shifts;
             AB[i] = ABi;
@@ -159,7 +158,7 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
             __int128_t ABi = (__int128_t(abs(A[i])) << (numeric_limits<T>::digits +1)) / abs(B[i]);
             exp = max(exp, ABi);
         }
-        shifts = ceil(log2(exp)) - numeric_limits<T>::digits;
+        shifts = msb(exp) - numeric_limits<T>::digits;
         for(size_t i = 0; i < N; i++){
             __int128_t ABi = ((__int128_t(A[i]) << (numeric_limits<T>::digits + 1)) / B[i]) >> shifts;
             AB[i] = ABi;
