@@ -71,28 +71,28 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     bitset<N> carryAB;
     bitset<N> sAB;
     bool carry = false;
-    int msb = numeric_limits<T>::digits;
+    int msb = numeric_limits<T>::digits - 1;
     int exp_diff = A.exponent - B.exponent;
 
     for(size_t i=0;i<N;i++){
         int64_t ABi = A[i] + (B[i] >> exp_diff);
         T       abi = ABi;
         carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+        sAB[i]      = signbit(ABi);
         carry      |= carryAB[i];
-        sAB[i]      = signbit(AB[i]);
     }
     AB.exponent = A.exponent + carry;
-    if(carry)   
+    if(carry)
         for(size_t i=0;i<N;i++){
-            int64_t ABi = ((carryAB[i] << msb) + ((A[i] + (B[i] >> exp_diff))));
-            AB[i] = ABi >> 1;
+            int64_t ABi = ((A[i] + (B[i] >> exp_diff)));
+            // cout << "carry" << endl;
+            // cout << (carryAB[i] << msb) << endl;
+            AB[i] = (T(ABi) >> 1) + (carryAB[i] << msb) * pow(-1.0, sAB[i]) + ((B[i] >> (exp_diff - 1)) & 1) ; // + (carryAB[i] << msb) * pow(-1.0, sAB[i]); //+ ((B[i] >> (exp_diff - 1)) & 1);
         }
     else
         for(size_t i=0;i<N;i++){
-            // cout << "2" << endl;
-            int64_t ABi = A[i] + (B[i] >> exp_diff) + ((B[i] >> (exp_diff - 1)) & 1);
-            cout << (A[i] + (B[i] >> exp_diff) + ((B[i] >> (exp_diff - 1)) & 1)) << endl;
-            AB[i] = ABi;
+            int64_t ABi = A[i] + (B[i] >> exp_diff);
+            AB[i] = T(ABi) + ((B[i] >> (exp_diff - 1)) & 1);
         }
     return AB;
 }
