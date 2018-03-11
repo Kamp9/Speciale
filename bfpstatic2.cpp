@@ -46,7 +46,16 @@ struct BFPStatic: public std::array<T,N>{
         for(int i=0;i<N;i++){
             assert(round(V[i]*power) >= std::numeric_limits<T>::min());
             assert(round(V[i]*power) <= std::numeric_limits<T>::max());
-            A[i] = round(V[i]*power);
+            double intpart;
+            double fractpart = modf(V[i]*power, &intpart);
+            // Would really like to take care of this in the operators instead
+            // But on the other hand, we would need to make calculations to avoid it
+            if(fractpart == -0.5){
+                A[i] = round(V[i]*power) + 1;
+            }
+            else {
+                A[i] = round(V[i]*power);
+            }
         }
     }
 
@@ -86,16 +95,15 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     AB.exponent = A.exponent + carry;
     if(carry)
         for(size_t i=0;i<N;i++){
-            int64_t ABi = ((A[i] + (B[i] >> exp_diff)));
-            // cout << "carry" << endl;
-            // cout << (carryAB[i] << msb) << endl;
-            AB[i] = (ABi >> 1); // + (carryAB[i] << msb) * pow(-1.0, sAB[i]); //+ ((B[i] >> (exp_diff - 1)) & 1);
+            bool rounding = ((A[i] + (B[i] >> exp_diff)) >> 1) & 1;
+            AB[i] = ((A[i] + (B[i] >> exp_diff)) >> 1);
         }
-    else
+    else{
         for(size_t i=0;i<N;i++){
-            int64_t ABi = A[i] + (B[i] >> exp_diff);
-            AB[i] = T(ABi);
+            bool rounding = (A[i] + (B[i] >> exp_diff)) & 1;
+            AB[i] = (A[i] + (B[i] >> exp_diff));
         }
+    }
     return AB;
 }
 
@@ -191,6 +199,8 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         return nB + A;
 }
 
+// Bug when we try to round -x.5,
+// This gives us the -x+1 instead of -x.
 template <typename T,size_t N>
 BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N>  AB;
@@ -203,8 +213,19 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
     // could check that shifts is not 0
     int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+    T mask = -1 << (shifts-1);
+
+    cout << shifts << endl;
     for (size_t i = 0; i < N; i++){
-        AB[i] = (Tx2(A[i]) * B[i]) >> shifts;
+        Tx2 res = Tx2(A[i]) * B[i];
+        bool rounding = ((res >> (shifts - 1)) & 1); // is there a very low edge case where this does not work?
+        // bool half_edge = signbit(res) & ((res & ((1 << (shifts+1) - 1))) == 0) ;
+        T ABi = (res >> shifts) + rounding;
+        // cout << res <<endl;
+        // cout << ((-1 << shifts) & res)  << endl;
+        // cout << int(mask) << endl;
+        // cout << (((res ^ mask) & mask) > 0) << endl;
+        AB[i] = ABi;
     }
     AB.exponent = A.exponent + B.exponent + shifts;
 
