@@ -43,9 +43,8 @@ BFPStatic<T,N> gen_bfp_no_0(boost::random::mt19937 &rng) {
 int main(){
     boost::random::mt19937 rng;
     rng.seed(time(NULL));
-    cout << round(-0.5) << endl;
-    auto A = gen_bfp_no_0<int16_t, 1000>(rng);
-    auto B = gen_bfp_no_0<int16_t, 1000>(rng);
+    auto A = gen_bfp_no_0<int8_t, 10>(rng);
+    auto B = gen_bfp_no_0<int8_t, 10>(rng);
 
     // BFPStatic<int8_t, 5> C{{32,-56,126,120,-111},0};
     // BFPStatic<int8_t, 5> D{{-83,71,47,98,-72},0};
@@ -55,6 +54,15 @@ int main(){
     // error in BFP ?
     // {{-42,-121,-118,-24,105},7} *
     // {{-11,-25,67,5,78},1} =  
+
+    // {{14,-33,-3,46,-49},-4} -
+    // {{-109,102,-128,-125,-112},2} = 
+
+    BFPStatic<int8_t, 1000> E{{-67,14,-36,-22,-47},-8};
+    BFPStatic<int8_t, 1000> F{{46,125,-17,-72,-102},5};
+
+    BFPStatic<int8_t, 1> G{{1}, 1};
+    BFPStatic<int8_t, 1> H{{3}, 1};
 
     // BFPStatic<int8_t, 5> C{{30638,26684,-12140,27759,16812},-10};
     // BFPStatic<int8_t, 5> D{{20393,-9791,-7414,-20592,30398},9};
@@ -77,7 +85,7 @@ int main(){
     // cout << (-40.5 + -9.75) << endl; 
     // check_add(A,A);
     // check_add(Afp,Afp);
-    check_mul(A,B);
+    check_sub(A,B);
     //    check_add(A,B);
 
   
