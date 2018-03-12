@@ -93,12 +93,8 @@ int main(){
     // cout << (-40.5 + -9.75) << endl; 
     // check_add(A,A);
     // check_add(Afp,Afp);
-<<<<<<< HEAD
     check_add(A,B);
-=======
     //check_sub(A,B);
->>>>>>> 598f35805b7b9a77be47421f6a34c3f9fa4fb037
-    //    check_add(A,B);
 
   
     // check_add(Cpos,Dpos);
