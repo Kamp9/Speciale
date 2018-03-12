@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
+#include <sys/time.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
@@ -26,7 +27,7 @@ template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp_no_0(boost::random::mt19937 &rng) {
     array<T,N> elems;
     //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
-    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         auto re = rand_elem(rng);
         while(re == 0)
@@ -40,9 +41,12 @@ BFPStatic<T,N> gen_bfp_no_0(boost::random::mt19937 &rng) {
 }
 
 
+
 int main(){
     boost::random::mt19937 rng;
-    rng.seed(time(NULL));
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    rng.seed(tv.tv_usec);
     auto A = gen_bfp_no_0<int8_t, 10>(rng);
     auto B = gen_bfp_no_0<int8_t, 10>(rng);
 
@@ -85,14 +89,14 @@ int main(){
     // cout << (-40.5 + -9.75) << endl; 
     // check_add(A,A);
     // check_add(Afp,Afp);
-    check_sub(A,B);
+    //check_sub(A,B);
     //    check_add(A,B);
 
   
     // check_add(Cpos,Dpos);
     // check_sub(A,B);
     //    check_mul(A,B);
-    // check_div(A,B);
+    check_div(A,B);
 
     return 0;
 }
