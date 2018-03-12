@@ -21,6 +21,11 @@ template <typename T> ostream &operator<<(ostream &s, const vector<T> &xs){
     return s;
 }
 
+template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
+  for(int i=0;i<bits.size();i++) s << bits[i];
+  return s;
+}
+
 // TODO: Derive double-length type automatically or pass as template parameter.
 typedef int64_t Tx2;
 
@@ -52,6 +57,7 @@ struct BFPStatic: public std::array<T,N>{
             // But on the other hand, we would need to make calculations to avoid it
             // cout << V[i]*power << endl;
             if(fractpart == -0.5){
+	      //cout << "fracpart == -0.5 for i="<<i<<"\n";
                 A[i] = round(V[i]*power) + 1;
             }
             else {
@@ -93,6 +99,10 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         sAB[i]      = signbit(ABi);
         carry      |= carryAB[i];
     }
+
+    cout << "carryAB = " << carryAB << "\n"
+	 << "signAB  = " << sAB << "\n\n";
+    
     AB.exponent = A.exponent + carry;
     if(carry){
         for(size_t i=0;i<N;i++){
@@ -196,13 +206,10 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 template <typename T,size_t N>
 BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> nB;
-    for (size_t i = 0; i < N; i++){ nB[i] = -1 * B[i]; }
+    for (size_t i = 0; i < N; i++){ nB[i] = -B[i]; }
     nB.exponent = B.exponent;
 
-    if(A.exponent < B.exponent)
-        return A + nB;
-    else
-        return nB + A;
+    return A + nB;
 }
 
 
@@ -442,12 +449,14 @@ template <typename T> void check_add(const T& A, const T& B){
        << AB.to_float() << "\n"
        << ABfloat << " exact,\n"
        << T(ABfloat).to_float() << " wanted.\n\n";
-    
+
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+  
+  
   cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
-  // cout << "Error compared to exact:\n"
-  //      <<  (AB.to_float() - ABfloat) << "\n"
-  //      << "Error compared to rounded exact:\n"
-  //      << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
   // cout << "signs:\n"
   //      << sA << "\n"
@@ -482,12 +491,14 @@ template <typename T> void check_sub(const T& A, const T& B){
        << AB.to_float() << "\n"
        << ABfloat << " exact,\n"
        << T(ABfloat).to_float() << " wanted.\n\n";
-    
+
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+  
+  
   cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
-  // cout << "Error compared to exact:\n"
-  //      <<  (AB.to_float() - ABfloat) << "\n"
-  //      << "Error compared to rounded exact:\n"
-  //      << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
   // cout << "signs:\n"
   //      << sA << "\n"
