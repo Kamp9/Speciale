@@ -55,14 +55,13 @@ struct BFPStatic: public std::array<T,N>{
             double fractpart = modf(V[i]*power, &intpart);
             // Would really like to take care of this in the operators instead
             // But on the other hand, we would need to make calculations to avoid it
-            // cout << V[i]*power << endl;
+
             if(fractpart == -0.5){
-	      //cout << "fracpart == -0.5 for i="<<i<<"\n";
+                cout << "rounding is happening!" << endl;
                 A[i] = round(V[i]*power) + 1;
             }
-            else {
+            else
                 A[i] = round(V[i]*power);
-            }
         }
     }
 
@@ -100,9 +99,6 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         carry      |= carryAB[i];
     }
 
-    cout << "carryAB = " << carryAB << "\n"
-	 << "signAB  = " << sAB << "\n\n";
-    
     AB.exponent = A.exponent + carry;
     if(carry){
         for(size_t i=0;i<N;i++){
@@ -112,7 +108,6 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         }
     }
     else{
-        cout << exp_diff << endl;
         for(size_t i=0;i<N;i++){
             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
             // does not work when exp_diff = 0
@@ -123,86 +118,7 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     return AB;
 }
 
-//   BFPStatic<T,N>  AB;
-//   bitset<N>  carryAB;
-//   int msbAB[N];
-//   bool carry = false;
-//   int msb        = numeric_limits<T>::digits - 1;
-//   int carry_mask = (1<<(msb+1));
 
-//   // Make sure that e_A >= e_B
-//   if(A.exponent < B.exponent) return B+A;
-//   int exp_diff = A.exponent - B.exponent;
-
-//   // Compute machine-word addition, carry-bit vector, and whether the carry bit was set.
-//   // TODO: Needs to be done more carefully for signed values.
-//   for(size_t i=0;i<N;i++){
-//     int64_t ABi = A[i] + (B[i]>>exp_diff);
-//     T       abi = ABi;
-
-//     // TODO: Sort out msbAB vs carryAB
-//     msbAB[i]   = (ABi & carry_mask)>>1;
-//     carryAB[i] = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-//     carry     |= carryAB[i];
-//   }
-
-//   //  cerr << "msbAB:\n" << vector<int>(msbAB,msbAB+N) << "\n";
-  
-//   AB.exponent = A.exponent + carry;
-
-//   if(carry)
-//     for(size_t i=0;i<N;i++){
-//       int64_t ABi = A[i] + (B[i]>>exp_diff);
-//       AB[i]       = (ABi>>1) | msbAB[i]; // +s
-//     }
-//   else
-//     for(size_t i=0;i<N;i++)
-//       AB[i] = A[i] + (B[i]>>exp_diff); // +s
-
-//   return AB;
-// >>>>>>> 6a17b8157a1868ca883f8a55d26ba911f332be2b
-// }
-
-// // BFPStatic operators +, -, *, and /
-// template <typename T,size_t N>
-// BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-//     // Make sure that e_A >= e_B
-//     if(A.exponent < B.exponent) return B+A;
-
-//     BFPStatic<T,N> AB;
-//     bitset<N> carryAB;
-//     bitset<N> sAB;
-//     bool carry = false;
-//     int msb = numeric_limits<T>::digits;
-//     int exp_diff = A.exponent - B.exponent;
-
-//     for(size_t i=0;i<N;i++){
-//         Tx2 ABi = A[i] + (B[i] >> exp_diff);
-//         T   abi = ABi;
-//         carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-//         carry      |= carryAB[i];
-//         sAB[i]      = signbit(AB[i]);
-//     }
-//     AB.exponent = A.exponent + carry;
-//     if(carry)   
-//         for(size_t i=0;i<N;i++){
-//             Tx2 ABi = ((carryAB[i] << msb) + ((A[i] + (B[i] >> exp_diff))));
-//             AB[i] = ABi >> 1;
-//         }
-//     else
-//         for(size_t i=0;i<N;i++){
-//             // cout << "2" << endl;
-//             Tx2 ABi = A[i] + (B[i] >> exp_diff) + ((B[i] >> (exp_diff - 1)) & 1);
-//             cout << (A[i] + (B[i] >> exp_diff) + ((B[i] >> (exp_diff - 1)) & 1)) << endl;
-//             AB[i] = ABi;
-//         }
-//     return AB;
-// }
-
-
-
-// Should this be implemented like operator+ instead of using it, in order to save a loop over N?
-// Should this be inplace instead? Cannot since BFPStatic is read only
 template <typename T,size_t N>
 BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> nB;
@@ -211,79 +127,6 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
     return A + nB;
 }
-
-
-// template <typename T,size_t N>
-// BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-//     // Make sure that e_A >= e_B
-//     // if(A.exponent < B.exponent) return B+A;
-
-//     BFPStatic<T,N> AB;
-//     bitset<N> carryAB;
-//     bitset<N> sAB;
-//     bool carry = false;
-//     int msb = numeric_limits<T>::digits - 1;
-
-//     int exp_diff = A.exponent - B.exponent;
-//     cout << "exp_diff " << exp_diff << endl;
-//     if(exp_diff > 0){
-//         for(size_t i=0;i<N;i++){
-//             Tx2     ABi = Tx2(A[i]) - (B[i] >> exp_diff);
-//             T       abi = ABi;
-//             carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-//             sAB[i]      = signbit(ABi);
-//             carry      |= carryAB[i];
-//         }
-//         AB.exponent = A.exponent + carry;
-//         if(carry){
-//             cout << "case 11" << endl;
-//             for(size_t i=0;i<N;i++){
-//                 Tx2 ABi = Tx2(A[i]) - (B[i] >> exp_diff);
-//                 bool rounding = ABi & 1;
-//                 AB[i] = (ABi >> 1) - rounding;
-//             }
-//         }
-//         else{
-//             cout << "case 12" << endl;
-//             for(size_t i=0;i<N;i++){
-//                 Tx2 ABi = Tx2(A[i]) - (B[i] >> exp_diff);
-//                 // does not work when exp_diff = 0
-//                 bool rounding = (B[i] >> (exp_diff - 1)) & 1;
-//                 AB[i] = ABi - rounding;
-//             }
-//         }
-//     }else{
-//         exp_diff = B.exponent - A.exponent;
-//         for(size_t i=0;i<N;i++){
-//             Tx2     ABi = (A[i] >> exp_diff) - Tx2(B[i]);
-//             T       abi = ABi;
-//             carryAB[i]  = (signbit(B[i]) ^ signbit(abi)) & (signbit(A[i]) ^ signbit(abi));
-//             sAB[i]      = signbit(ABi);
-//             carry      |= carryAB[i];
-//         }
-//         AB.exponent = B.exponent + carry;
-//         if(carry){
-//             cout << "case 21" << endl;
-//             for(size_t i=0;i<N;i++){
-//                 Tx2 ABi = (A[i] >> exp_diff) - Tx2(B[i]);
-//                 bool rounding = ABi & 1;
-//                 AB[i] = (ABi >> 1) - rounding;
-//             }
-//         }
-//         else{
-//             cout << "case 22" << endl;
-//             for(size_t i=0;i<N;i++){
-//                 Tx2 ABi = (A[i] >> exp_diff) - Tx2(B[i]);
-//                 // does not work when exp_diff = 0
-//                 bool rounding = (A[i] >> (exp_diff - 1)) & 1;
-//                 AB[i] = ABi - rounding;
-//             }
-//         }
-//     }
-
-//     return AB;
-// }
-
 
 
 // Bug when we try to round -x.5,
@@ -318,63 +161,24 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     Tx2 max_value = 0;
 
     for (size_t i = 0; i < N; i++) {
-        Tx2 ABi = (Tx2(A[i]) << numeric_limits<T>::digits) / B[i];
+        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         max_value = max(max_value, std::abs(ABi));
     }
     int shifts = floor_log2(max_value) - (numeric_limits<T>::digits);
     cout << shifts << endl;
     for (size_t i = 0; i < N; i++){
-        Tx2 ABi = (Tx2(A[i]) << numeric_limits<T>::digits) / B[i];
+        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+        bool rounding = ((ABi >> (shifts - 1)) & 1);
+        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
 
-        bool rounding = (ABi >> (shifts - 1)) & 1;
-
-        cout << (B[i] & 1) << endl;
-
-        AB[i] = (ABi >> shifts) + rounding;
-
-        // AB[i] = (ABi >> shifts) + rounding * signbit(); //* pow(-1.0, rounding);
+        AB[i] = (ABi >> shifts) + rounding - rounding2;
     }
-    AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits;
+
+    AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
 
     return AB;
 }
 
-
-
-
-
-// template <typename T,size_t N>
-// BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-//     BFPStatic<T,N> AB;
-//     int shifts = 0;
-//     if(A.exponent >= B.exponent){
-
-//         int exp_diff = A.exponent - B.exponent;
-//         for (size_t i = 0; i < N; i++) {
-//             Tx2 ABi = (Tx2(abs(A[i])) << (numeric_limits<T>::digits + 1)) / abs(B[i]);
-//             exp = max(exp, ABi);
-//         }
-
-//         shifts = floor_log2(exp) - numeric_limits<T>::digits;
-//         for(size_t i = 0; i < N; i++){
-//             __int128_t ABi = ((__int128_t(A[i]) << (numeric_limits<T>::digits + 1)) / B[i]) >> shifts;
-//             AB[i] = ABi;
-//         }
-//     }else{
-//         int exp_diff = B.exponent - A.exponent;
-//         for(size_t i = 0; i < N; i++) {
-//             __int128_t ABi = (__int128_t(abs(A[i])) << (numeric_limits<T>::digits +1)) / abs(B[i]);
-//             exp = max(exp, ABi);
-//         }
-//         shifts = floor_log2(exp) - numeric_limits<T>::digits;
-//         for(size_t i = 0; i < N; i++){
-//             __int128_t ABi = ((__int128_t(A[i]) << (numeric_limits<T>::digits + 1)) / B[i]) >> shifts;
-//             AB[i] = ABi;
-//         }
-//     }
-//     AB.exponent = A.exponent - B.exponent + shifts - (numeric_limits<T>::digits + 1);    
-//     return AB;
-// }
 
 
 // Vector operations +, -, *, and /

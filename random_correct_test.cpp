@@ -13,7 +13,7 @@ template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
     array<T,N> elems;
     //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
-    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         elems[i] = rand_elem(rng);
     }
@@ -42,14 +42,43 @@ BFPStatic<T,N> gen_bfp_no_0(boost::random::mt19937 &rng) {
 
 
 
+template <typename T, size_t N>
+BFPStatic<T,N> gen_bfp_pos(boost::random::mt19937 &rng) {
+    array<T,N> elems;
+    //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(1, numeric_limits<T>::max());
+    for(size_t i = 0; i < N; i++){
+        elems[i] = rand_elem(rng);
+    }
+    boost::random::uniform_int_distribution<T> rand_exp(0, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    BFPStatic<T,N> A(elems, 10); //rand_exp(rng)
+    // BFPStatic<T,N> A(elems, 0);
+    return A; //BFPStatic<T,N>(A.to_float());
+}
+
+template <typename T, size_t N>
+BFPStatic<T,N> gen_bfp_neg(boost::random::mt19937 &rng) {
+    array<T,N> elems;
+    //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, -1);
+    for(size_t i = 0; i < N; i++){
+        elems[i] = rand_elem(rng);
+    }
+    boost::random::uniform_int_distribution<T> rand_exp(0, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    BFPStatic<T,N> A(elems, 0); //rand_exp(rng)
+    // BFPStatic<T,N> A(elems, 0);
+    return A; //BFPStatic<T,N>(A.to_float());
+}
+
 int main(){
     boost::random::mt19937 rng;
 
     struct timeval tv;
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
-    auto A = gen_bfp_no_0<int8_t, 10>(rng);
-    auto B = gen_bfp_no_0<int8_t, 10>(rng);
+    auto A = gen_bfp_no_0<int8_t, 50>(rng);
+    auto B = gen_bfp_no_0<int8_t, 50>(rng);
+
 
     // BFPStatic<int8_t, 5> C{{32,-56,126,120,-111},0};
     // BFPStatic<int8_t, 5> D{{-83,71,47,98,-72},0};
@@ -69,8 +98,8 @@ int main(){
     // BFPStatic<int8_t, 1> P{{0}, 0};
     // BFPStatic<int8_t, 1> Q{{0}, 0};
 
-    BFPStatic<int8_t, 1> G{{1}, 1};
-    BFPStatic<int8_t, 1> H{{3}, 1};
+    BFPStatic<int8_t, 5> P{{-67,-89,-98,-42,-62},6};
+    BFPStatic<int8_t, 5> Q{{-22,22,95,46,79},10};
 
     // BFPStatic<int8_t, 5> C{{30638,26684,-12140,27759,16812},-10};
     // BFPStatic<int8_t, 5> D{{20393,-9791,-7414,-20592,30398},9};
@@ -90,21 +119,18 @@ int main(){
 
     // BFPStatic<int8_t,10> A{{-81, 18, 119, 27, 82, 74, 81, 1, 108, 85},-1};
     // BFPStatic<int8_t,10> B{{-39, -79, 98, -104, 4, 6, 57, 23, 75, 88},-2};
-    // cout << (-40.5 + -9.75) << endl; 
+    // cout << (-40.5 + -9.75) << endl;
+
     // check_add(A,A);
     // check_add(Afp,Afp);
-<<<<<<< HEAD
-    check_add(A,B);
-=======
+    check_div(A,B);
     //check_sub(A,B);
->>>>>>> 598f35805b7b9a77be47421f6a34c3f9fa4fb037
     //    check_add(A,B);
 
   
     // check_add(Cpos,Dpos);
     // check_sub(A,B);
     //    check_mul(A,B);
-    check_div(A,B);
 
     return 0;
 }
