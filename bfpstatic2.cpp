@@ -92,14 +92,11 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     int exp_diff = A.exponent - B.exponent;
 
     for(size_t i=0;i<N;i++){
-        Tx2     ABi = A[i] + (B[i] >> exp_diff);
-        T       abi = ABi;
-        carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-        sAB[i]      = signbit(ABi);
-        carry      |= carryAB[i];
+        Tx2 ABi = A[i] + (B[i] >> exp_diff);
+        T   abi = ABi;
+        carry  |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
 
-    AB.exponent = A.exponent + carry;
     if(carry){
         for(size_t i=0;i<N;i++){
             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
@@ -115,6 +112,9 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
             AB[i] = ABi + rounding;
         }
     }
+
+    AB.exponent = A.exponent + carry;
+
     return AB;
 }
 
@@ -164,7 +164,7 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         max_value = max(max_value, std::abs(ABi));
     }
-    int shifts = floor_log2(max_value) - (numeric_limits<T>::digits);
+    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
     cout << shifts << endl;
     for (size_t i = 0; i < N; i++){
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
@@ -177,6 +177,50 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
 
     return AB;
+}
+
+template <typename T, size_t N>
+BFPStatic<T, N> my_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
+    BFPStatic<T,N> Ap;
+    Tx2 max_value = 0;
+    for (size_t i = 0; i < N; i++){
+        Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
+        max_value = max(max_value, Api);
+    }
+    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+
+    for (size_t i = 0; i < N; i++){
+        Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
+        Ap[i] = Api >> shifts;
+    }
+
+    cout << shifts << endl;
+    Ap.exponent = A.exponent + shifts - numeric_limits<T>::digits;
+    return Ap;
+}
+
+
+template <typename T, size_t N >
+BFPStatic<T, N> my_sqrt(const BFPStatic<T, N> &A) {
+    BFPStatic<T,N> sqrtA;
+    for (size_t i=0; i < N; i++){
+        if (A[i] <= 0)
+            return 0;       // if negative number throw an exception?
+        int exp = 0;
+        A[i] = frexp(A[i], &exp); // extract binary exponent from x
+        if (exp & 1) {      // we want exponent to be even
+            exp--;
+            A[i] *= 2;
+        }
+        double y = (1+A[i])/2; // first approximation
+        double z = 0;
+        while (y != z) {    // yes, we CAN compare doubles here!
+            z = y;
+            y = (y + A[i]/y) / 2;
+        }
+        sqrtA[i] = ldexp(y, exp/2); // multiply answer by 2^(exp/2)
+    }
+    return sqrtA;
 }
 
 
@@ -220,6 +264,24 @@ template <typename T> vector<T> operator/(const vector<T> &A, const vector<T> &B
         AB[i] = A[i] / B[i];
 
     return AB;
+}
+
+template <typename T> vector<T> Vpow(const vector<T> &A, const std::vector<T> &p){
+    vector<T> Ap(A.size());
+
+    for(int i=0;i<Ap.size();i++)
+        Ap[i] = pow(A[i], p[0]);
+
+    return Ap;
+}
+
+template <typename T> vector<T> Vsqrt(const vector<T> &A){
+    vector<T> sqrtA(A.size());
+
+    for(int i=0;i<sqrtA.size();i++)
+        sqrtA[i] = sqrt(A[i]);
+
+    return sqrtA;
 }
 
 
@@ -339,10 +401,10 @@ template <typename T> void check_mul(const T& A, const T& B){
        << T(ABfloat).to_float() << " wanted.\n\n";
     
   cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
-  // cout << "Error compared to exact:\n"
-  //      <<  (AB.to_float() - ABfloat) << "\n"
-  //      << "Error compared to rounded exact:\n"
-  //      << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
   // cout << "signs:\n"
   //      << sA << "\n"
@@ -379,12 +441,41 @@ template <typename T> void check_div(const T& A, const T& B){
        << T(ABfloat).to_float() << " wanted.\n\n";
     
   cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
-  // cout << "Error compared to exact:\n"
-  //      <<  (AB.to_float() - ABfloat) << "\n"
-  //      << "Error compared to rounded exact:\n"
-  //      << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+  cout << "Error compared to exact:\n"
+       <<  (AB.to_float() - ABfloat) << "\n"
+       << "Error compared to rounded exact:\n"
+       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
   // cout << "signs:\n"
   //      << sA << "\n"
   //      << sB << "\n\n";
 }
+
+template <typename T> void check_pow(const T& A, const T& p){
+  size_t N = A.size();
+  cout << "******************** Checking power function of: ********************\n"
+       << A << " pow " << p.to_float()[0] << " = \n\n";
+
+  auto Afloat = A.to_float();
+  auto Ap = my_pow(A, p);
+  auto Apfloat = Vpow(A.to_float(), p.to_float());
+
+  cout << "Result of BFP-power:\n"
+       << Ap << "\n"
+       << T(Apfloat) << " wanted.\n\n";
+}
+
+template <typename T> void check_sqrt(const T& A){
+  size_t N = A.size();
+  cout << "******************** Checking power function of: ********************\n"
+       << "sqrt " << A << " = \n\n";
+
+  auto Afloat = A.to_float();
+  auto sqrtA = my_sqrt(A);
+  auto Apfloat = Vsqrt(A.to_float());
+
+  cout << "Result of BFP-power:\n"
+       << sqrtA << "\n"
+       << T(Apfloat) << " wanted.\n\n";
+}
+
