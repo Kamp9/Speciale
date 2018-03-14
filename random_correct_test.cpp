@@ -76,18 +76,23 @@ int main(){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp_pos<int8_t, 1>(rng);
-    BFPStatic<int8_t, 1> p{{2}, 0};
+    auto A = gen_bfp_pos<int8_t, 5>(rng);
+
     // auto B = gen_bfp_no_0<int32_t, 1000>(rng);
 
-    // BFPStatic<int8_t, 100> C{{-99,18,49,-101,-42},-8};
+    // BFPStatic<int8_t, 1> A{{123}, 10};
+    
+    // BFPStatic<int8_t, 1> p{{2}, 0};
+
+
+    BFPStatic<int8_t, 5> C{{1,2,3,4,5},-7};
     // BFPStatic<int8_t, 100> D{{-15,-107,66,-111,-13},-10};
 
     // BFPStatic<int8_t, 5> P{{-67,-89,-98,-42,-62},6};
     // BFPStatic<int8_t, 5> Q{{-22,22,95,46,79},10};
 
     // check_add(A,B);
-    check_pow(A, p);
+    check_sqrt(C);
 
     return 0;
 }

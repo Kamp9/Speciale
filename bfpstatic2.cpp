@@ -165,7 +165,6 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         max_value = max(max_value, std::abs(ABi));
     }
     int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
-    cout << shifts << endl;
     for (size_t i = 0; i < N; i++){
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         bool rounding = ((ABi >> (shifts - 1)) & 1);
@@ -203,22 +202,40 @@ BFPStatic<T, N> my_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
 template <typename T, size_t N >
 BFPStatic<T, N> my_sqrt(const BFPStatic<T, N> &A) {
     BFPStatic<T,N> sqrtA;
+    Tx2 max_value = 0;
+
     for (size_t i=0; i < N; i++){
-        if (A[i] <= 0)
-            return 0;       // if negative number throw an exception?
-        int exp = 0;
-        A[i] = frexp(A[i], &exp); // extract binary exponent from x
-        if (exp & 1) {      // we want exponent to be even
-            exp--;
-            A[i] *= 2;
-        }
-        double y = (1+A[i])/2; // first approximation
-        double z = 0;
-        while (y != z) {    // yes, we CAN compare doubles here!
+        Tx2 sqrtAi = A[i] << (numeric_limits<T>::digits + 1); // << 1
+        Tx2 y = sqrtAi >> 1; // (1 + sqrtAi) / 2;
+        Tx2 z = 0;
+        while (y != z) {
             z = y;
-            y = (y + A[i]/y) / 2;
+            Tx2 y1 = (y + sqrtAi / y);
+            y = (y1 >> 1) + (y1 & 1);
         }
-        sqrtA[i] = ldexp(y, exp/2); // multiply answer by 2^(exp/2)
+        max_value = max(max_value, y) ;
+    }        
+
+    int shifts = floor_log2(max_value) - (numeric_limits<T>::digits);
+    cout << shifts << endl;
+
+    for (size_t i=0; i < N; i++){
+        Tx2 sqrtAi = A[i] << (numeric_limits<T>::digits + 1); // << 1
+        Tx2 y =  sqrtAi >> 1; // (1 + sqrtAi) / 2;
+        Tx2 z = 0;
+        while (y != z) {
+            z = y;
+            Tx2 y1 = (y + sqrtAi / y);
+            y = (y1 >> 1) + (y1 & 1);
+        }
+
+        if (shifts > 0){
+            sqrtA[i] = y >> shifts;
+            sqrtA.exponent = (A.exponent >> 1) - shifts - 2;
+        } else {
+            sqrtA[i] = y << abs(shifts);
+            sqrtA.exponent = (A.exponent >> 1) - shifts - 2;
+        }   
     }
     return sqrtA;
 }
@@ -465,12 +482,13 @@ template <typename T> void check_pow(const T& A, const T& p){
        << T(Apfloat) << " wanted.\n\n";
 }
 
+
 template <typename T> void check_sqrt(const T& A){
   size_t N = A.size();
   cout << "******************** Checking power function of: ********************\n"
        << "sqrt " << A << " = \n\n";
 
-  auto Afloat = A.to_float();
+  // auto Afloat = A.to_float();
   auto sqrtA = my_sqrt(A);
   auto Apfloat = Vsqrt(A.to_float());
 
