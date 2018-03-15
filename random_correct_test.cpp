@@ -78,21 +78,27 @@ int main(){
 
     auto A = gen_bfp_pos<int8_t, 5>(rng);
 
+    // sqrt {{15,27,19,6,62},9}
+
     // auto B = gen_bfp_no_0<int32_t, 1000>(rng);
 
     // BFPStatic<int8_t, 1> A{{123}, 10};
     
-    // BFPStatic<int8_t, 1> p{{2}, 0};
+    BFPStatic<int8_t, 5> p{{1,2,3,4,5}, -10};
 
 
-    BFPStatic<int8_t, 5> C{{1,2,3,4,5},-7};
+    BFPStatic<int8_t, 1> C{{10},1};
     // BFPStatic<int8_t, 100> D{{-15,-107,66,-111,-13},-10};
 
     // BFPStatic<int8_t, 5> P{{-67,-89,-98,-42,-62},6};
     // BFPStatic<int8_t, 5> Q{{-22,22,95,46,79},10};
 
     // check_add(A,B);
-    check_sqrt(C);
+    check_sqrt(A);
+
+    //Good:
+    // {{29,10,79,45,31},5}
+
 
     return 0;
 }
