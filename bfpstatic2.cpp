@@ -28,6 +28,8 @@ template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
 
 // TODO: Derive double-length type automatically or pass as template parameter.
 typedef int64_t Tx2;
+typedef uint64_t uTx2;
+
 
 // BFPStatic definition
 template <typename T, size_t N>
@@ -203,30 +205,33 @@ BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
 template <typename T, size_t N >
 BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     BFPStatic<T,N> sqrtA;
-    Tx2 max_value = 0;
+    uTx2 max_value = 0;
 
     for (size_t i=0; i < N; i++){
-        Tx2 sqrtAi = A[i] << (numeric_limits<T>::digits + 1 + (A.exponent & 1)); // << 1
-        Tx2 y = (sqrtAi >> 1); // (1 + sqrtAi) / 2;
-        Tx2 z = 0;
-        Tx2 y1;
+        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1)); // +1
+        uTx2 y = (sqrtAi >> 1); // (1 + sqrtAi) / 2;
+        uTx2 z = 0;
+        uTx2 y1;
+
         while (y != z) {
-            cout << z << endl;
             z = y;
             y1 = (y + sqrtAi / y); // + (sqrtAi & 1);
             y = (y1 >> 1) + (y1 & 1);
+            cout << y << endl;
         }
+        cout << endl;
         max_value = max(max_value, y - (y1 & 1));
     }
 
     int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+    cout << max_value << endl;
     cout << shifts << endl;
     for (size_t i=0; i < N; i++){
-        Tx2 sqrtAi = A[i] << (numeric_limits<T>::digits + 1 + (A.exponent & 1)); // " "+ 1// << 1
-        Tx2 y = (sqrtAi >> 1); // (1 + sqrtAi) / 2;
-        Tx2 z = 0;
+        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1)); // 1
+        uTx2 y = (sqrtAi >> 1); // (1 + sqrtAi) / 2;
+        uTx2 z = 0;
         // cout << sqrtAi << endl;
-        Tx2 y1;
+        uTx2 y1;
         while (y != z) {
             z = y;
             // cout << y + float(sqrtAi) / y << endl;
@@ -234,13 +239,16 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
             y = (y1 >> 1) + (y1 & 1);
         }
         y -= (y1 & 1);
+
+        // cout << endl;
         // Vi skal have if(shifts) branches udenom for løkken i stedet
         // bool rounding2 = sqrtAi // ((sqrtAi & ((1 << shifts) -1)) == (1 << (shifts - 1)));
-        if (shifts > 0){
-            sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
-        } else {
-            sqrtA[i] = y << abs(shifts);
-        }
+
+        // if (shifts > 0){
+        sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
+        // } else {
+        //     sqrtA[i] = y << abs(shifts);
+        // }
         sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
     }
