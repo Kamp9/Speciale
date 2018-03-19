@@ -197,6 +197,7 @@ BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
 
     cout << shifts << endl;
     Ap.exponent = A.exponent + shifts - numeric_limits<T>::digits;
+    // Ap.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1);
     return Ap;
 }
 
@@ -208,18 +209,16 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     uTx2 max_value = 0;
 
     for (size_t i=0; i < N; i++){
-        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1)); // +1
-        uTx2 y = (sqrtAi >> 1); // (1 + sqrtAi) / 2;
+        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+        uTx2 y = (sqrtAi >> 1);
         uTx2 z = 0;
         uTx2 y1;
 
         while (y != z) {
             z = y;
-            y1 = (y + sqrtAi / y); // + (sqrtAi & 1);
+            y1 = (y + sqrtAi / y);
             y = (y1 >> 1) + (y1 & 1);
-            cout << y << endl;
         }
-        cout << endl;
         max_value = max(max_value, y - (y1 & 1));
     }
 
@@ -227,34 +226,41 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     cout << max_value << endl;
     cout << shifts << endl;
     for (size_t i=0; i < N; i++){
-        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1)); // 1
-        uTx2 y = (sqrtAi >> 1); // (1 + sqrtAi) / 2;
+        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+        uTx2 y = (sqrtAi >> 1);
         uTx2 z = 0;
-        // cout << sqrtAi << endl;
         uTx2 y1;
         while (y != z) {
             z = y;
-            // cout << y + float(sqrtAi) / y << endl;
             y1 = (y + sqrtAi / y);
             y = (y1 >> 1) + (y1 & 1);
         }
         y -= (y1 & 1);
 
-        // cout << endl;
-        // Vi skal have if(shifts) branches udenom for løkken i stedet
-        // bool rounding2 = sqrtAi // ((sqrtAi & ((1 << shifts) -1)) == (1 << (shifts - 1)));
-
-        // if (shifts > 0){
         sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
-        // } else {
-        //     sqrtA[i] = y << abs(shifts);
-        // }
-        sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
     }
+    sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
+
     return sqrtA;
 }
 
+
+// template <typename T, size_t N >
+// BFPStatic<T, N> bfp_exp(const BFPStatic<T, N> &A) {
+//     BFPStatic<T,N> expA;
+//     for (size_t i = 0; i < N; i++){
+//         double sum = 1.0 + A[i];
+//         double term = x;                 // term for k = 1 is just x
+//         for (int k = 2; k < 50; k++){
+//             term = term * x / (double)k; // term[k] = term[k-1] * x / k
+//             sum = sum + term;
+//         }
+//         expA[i] = sum;
+//     }
+//     expA.exponent = 0;
+//     return expA;
+// }
 
 
 // Vector operations +, -, *, and /
@@ -314,6 +320,15 @@ template <typename T> vector<T> Vsqrt(const vector<T> &A){
         sqrtA[i] = sqrt(A[i]);
 
     return sqrtA;
+}
+
+template <typename T> vector<T> Vexp(const vector<T> &A){
+    vector<T> expA(A.size());
+
+    for(int i=0;i<expA.size();i++)
+        expA[i] = exp(A[i]);
+
+    return expA;
 }
 
 
