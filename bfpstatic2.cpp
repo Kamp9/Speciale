@@ -223,8 +223,6 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     }
 
     int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
-    cout << max_value << endl;
-    cout << shifts << endl;
     for (size_t i=0; i < N; i++){
         uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
         uTx2 y = (sqrtAi >> 1);
@@ -239,10 +237,48 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
 
         sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
 
-    }
+        }
     sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
     return sqrtA;
+}
+
+// https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
+template <typename T, size_t N >
+BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A) {
+    BFPStatic<T,N> invsqrtA;
+    Tx2 max_value = 0;
+
+    for (size_t i=0; i < N; i++){
+        Tx2 threehalfs = Tx2(3) << numeric_limits<T>::digits;  //1.5F;
+
+        Tx2 x2 = (Tx2(A[i])) >> 1;
+        Tx2 y  = Tx2(A[i]) << (numeric_limits<T>::digits + 1);
+        // j  = * ( long * ) &y;
+        Tx2 j = (Tx2(0x5f3759df) << (numeric_limits<T>::digits + 1)) - (j >> 1);
+        y = j >> (numeric_limits<T>::digits);
+        y = y * ( threehalfs - ( x2 * y * y ) );
+        y = y * ( threehalfs - ( x2 * y * y ) );
+        max_value = max(max_value, y);
+    }
+
+    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+
+    for (size_t i=0; i < N; i++){
+        Tx2 threehalfs = Tx2(3) << numeric_limits<T>::digits;  //1.5F;
+
+        Tx2 x2 = (Tx2(A[i]));
+        Tx2 y  = Tx2(A[i]) << (numeric_limits<T>::digits);
+        // j  = * ( long * ) &y;
+        Tx2 j = (Tx2(0x5f3759df) << (numeric_limits<T>::digits + 1)) - (j >> 1);
+        y = j >> (numeric_limits<T>::digits + 1);
+        y = y * ( threehalfs - ( x2 * y * y ) );
+        y = y * ( threehalfs - ( x2 * y * y ) );
+
+        invsqrtA[i] = y >> abs(shifts);
+    }
+    invsqrtA.exponent = A.exponent + shifts - numeric_limits<T>::digits;
+    return invsqrtA;
 }
 
 
@@ -320,6 +356,16 @@ template <typename T> vector<T> Vsqrt(const vector<T> &A){
         sqrtA[i] = sqrt(A[i]);
 
     return sqrtA;
+}
+
+template <typename T> vector<T> Vinvsqrt(const vector<T> &A){
+    vector<T> invsqrtA(A.size());
+
+    for(int i=0;i<invsqrtA.size();i++){
+        invsqrtA[i] = 1.0 / std::sqrt(A[i]);
+    }
+
+    return invsqrtA;
 }
 
 template <typename T> vector<T> Vexp(const vector<T> &A){
@@ -527,4 +573,20 @@ template <typename T> void check_sqrt(const T& A){
        << T(sqrtAfloat) << " wanted.\n\n";
 
   cout << "Is the result correct? " << (sqrtA.to_float() == T(sqrtAfloat).to_float()? "Yes.\n" : "No.\n");
+}
+
+template <typename T> void check_invsqrt(const T& A){
+  size_t N = A.size();
+  cout << "******************** Checking inverse square root function of: ********************\n"
+       << "invsqrt " << A << " = \n\n";
+
+  // auto Afloat = A.to_float();
+  auto invsqrtA = bfp_invsqrt(A);
+  auto invsqrtAfloat = Vinvsqrt(A.to_float());
+
+  cout << "Result of BFP-power:\n"
+       << invsqrtA << "\n"
+       << T(invsqrtAfloat) << " wanted.\n\n";
+
+  cout << "Is the result correct? " << (invsqrtA.to_float() == T(invsqrtAfloat).to_float()? "Yes.\n" : "No.\n");
 }

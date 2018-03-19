@@ -41,7 +41,6 @@ BFPStatic<T,N> gen_bfp_no_0(boost::random::mt19937 &rng) {
 }
 
 
-
 template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp_pos(boost::random::mt19937 &rng) {
     array<T,N> elems;
@@ -76,7 +75,7 @@ int main(){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp_pos<int32_t, 5>(rng);
+    auto A = gen_bfp_pos<int32_t, 100>(rng);
 
     // sqrt {{15,27,19,6,62},9}
 
@@ -86,7 +85,6 @@ int main(){
     
     BFPStatic<int8_t, 5> p{{1,2,3,4,1}, 0};
 
-
     BFPStatic<int8_t, 1> C{{10},1};
     // BFPStatic<int8_t, 100> D{{-15,-107,66,-111,-13},-10};
 
@@ -94,10 +92,9 @@ int main(){
     // BFPStatic<int8_t, 5> Q{{-22,22,95,46,79},10};
 
     // check_add(A,B);
+    // check_sqrt(A);
+    
     check_sqrt(A);
-
-    // Bad:
-    // sqrt {{22,62,63,62,41},6}
 
     return 0;
 }
