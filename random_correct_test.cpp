@@ -75,7 +75,7 @@ int main(){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp_pos<int32_t, 100>(rng);
+    // auto A = gen_bfp_pos<int32_t, 1>(rng);
 
     // sqrt {{15,27,19,6,62},9}
 
@@ -83,9 +83,9 @@ int main(){
 
     // BFPStatic<int8_t, 1> A{{123}, 10};
     
-    BFPStatic<int8_t, 5> p{{1,2,3,4,1}, 0};
+    BFPStatic<int32_t, 1> A{{1},0};
 
-    BFPStatic<int8_t, 1> C{{10},1};
+    BFPStatic<int32_t, 1> B{{1},0};
     // BFPStatic<int8_t, 100> D{{-15,-107,66,-111,-13},-10};
 
     // BFPStatic<int8_t, 5> P{{-67,-89,-98,-42,-62},6};
@@ -94,7 +94,7 @@ int main(){
     // check_add(A,B);
     // check_sqrt(A);
     
-    check_sqrt(A);
+    check_mul(A, B);
 
     return 0;
 }

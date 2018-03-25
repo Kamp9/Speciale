@@ -12,6 +12,8 @@
 #include <functional>
 #include <typeinfo>
 
+#include <xmmintrin.h>
+
 #include "bfplib.hh"
 
 using namespace std;
@@ -243,42 +245,48 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     return sqrtA;
 }
 
+
 // https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
 template <typename T, size_t N >
-BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A) {
+BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
     BFPStatic<T,N> invsqrtA;
-    Tx2 max_value = 0;
+    // cout << BFPStatic<T, N>{{1}, -1} << endl;
+    auto john = BFPStatic<T, N>{{1}, -1};
+    auto x2 = A * john;
+    cout << john << endl;
+    
+    auto threehalfs = BFPStatic<T, N>{{3}, -1};
+    auto y = A;
 
+    y.exponent++;
+    auto i = (BFPStatic<T, N>{{0x5f3759df}, 0}) - y;
+    i.exponent = floor_log2(i.exponent);
+    
+
+    i = i * (threehalfs - (x2 * i * i));
+    return i;
+}
+
+
+template <typename T, size_t N >
+BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
+    vector<double> invsqrtAfloat(A.size());
     for (size_t i=0; i < N; i++){
-        Tx2 threehalfs = Tx2(3) << numeric_limits<T>::digits;  //1.5F;
+        int32_t j;
+        float x2, y;
+        const float threehalfs = 1.5F;
+        x2 = A[i] * 0.5F;
+        cout << x2 << endl;
+        y = A[i];
+        j = *(int32_t *) &y;
+        j = 0x5f3759df - (j >> 1);
+        y = *(float *) &j;
 
-        Tx2 x2 = (Tx2(A[i])) >> 1;
-        Tx2 y  = Tx2(A[i]) << (numeric_limits<T>::digits + 1);
-        // j  = * ( long * ) &y;
-        Tx2 j = (Tx2(0x5f3759df) << (numeric_limits<T>::digits + 1)) - (j >> 1);
-        y = j >> (numeric_limits<T>::digits);
-        y = y * ( threehalfs - ( x2 * y * y ) );
-        y = y * ( threehalfs - ( x2 * y * y ) );
-        max_value = max(max_value, y);
+        y = y * (threehalfs - (x2 * y * y));
+        y = y * (threehalfs - (x2 * y * y));
+        invsqrtAfloat[i] = y;
     }
-
-    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
-
-    for (size_t i=0; i < N; i++){
-        Tx2 threehalfs = Tx2(3) << numeric_limits<T>::digits;  //1.5F;
-
-        Tx2 x2 = (Tx2(A[i]));
-        Tx2 y  = Tx2(A[i]) << (numeric_limits<T>::digits);
-        // j  = * ( long * ) &y;
-        Tx2 j = (Tx2(0x5f3759df) << (numeric_limits<T>::digits + 1)) - (j >> 1);
-        y = j >> (numeric_limits<T>::digits + 1);
-        y = y * ( threehalfs - ( x2 * y * y ) );
-        y = y * ( threehalfs - ( x2 * y * y ) );
-
-        invsqrtA[i] = y >> abs(shifts);
-    }
-    invsqrtA.exponent = A.exponent + shifts - numeric_limits<T>::digits;
-    return invsqrtA;
+    return BFPStatic<T,N>(invsqrtAfloat);
 }
 
 
@@ -367,6 +375,20 @@ template <typename T> vector<T> Vinvsqrt(const vector<T> &A){
 
     return invsqrtA;
 }
+
+
+// template <typename T> vector<T> Vinvsqrtugly(const vector<T> &A){
+//     vector<T> invsqrtA(A.size());
+
+//     __m128 B=_mm_load1_ps(&A); //, B=_mm_load1_ps(&b), C=_mm_load1_ps(&c);
+//     // __m128 Thresh=_mm_load1_ps(&thresh);
+//     __m128 john = _mm_rsqrt_ss(&B);
+//     // invsqrtA[i] = __m128 _mm_rsqrt_ss(__m128 A[i]);
+
+//     return invsqrtA;
+// }
+
+
 
 template <typename T> vector<T> Vexp(const vector<T> &A){
     vector<T> expA(A.size());
@@ -568,12 +590,13 @@ template <typename T> void check_sqrt(const T& A){
   auto sqrtA = bfp_sqrt(A);
   auto sqrtAfloat = Vsqrt(A.to_float());
 
-  cout << "Result of BFP-power:\n"
+  cout << "Result of BFP-square root:\n"
        << sqrtA << "\n"
        << T(sqrtAfloat) << " wanted.\n\n";
 
   cout << "Is the result correct? " << (sqrtA.to_float() == T(sqrtAfloat).to_float()? "Yes.\n" : "No.\n");
 }
+
 
 template <typename T> void check_invsqrt(const T& A){
   size_t N = A.size();
@@ -584,9 +607,10 @@ template <typename T> void check_invsqrt(const T& A){
   auto invsqrtA = bfp_invsqrt(A);
   auto invsqrtAfloat = Vinvsqrt(A.to_float());
 
-  cout << "Result of BFP-power:\n"
+  cout << "Result of BFP-inverse square root:\n"
        << invsqrtA << "\n"
        << T(invsqrtAfloat) << " wanted.\n\n";
 
   cout << "Is the result correct? " << (invsqrtA.to_float() == T(invsqrtAfloat).to_float()? "Yes.\n" : "No.\n");
+  auto invsqrtA2 = bfp_invsqrtfloat(A);
 }
