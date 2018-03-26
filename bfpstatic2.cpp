@@ -55,17 +55,17 @@ struct BFPStatic: public std::array<T,N>{
         for(int i=0;i<N;i++){
             assert(round(V[i]*power) >= std::numeric_limits<T>::min());
             assert(round(V[i]*power) <= std::numeric_limits<T>::max());
-            double intpart;
-            double fractpart = modf(V[i]*power, &intpart);
+            // double intpart;
+            // double fractpart = modf(V[i]*power, &intpart);
             // Would really like to take care of this in the operators instead
             // But on the other hand, we would need to make calculations to avoid it
             // cout << V[i]*power << endl;
-            if(fractpart == -0.5){
-                cout << "rounding is happening!" << endl;
-                A[i] = round(V[i]*power) + 1;
-            }
-            else
-                A[i] = round(V[i]*power);
+            // if(fractpart == -0.5){
+            //     cout << "rounding is happening!" << endl;
+            //     A[i] = round(V[i]*power) + 1;
+            // }
+            // else
+            A[i] = round(V[i]*power);
         }
     }
 
@@ -91,9 +91,8 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> AB;
     bitset<N> carryAB;
     bitset<N> sAB;
-    bool carry = false;
-    int msb = numeric_limits<T>::digits - 1;
     int exp_diff = A.exponent - B.exponent;
+    bool carry = false;
 
     for(size_t i=0;i<N;i++){
         Tx2 ABi = A[i] + (B[i] >> exp_diff);
@@ -102,18 +101,40 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     }
 
     if(carry){
-        for(size_t i=0;i<N;i++){
-            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            bool rounding = ABi & 1;
-            AB[i] = (ABi >> 1) + rounding;
+        if(exp_diff > 0){
+            cout << "case: 11" << endl;
+            for(size_t i=0;i<N;i++){
+                Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+                bool rounding3 = (B[i] >> (exp_diff - 1) & 1);
+                bool rounding = ((ABi >> 1) & 1);
+                bool rounding2 = (ABi & 1) & signbit(ABi);
+                AB[i] = (ABi >> 1) + rounding - rounding2 + rounding3;
+            }
+        }else{
+            cout << "case: 12" << endl;
+            for(size_t i=0;i<N;i++){
+                Tx2 ABi = Tx2(A[i]) + B[i];
+                bool rounding = (ABi & 1) & (!signbit(ABi));
+                AB[i] = (ABi >> 1) + rounding;
+            }
         }
     }
     else{
-        for(size_t i=0;i<N;i++){
-            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            // does not work when exp_diff = 0
-            bool rounding = (B[i] >> (exp_diff - 1)) & 1;
-            AB[i] = ABi + rounding;
+        if (exp_diff > 0) {
+            cout << "case: 21" << endl;
+            for(size_t i=0;i<N;i++){
+                Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+                // bool rounding = ((B[i] >> (exp_diff - 1)) & 1) & (!signbit(ABi));
+                bool rounding = ((B[i] >> (exp_diff - 1)) & 1);
+                bool rounding2 = ((B[i] & ((1 << exp_diff) - 1)) == (1 << (exp_diff - 1))) && signbit(ABi);
+                // bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
+                AB[i] = ABi + rounding - rounding2;
+            }
+        }else{
+            cout << "case: 22" << endl;
+            for(size_t i=0;i<N;i++){
+                AB[i] = A[i] + B[i];
+            }
         }
     }
 
@@ -133,8 +154,6 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 }
 
 
-// Bug when we try to round -x.5,
-// This gives us the -x+1 instead of -x.
 template <typename T,size_t N>
 BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> AB;
@@ -145,16 +164,17 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         max_value = max(max_value, std::abs(ABi));
     }
 
-    // could check that shifts is not 0
-    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+    int shifts = 1 + floor_log2(max_value) - (numeric_limits<T>::digits);
+    if (shifts < 0)
+        shifts = 0;
 
     for (size_t i = 0; i < N; i++){
         Tx2 ABi = Tx2(A[i]) * B[i];
         bool rounding = (ABi >> (shifts - 1)) & 1;
-        AB[i] = (ABi >> shifts) + rounding;
+        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
+        AB[i] = (ABi >> shifts) + rounding - rounding2;
     }
     AB.exponent = A.exponent + B.exponent + shifts;
-
     return AB;
 }
 
@@ -168,11 +188,14 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         max_value = max(max_value, std::abs(ABi));
     }
-    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+    if (shifts < 0)
+        shifts = 0;
+
     for (size_t i = 0; i < N; i++){
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         bool rounding = ((ABi >> (shifts - 1)) & 1);
-        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
+        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
 
         AB[i] = (ABi >> shifts) + rounding - rounding2;
     }
@@ -190,7 +213,7 @@ BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
         Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
         max_value = max(max_value, Api);
     }
-    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
 
     for (size_t i = 0; i < N; i++){
         Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
@@ -224,7 +247,11 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
         max_value = max(max_value, y - (y1 & 1));
     }
 
-    int shifts = floor_log2(max_value) - numeric_limits<T>::digits;
+    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+    if (shifts < 0){
+      shifts = 0;
+    }
+
     for (size_t i=0; i < N; i++){
         uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
         uTx2 y = (sqrtAi >> 1);
@@ -435,7 +462,6 @@ template <typename T> void check_add(const T& A, const T& B){
        <<  (AB.to_float() - ABfloat) << "\n"
        << "Error compared to rounded exact:\n"
        << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
-  
   
   cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
 
