@@ -3,6 +3,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+using namespace std;
+
 void print_bit_rep(double doubleValue){
 	uint8_t *bytePointer = (uint8_t *)&doubleValue;
 
@@ -17,6 +19,7 @@ void print_bit_rep(double doubleValue){
 	    }
         printf(" ");
 	}
+	printf("\n");
 }
 
 // Langsom O(n)-version af floor(log2(x)) for heltal: mest betydende satte bit
@@ -27,7 +30,8 @@ template <typename T> int floor_log2(T value)
     value >>= 1;
     i++;
   }
-  return i;
+
+  return i - 1;
 }
 
 // template <typename T> msb(const &T x);
