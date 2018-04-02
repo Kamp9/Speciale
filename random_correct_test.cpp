@@ -76,15 +76,18 @@ int main(){
     rng.seed(tv.tv_usec);
 
 
-    auto C = gen_bfp<int8_t, 100>(rng);
-    auto D = gen_bfp<int8_t, 2>(rng);
+    auto C = gen_bfp<int8_t, 10>(rng);
+    auto D = gen_bfp<int8_t, 10>(rng);
     // auto A = gen_bfp_pos<int32_t, 1>(rng);
 
-    BFPStatic<int8_t, 5> L{{56,-29,14,39,-43},2};
-    BFPStatic<int8_t, 5> M{{-52,22,-51,46,106},-3};
+    // BFPStatic<int8_t, 5> L{{56,-29,14,39,-43},2};
+    // BFPStatic<int8_t, 5> M{{-52,22,-51,46,106},-3};
 
     // sqrt {{15,27,19,6,62},9}
     
+    BFPStatic<int32_t, 1> L{{10},0};
+    // BFPStatic<int8_t, 1> M{{-1},0};
+
     // Fail in addition?
     // {{107,27,-69,99,68,-21,-122,-47,-38,39,-62,123,-29,-27,26,25,38,51,71,-43,92,-58,-115,-40,5,-50,53,72,118,-34,33,-84,5,65,-17,-63,-28,-77,7,-12},-7} +
     // {{127,60,-125,13,0,107,117,-39,21,-61,44,-34,-52,13,-48,-38,-79,-100,118,-62,38,94,12,119,52,49,-84,-97,-40,-64,-25,-109,37,43,-78,62,47,-70,22,11},0}
@@ -93,12 +96,12 @@ int main(){
 
     // BFPStatic<int8_t, 1> A{{123}, 10};
     
-    BFPStatic<int8_t, 1> F{{127}, 0};
-    BFPStatic<int8_t, 1> G{{127}, 0};
+    // BFPStatic<int8_t, 1> F{{11}, -2}  ;
+    // BFPStatic<int8_t, 1> G{{11}, 1};
 
     // BFPStatic<int32_t, 1> A{{61},14};
     // BFPStatic<int32_t, 1> A{{61},14};
-    BFPStatic<int32_t, 1> B{{4},-11};
+    // BFPStatic<int8_t, 1> C{{2},10};
     // BFPStatic<int8_t, 100> D{{-15,-107,66,-111,-13},-10};
 
     // BFPStatic<int8_t, 1> P{{100},0};
@@ -106,9 +109,14 @@ int main(){
 
     // check_add(A,B);
     // check_sqrt(A);
-    auto S = gen_bfp_pos<int8_t, 10>(rng);
-    auto R = gen_bfp_pos<int8_t, 10>(rng);
-    check_mul(S, R);
+    // auto S = gen_bfp<int8_t, 20>(rng);
+    // auto R = gen_bfp<int8_t, 20>(rng);
+
+    // BFPStatic<int8_t, 1> A100{{-65}, 1};
+    // BFPStatic<int8_t, 1> B100{{-65}, 0};
+
+    // check_invsqrt(L);
+    check_invsqrt(L);
 
     return 0;
 }
