@@ -65,6 +65,8 @@ struct BFPStatic: public std::array<T,N>{
             //     A[i] = round(V[i]*power) + 1;
             // }
             // else
+            // cout << round(V[i]*power) << endl;
+            // cout << V[i]*power << endl;
             A[i] = round(V[i]*power);
         }
     }
@@ -83,9 +85,62 @@ struct BFPStatic: public std::array<T,N>{
     }
 };
 
+// template <typename T,size_t N>
+// BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
+//     // Make sure that e_A >= e_B
+//     if(A.exponent < B.exponent) return B+A;
+
+//     BFPStatic<T,N> AB;
+//     bitset<N> carryAB;
+//     bitset<N> sAB;
+//     int exp_diff = A.exponent - B.exponent;
+//     bool carry = false;
+
+//     // for(size_t i=0;i<N;i++){
+//     //     Tx2 ABi = A[i] + (B[i] >> exp_diff);
+//     //     T   abi = ABi;
+//     //     carry  |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+//     // }
+//     Tx2 max_value = 0;
+//     for (size_t i = 0; i < N; i++){
+//         Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+//         max_value = max(max_value, std::abs(ABi) - signbit(ABi));
+//     }
+
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+
+//     // if statement on shifts?
+//     if(exp_diff == 0){
+//         for (size_t i = 0; i < N; i++){
+//             AB[i] = Tx2(A[i]) + B[i];
+//         }
+//         AB.exponent = A.exponent + shifts;
+//         return AB;
+//     }
+
+//     if(shifts >= 0){
+//         for (size_t i = 0; i < N; i++){
+//             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+//             AB[i] = ABi >> shifts;
+//         }
+//         AB.exponent = A.exponent + shifts;
+//         return AB;
+//     }
+
+//     else{
+//         shifts = abs(shifts);
+//         for (size_t i = 0; i < N; i++){
+//             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+//             bool rounding = (B[i] >> (exp_diff - 1)) & (!signbit(B[i]));
+//             AB[i] = (ABi << shifts) - (rounding << (shifts - 1));
+//         }
+//         AB.exponent = A.exponent - shifts;
+//         return AB;
+//     }
+// }
+
 template <typename T,size_t N>
 BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-    // Make sure that e_A >= e_B
     if(A.exponent < B.exponent) return B+A;
 
     BFPStatic<T,N> AB;
@@ -95,46 +150,27 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     bool carry = false;
 
     for(size_t i=0;i<N;i++){
-        Tx2 ABi = A[i] + (B[i] >> exp_diff);
-        T   abi = ABi;
-        carry  |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+        Tx2     ABi = A[i] + (B[i] >> exp_diff);
+        T       abi = ABi;
+        carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+        sAB[i]      = signbit(ABi);
+        carry      |= carryAB[i];
     }
 
+    AB.exponent = A.exponent + carry;
     if(carry){
-        if(exp_diff > 0){
-            cout << "case: 11" << endl;
-            for(size_t i=0;i<N;i++){
-                Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-                bool rounding3 = (B[i] >> (exp_diff - 1) & 1);
-                bool rounding = ((ABi >> 1) & 1);
-                bool rounding2 = (ABi & 1) & signbit(ABi);
-                AB[i] = (ABi >> 1) + rounding - rounding2 + rounding3;
-            }
-        }else{
-            cout << "case: 12" << endl;
-            for(size_t i=0;i<N;i++){
-                Tx2 ABi = Tx2(A[i]) + B[i];
-                bool rounding = (ABi & 1) & (!signbit(ABi));
-                AB[i] = (ABi >> 1) + rounding;
-            }
+        for(size_t i=0;i<N;i++){
+            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+            bool rounding = ABi & 1;
+            AB[i] = (ABi >> 1) + rounding;
         }
     }
     else{
-        if (exp_diff > 0) {
-            cout << "case: 21" << endl;
-            for(size_t i=0;i<N;i++){
-                Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-                // bool rounding = ((B[i] >> (exp_diff - 1)) & 1) & (!signbit(ABi));
-                bool rounding = ((B[i] >> (exp_diff - 1)) & 1);
-                bool rounding2 = ((B[i] & ((1 << exp_diff) - 1)) == (1 << (exp_diff - 1))) && signbit(ABi);
-                // bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
-                AB[i] = ABi + rounding - rounding2;
-            }
-        }else{
-            cout << "case: 22" << endl;
-            for(size_t i=0;i<N;i++){
-                AB[i] = A[i] + B[i];
-            }
+        for(size_t i=0;i<N;i++){
+            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
+            // does not work when exp_diff = 0
+            bool rounding = (B[i] >> (exp_diff - 1)) & 1;
+            AB[i] = ABi + rounding;
         }
     }
 
@@ -220,9 +256,7 @@ BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
         Ap[i] = Api >> shifts;
     }
 
-    cout << shifts << endl;
     Ap.exponent = A.exponent + shifts - numeric_limits<T>::digits;
-    // Ap.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1);
     return Ap;
 }
 
@@ -248,10 +282,10 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     }
 
     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+
     if (shifts < 0){
       shifts = 0;
     }
-
     for (size_t i=0; i < N; i++){
         uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
         uTx2 y = (sqrtAi >> 1);
@@ -277,21 +311,19 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
 template <typename T, size_t N >
 BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
     BFPStatic<T,N> invsqrtA;
-    // cout << BFPStatic<T, N>{{1}, -1} << endl;
-    auto john = BFPStatic<T, N>{{1}, -1};
-    auto x2 = A * john;
-    cout << john << endl;
-    
+    auto half = BFPStatic<T, N>{{1}, -1};
+    auto x2 = A * half;
     auto threehalfs = BFPStatic<T, N>{{3}, -1};
     auto y = A;
 
     y.exponent++;
     auto i = (BFPStatic<T, N>{{0x5f3759df}, 0}) - y;
-    i.exponent = floor_log2(i.exponent);
-    
+    cout << (i[0] >> 20) << endl;
+    i.exponent = i[0] >> 25;
 
-    i = i * (threehalfs - (x2 * i * i));
-    return i;
+    auto johni = (i[0] << 8) >> 30;
+    auto res = johni * (threehalfs[0] - (x2[0] * johni * johni));
+    return res;
 }
 
 
@@ -303,13 +335,12 @@ BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
         float x2, y;
         const float threehalfs = 1.5F;
         x2 = A[i] * 0.5F;
-        cout << x2 << endl;
+
         y = A[i];
         j = *(int32_t *) &y;
         j = 0x5f3759df - (j >> 1);
+        cout << j << endl;
         y = *(float *) &j;
-
-        y = y * (threehalfs - (x2 * y * y));
         y = y * (threehalfs - (x2 * y * y));
         invsqrtAfloat[i] = y;
     }
@@ -630,10 +661,12 @@ template <typename T> void check_invsqrt(const T& A){
        << "invsqrt " << A << " = \n\n";
 
   // auto Afloat = A.to_float();
-  auto invsqrtA = bfp_invsqrt(A);
+  auto invsqrtbfpA = bfp_invsqrt(A);
+  auto invsqrtA = bfp_invsqrtfloat(A);
   auto invsqrtAfloat = Vinvsqrt(A.to_float());
 
   cout << "Result of BFP-inverse square root:\n"
+       << invsqrtbfpA << "\n"
        << invsqrtA << "\n"
        << T(invsqrtAfloat) << " wanted.\n\n";
 
