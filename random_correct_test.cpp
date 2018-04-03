@@ -13,7 +13,7 @@ template <typename T, size_t N>
 BFPStatic<T,N> gen_bfp(boost::random::mt19937 &rng) {
     array<T,N> elems;
     //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
-    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         elems[i] = rand_elem(rng);
     }
