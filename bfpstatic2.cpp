@@ -311,6 +311,7 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
 template <typename T, size_t N >
 BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
     BFPStatic<T,N> invsqrtA;
+    
     auto half = BFPStatic<T, N>{{1}, -1};
     auto x2 = A * half;
     auto threehalfs = BFPStatic<T, N>{{3}, -1};
@@ -318,12 +319,12 @@ BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
 
     y.exponent++;
     auto i = (BFPStatic<T, N>{{0x5f3759df}, 0}) - y;
-    cout << (i[0] >> 20) << endl;
-    i.exponent = i[0] >> 25;
+    
+    // cout << (i[0] >> 20) << endl;
+    // i.exponent = i[0] >> 25;
 
-    auto johni = (i[0] << 8) >> 30;
-    auto res = johni * (threehalfs[0] - (x2[0] * johni * johni));
-    return res;
+    i = i * (threehalfs - (x2 * i * i));
+    return i;
 }
 
 
@@ -335,12 +336,12 @@ BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
         float x2, y;
         const float threehalfs = 1.5F;
         x2 = A[i] * 0.5F;
-
         y = A[i];
         j = *(int32_t *) &y;
         j = 0x5f3759df - (j >> 1);
-        cout << j << endl;
         y = *(float *) &j;
+
+        y = y * (threehalfs - (x2 * y * y));
         y = y * (threehalfs - (x2 * y * y));
         invsqrtAfloat[i] = y;
     }
