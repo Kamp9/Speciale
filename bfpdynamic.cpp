@@ -66,7 +66,7 @@ struct BFPDynamic: public std::vector<T>{
             // else
             // cout << round(V[i]*power) << endl;
             // cout << V[i]*power << endl;
-            A[i] = round(V[i]*power);
+            A.push_back(round(V[i]*power));
         }
     }
 
@@ -157,15 +157,17 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 	//        carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
 	//        sAB[i]      = signbit(ABi);
 	//        carry      |= carryAB[i];
-	carry      |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+	      carry      |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
 
     AB.exponent = A.exponent + carry;
+
     if(carry){
         for(size_t i=0;i<N;i++){
+
             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
             bool rounding = ABi & 1;
-            AB[i] = (ABi >> 1) + rounding;
+            AB.push_back((ABi >> 1) + rounding);
         }
     }
     else{
@@ -173,10 +175,9 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
             // does not work when exp_diff = 0
             bool rounding = (B[i] >> (exp_diff - 1)) & 1;
-            AB[i] = ABi + rounding;
+            AB.push_back(ABi + rounding);
         }
     }
-
     AB.exponent = A.exponent + carry;
 
     return AB;
@@ -189,7 +190,7 @@ BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
   // assert(N==B.size());
   BFPDynamic<T> nB(N);
 
-  for (size_t i = 0; i < N; i++){ nB[i] = -B[i]; }
+  for (size_t i = 0; i < N; i++){ nB.push_back(-B[i]); }
   nB.exponent = B.exponent;
 
   return A + nB;
@@ -216,7 +217,7 @@ BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     Tx2 ABi = Tx2(A[i]) * B[i];
     bool rounding = (ABi >> (shifts - 1)) & 1;
     bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-    AB[i] = (ABi >> shifts) + rounding - rounding2;
+    AB.push_back((ABi >> shifts) + rounding - rounding2);
   }
   AB.exponent = A.exponent + B.exponent + shifts;
   return AB;
@@ -244,7 +245,7 @@ BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
         bool rounding = ((ABi >> (shifts - 1)) & 1);
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
 
-        AB[i] = (ABi >> shifts) + rounding - rounding2;
+        AB.push_back((ABi >> shifts) + rounding - rounding2);
     }
 
     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
@@ -267,7 +268,7 @@ BFPDynamic<T> bfp_pow(const BFPDynamic<T> &A, const BFPDynamic<T> &p) {
 
     for (size_t i = 0; i < N; i++){
         Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
-        Ap[i] = Api >> shifts;
+        Ap.push_back(Api >> shifts);
     }
 
     Ap.exponent = A.exponent + shifts - numeric_limits<T>::digits;
@@ -294,9 +295,9 @@ BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
       uTx2 y1;
 
       while (y != z) {
-	z = y;
-	y1 = (y + sqrtAi / y);
-	y = (y1 >> 1) + (y1 & 1);
+        	z = y;
+        	y1 = (y + sqrtAi / y);
+        	y = (y1 >> 1) + (y1 & 1);
       }
       max_value = max(max_value, y - (y1 & 1));
     }
@@ -318,13 +319,90 @@ BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
         }
         y -= (y1 & 1);
 
-        sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
-
+        sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
         }
     sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
     return sqrtA;
 }
+
+
+#define BITSPERLONG 32
+#define TOP2BITS(x) ((x & (3L << (BITSPERLONG-2))) >> (BITSPERLONG-2))
+
+template <typename T>
+BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
+    size_t N = A.size();
+    BFPDynamic<T> sqrtA;
+    uTx2 max_value = 0;
+
+    for (size_t i=0; i < N; i++){
+        unsigned long x = A[i] << (A.exponent & 1);
+        unsigned long a = 0L;                   /* accumulator      */
+        unsigned long r = 0L;                   /* remainder        */
+        unsigned long e = 0L;                   /* trial product    */
+
+        for (int j = 0; j < BITSPERLONG; j++){
+            r = (r << 2) + TOP2BITS(x); x <<= 2;
+            a <<= 1;
+            e = (a << 1) + 1;
+            if (r >= e){
+                  r -= e;
+                  a++;
+            }
+        }
+        max_value = max(max_value, a);
+        // max_value = max(max_value, A[i]);
+    }
+    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+
+    if (shifts > 0){
+        for (size_t i=0; i < N; i++){
+            unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
+            unsigned long a = 0L;                   /* accumulator      */
+            unsigned long r = 0L;                   /* remainder        */
+            unsigned long e = 0L;                   /* trial product    */
+
+            for (int j = 0; j < BITSPERLONG; j++){
+                r = (r << 2) + TOP2BITS(x); x <<= 2;
+                a <<= 1;
+                e = (a << 1) + 1;
+                if (r >= e){
+                      r -= e;
+                      a++;
+                }
+            }
+            bool rounding = ((a >> (shifts - 1)) & 1);
+            sqrtA.push_back((a >> shifts) + rounding);
+        }
+    }else{
+        for (size_t i=0; i < N; i++){
+            unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
+            unsigned long a = 0L;                   /* accumulator      */
+            unsigned long r = 0L;                   /* remainder        */
+            unsigned long e = 0L;                   /* trial product    */
+
+            for (int j = 0; j < BITSPERLONG; j++){
+                r = (r << 2) + TOP2BITS(x); x <<= 2;
+                a <<= 1;
+                e = (a << 1) + 1;
+                if (r >= e){
+                      r -= e;
+                      a++;
+                }
+            }
+            bool rounding = ((a >> (shifts - 1)) & 1);
+            sqrtA.push_back((a << abs(shifts)) + rounding);
+        }
+    }
+
+    // sqrtA.exponent = 1 + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
+    sqrtA.exponent = ((shifts + numeric_limits<T>::digits) >> 1) - (numeric_limits<T>::digits - shifts);
+
+    return sqrtA;
+}
+
+
 
 
 // https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
@@ -368,7 +446,7 @@ BFPDynamic<T> bfp_invsqrtfloat(const BFPDynamic<T> &A) {
         cout << j << endl;
         y = *(float *) &j;
         y = y * (threehalfs - (x2 * y * y));
-        invsqrtAfloat[i] = y;
+        invsqrtAfloat.push_back(y);
     }
     return BFPDynamic<T>(invsqrtAfloat);
 }
@@ -461,19 +539,6 @@ template <typename T> vector<T> Vinvsqrt(const vector<T> &A){
 }
 
 
-// template <typename T> vector<T> Vinvsqrtugly(const vector<T> &A){
-//     vector<T> invsqrtA(A.size());
-
-//     __m128 B=_mm_load1_ps(&A); //, B=_mm_load1_ps(&b), C=_mm_load1_ps(&c);
-//     // __m128 Thresh=_mm_load1_ps(&thresh);
-//     __m128 john = _mm_rsqrt_ss(&B);
-//     // invsqrtA[i] = __m128 _mm_rsqrt_ss(__m128 A[i]);
-
-//     return invsqrtA;
-// }
-
-
-
 template <typename T> vector<T> Vexp(const vector<T> &A){
     vector<T> expA(A.size());
 
@@ -495,6 +560,7 @@ template <typename T> void check_add(const T& A, const T& B){
   auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A+B;
   auto ABfloat = A.to_float() + B.to_float();
+
   cout << ABfloat << endl;
 
   vector<bool> sA(N), sB(N);
