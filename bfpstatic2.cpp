@@ -12,6 +12,9 @@
 #include <functional>
 #include <typeinfo>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <xmmintrin.h>
 
 #include "bfplib.hh"
@@ -305,6 +308,147 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
 
     return sqrtA;
 }
+
+
+
+/**
+ * \brief    Fast Square root algorithm, with rounding
+ *
+ * This does arithmetic rounding of the result. That is, if the real answer
+ * would have a fractional part of 0.5 or greater, the result is rounded up to
+ * the next integer.
+ *      - SquareRootRounded(2) --> 1
+ *      - SquareRootRounded(3) --> 2
+ *      - SquareRootRounded(4) --> 2
+ *      - SquareRootRounded(6) --> 2
+ *      - SquareRootRounded(7) --> 3
+ *      - SquareRootRounded(8) --> 3
+ *      - SquareRootRounded(9) --> 3
+ *
+ * \param[in] a_nInput - unsigned integer for which to find the square root
+ *
+ * \return Integer square root of the input value.
+ */
+// uint32_t SquareRootRounded(uint32_t a_nInput)
+// {
+//     uint32_t op  = a_nInput;
+//     uint32_t res = 0;
+//     uint32_t one = 1uL << 30; // The second-to-top bit is set: use 1u << 14 for uint16_t type; use 1uL<<30 for uint32_t type
+
+
+//     // "one" starts at the highest power of four <= than the argument.
+//     while (one > op)
+//     {
+//         one >>= 2;
+//     }
+
+//     while (one != 0)
+//     {
+//         if (op >= res + one)
+//         {
+//             op = op - (res + one);
+//             res = res +  2 * one;
+//         }
+//         res >>= 1;
+//         one >>= 2;
+//     }
+
+//     /* Do arithmetic rounding to nearest integer */
+//     if (op > res)
+//     {
+//         res++;
+//     }
+
+//     return res;
+// }
+
+// https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
+
+#define BITSPERLONG 32
+#define TOP2BITS(x) ((x & (3L << (BITSPERLONG-2))) >> (BITSPERLONG-2))
+
+struct int_sqrt {
+      unsigned sqrt,
+               frac;
+};
+
+template <typename T, size_t N >
+BFPStatic<T, N> bfp_sqrt2(const BFPStatic<T, N> &A) {
+    BFPStatic<T,N> sqrtA;
+    uTx2 max_value = 0;
+
+    for (size_t i=0; i < N; i++){
+        unsigned long x = A[i] << (A.exponent & 1);
+        unsigned long a = 0L;                   /* accumulator      */
+        unsigned long r = 0L;                   /* remainder        */
+        unsigned long e = 0L;                   /* trial product    */
+
+        for (int j = 0; j < BITSPERLONG; j++){
+            r = (r << 2) + TOP2BITS(x); x <<= 2;
+            a <<= 1;
+            e = (a << 1) + 1;
+            if (r >= e){
+                  r -= e;
+                  a++;
+            }
+        }
+        max_value = max(max_value, a);
+        // max_value = max(max_value, A[i]);
+    }
+    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+    // if (shifts < 0){
+    //   shifts = 0;
+    // }
+    cout << shifts << endl;
+    // int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+    if (shifts > 0){
+        for (size_t i=0; i < N; i++){
+            unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
+            unsigned long a = 0L;                   /* accumulator      */
+            unsigned long r = 0L;                   /* remainder        */
+            unsigned long e = 0L;                   /* trial product    */
+
+            for (int j = 0; j < BITSPERLONG; j++){
+                r = (r << 2) + TOP2BITS(x); x <<= 2;
+                a <<= 1;
+                e = (a << 1) + 1;
+                if (r >= e){
+                      r -= e;
+                      a++;
+                }
+            }
+            bool rounding = ((a >> (shifts - 1)) & 1);
+            sqrtA[i] = (a >> shifts) + rounding;
+        }
+    }else{
+        for (size_t i=0; i < N; i++){
+            unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
+            unsigned long a = 0L;                   /* accumulator      */
+            unsigned long r = 0L;                   /* remainder        */
+            unsigned long e = 0L;                   /* trial product    */
+
+            for (int j = 0; j < BITSPERLONG; j++){
+                r = (r << 2) + TOP2BITS(x); x <<= 2;
+                a <<= 1;
+                e = (a << 1) + 1;
+                if (r >= e){
+                      r -= e;
+                      a++;
+                }
+            }
+            bool rounding = ((a >> (shifts - 1)) & 1);
+            sqrtA[i] = (a << abs(shifts)) + rounding;
+        }
+    }
+
+
+    cout << numeric_limits<T>::digits << endl;
+    // sqrtA.exponent = 1 + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
+    sqrtA.exponent = ((shifts + numeric_limits<T>::digits) >> 1) - (numeric_limits<T>::digits - shifts);
+
+    return sqrtA;
+}
+
 
 
 // https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
@@ -645,7 +789,7 @@ template <typename T> void check_sqrt(const T& A){
        << "sqrt " << A << " = \n\n";
 
   // auto Afloat = A.to_float();
-  auto sqrtA = bfp_sqrt(A);
+  auto sqrtA = bfp_sqrt2(A);
   auto sqrtAfloat = Vsqrt(A.to_float());
 
   cout << "Result of BFP-square root:\n"
