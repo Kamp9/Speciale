@@ -11,7 +11,7 @@ for label, name, int_sizes, num_elems in scripts:
     	for num in num_elems:
 	        full_label = "%s / %s / %s" % (label, size, num)
 	        # op_type 1 = addition
-	        op_type = 5
+	        op_type = 1
 	        bash_cmd = "./dynamic_bench_test " + str(size) + " " + str(op_type) + " " + str(num)
 	        cmd_list.append(bp.command(bash_cmd, full_label))
 
