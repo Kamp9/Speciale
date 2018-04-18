@@ -49,7 +49,7 @@ BFPStatic<T,N> gen_bfp_pos(boost::random::mt19937 &rng) {
     for(size_t i = 0; i < N; i++){
         elems[i] = rand_elem(rng);
     }
-    boost::random::uniform_int_distribution<T> rand_exp(0, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_exp(-10,10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
     BFPStatic<T,N> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
@@ -75,17 +75,16 @@ int main(){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
 
-
     auto C = gen_bfp<int8_t, 10>(rng);
     auto D = gen_bfp<int8_t, 10>(rng);
-    // auto A = gen_bfp_pos<int32_t, 1>(rng);
+    auto A = gen_bfp_pos<int8_t, 1>(rng);
 
     // BFPStatic<int8_t, 5> L{{56,-29,14,39,-43},2};
     // BFPStatic<int8_t, 5> M{{-52,22,-51,46,106},-3};
 
     // sqrt {{15,27,19,6,62},9}
     
-    BFPStatic<int32_t, 1> L{{10},0};
+    // BFPStatic<int32_t, 1> L{{13511351},17};
     // BFPStatic<int8_t, 1> M{{-1},0};
 
     // Fail in addition?
@@ -116,7 +115,7 @@ int main(){
     // BFPStatic<int8_t, 1> B100{{-65}, 0};
 
     // check_invsqrt(L);
-    check_invsqrt(L);
+    check_sqrt(A);
 
     return 0;
 }

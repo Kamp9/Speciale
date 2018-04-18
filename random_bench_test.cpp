@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
+#include <ctime>
 #include <sys/time.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -28,12 +29,21 @@ int main(int argc, char *argv[]){
     struct timeval tv;
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
-    
-    size_t N = atoi(argv[1]);
-    cout << N << endl;
-    auto A = gen_bfp<int8_t, 1000000>(rng);
-    auto B = gen_bfp<int8_t, 1000000>(rng);
 
-    A + B;
+    auto A = gen_bfp<int8_t, 10>(rng);
+    auto B = gen_bfp<int8_t, 10>(rng);
+    
+    auto Afloat = A.to_float();
+    auto Bfloat = B.to_float();
+
+    clock_t begin = clock();
+
+    // Code to time 
+    Afloat * Bfloat;
+
+    clock_t end = clock();
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
+    cout << elapsed_secs << endl;
 
 }
