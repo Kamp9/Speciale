@@ -23,6 +23,12 @@ template <typename T> ostream &operator<<(ostream &s, const vector<T> &xs){
     return s;
 }
 
+template <typename T, size_t N> ostream &operator<<(ostream &s, const array<T, N> &xs){
+    s << "{"; for(int i=0;i<xs.size();i++) s << int(xs[i]) << (i+1<xs.size()?"," : ""); s << "}";
+    return s;
+}
+
+
 template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
   for(int i=0;i<bits.size();i++) s << bits[i];
   return s;
@@ -36,11 +42,14 @@ typedef uint64_t uTx2;
 // BFPDynamic definition
 template <typename T>
 struct BFPDynamic: public std::vector<T>{
-  int exponent;
+    int exponent;
+    bool normalized;
+    std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
 
-  BFPDynamic(int exponent=0) : exponent(exponent) {}
-  BFPDynamic(const std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
-  BFPDynamic(const std::vector<double> &V) {
+
+    BFPDynamic(int exponent=0) : exponent(exponent) {}
+    BFPDynamic(std::vector<T> &A, int exponent, bool normalized) : std::vector<T>(A), exponent(exponent), normalized(normalized) {}
+    BFPDynamic(std::vector<double> &V) {
         size_t N = V.size();
         std::vector<T> &A(*this);
 
@@ -68,6 +77,22 @@ struct BFPDynamic: public std::vector<T>{
             // cout << V[i]*power << endl;
             A.push_back(round(V[i]*power));
         }
+    }
+
+    BFPDynamic<T> normalize() {
+        std::vector<T> &A(*this);
+        const size_t N = this->size();
+        // std::array<size_t, numeric_limits<T>::digits> &lazy_list(*this);
+        int min_shifts = numeric_limits<T>::digits + 1;
+        for(int i=0; i<N; i++){
+            min_shifts = min(calc_shifts(A[i]), min_shifts);
+            A[i] <<= min_shifts;
+            lazy_list[min_shifts] = i;
+            // cout << min_shifts << endl;
+        }
+        cout << min_shifts << endl;
+        this->exponent -= min_shifts;
+        return *this;
     }
 
     std::vector<double> to_float() const {
