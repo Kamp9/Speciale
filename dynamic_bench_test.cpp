@@ -8,7 +8,6 @@
 
 #include "bfpdynamic.cpp"
 
-// using namespace std;
 
 template <typename T>
 BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
@@ -19,7 +18,7 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
         elems.push_back(rand_elem(rng));
     }
     boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
-    BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
+    BFPDynamic<T> A(elems, rand_exp(rng), false); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
 }
@@ -89,68 +88,74 @@ int main(int argc, char *argv[]){
     struct timeval tv;
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
-    
-    int test_type = atoi(argv[1]);
-    int op_type   = atoi(argv[2]);
-    size_t N      = atoi(argv[3]);
 
-    clock_t begin;
-    clock_t end;
-    double elapsed_secs;
+    // We need three arguments
+    if (argc != 4){
+        cout << "3 arguments needed: test_type, op_type, and size!" << endl;
+        return 0;
+    }else{
+        int test_type = atoi(argv[1]);
+        int op_type   = atoi(argv[2]);
+        size_t N      = atoi(argv[3]);
 
-    // Hmm
-    BFPDynamic<int32_t> A;
-    vector<double> Afloat;
+        clock_t begin;
+        clock_t end;
+        double elapsed_secs;
 
-    BFPDynamic<int8_t> A8;
-    BFPDynamic<int16_t> A16;
-    BFPDynamic<int32_t> A32;
+        // Hmm
+        BFPDynamic<int32_t> A;
+        vector<double> Afloat;
 
-    switch(test_type){
-        case 0 :
-            A = gen_bfp<int32_t>(rng, N);
-            Afloat = A.to_float();
-            begin = clock();
+        BFPDynamic<int8_t> A8;
+        BFPDynamic<int16_t> A16;
+        BFPDynamic<int32_t> A32;
 
-            call_op_float(op_type, Afloat);
+        switch(test_type){
+            case 0 :
+                A = gen_bfp<int32_t>(rng, N);
+                Afloat = A.to_float();
+                begin = clock();
 
-            end = clock();
-            elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-            break;
+                call_op_float(op_type, Afloat);
 
-        case 8 :
-            A8 = gen_bfp<int8_t>(rng, N);
-            begin = clock();
+                end = clock();
+                elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+                break;
 
-            call_op(op_type, A8);
+            case 8 :
+                A8 = gen_bfp<int8_t>(rng, N);
+                begin = clock();
 
-            end = clock();
-            elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-            break;
+                call_op(op_type, A8);
 
-        case 16 :
-            A16 = gen_bfp<int16_t>(rng, N);
-            begin = clock();
-            
-            call_op(op_type, A16);
-            
-            end = clock();
-            elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-            break;
+                end = clock();
+                elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+                break;
 
-        case 32 :
-            A32 = gen_bfp<int32_t>(rng, N);
-            begin = clock();
-            
-            call_op(op_type, A32);
-            
-            end = clock();
-            elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-            break;
-        default :
-            cout << "Wrong test type! Must be 8, 16, or 32 in first argument." << endl;
+            case 16 :
+                A16 = gen_bfp<int16_t>(rng, N);
+                begin = clock();
+                
+                call_op(op_type, A16);
+                
+                end = clock();
+                elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+                break;
+
+            case 32 :
+                A32 = gen_bfp<int32_t>(rng, N);
+                begin = clock();
+                
+                call_op(op_type, A32);
+                
+                end = clock();
+                elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+                break;
+            default :
+                cout << "Wrong test type! Must be 8, 16, or 32 in first argument." << endl;
+        }
+        // cout << elapsed_secs << endl;
+        cout << "elapsed-time: " << elapsed_secs << endl;
+        return 0;
     }
-    // cout << elapsed_secs << endl;
-    cout << "elapsed-time: " << elapsed_secs << endl;
-    return 0;
 }
