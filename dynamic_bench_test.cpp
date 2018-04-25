@@ -18,7 +18,7 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
         elems.push_back(rand_elem(rng));
     }
     boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
-    BFPDynamic<T> A(elems, rand_exp(rng), false); //rand_exp(rng)
+    BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
 }

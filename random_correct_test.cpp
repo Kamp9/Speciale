@@ -77,7 +77,8 @@ int main(){
 
     auto C = gen_bfp<int8_t, 10>(rng);
     auto D = gen_bfp<int8_t, 10>(rng);
-    auto A = gen_bfp_pos<int8_t, 1>(rng);
+    auto A = gen_bfp_pos<int8_t, 10>(rng);
+    auto B = gen_bfp_pos<int8_t, 10>(rng);
 
     // BFPStatic<int8_t, 5> L{{56,-29,14,39,-43},2};
     // BFPStatic<int8_t, 5> M{{-52,22,-51,46,106},-3};
@@ -106,7 +107,7 @@ int main(){
     // BFPStatic<int8_t, 1> P{{100},0};
     // BFPStatic<int8_t, 1> Q{{100},0};
 
-    // check_add(A,B);
+    check_add(A ,B);
     // check_sqrt(A);
     // auto S = gen_bfp<int8_t, 20>(rng);
     // auto R = gen_bfp<int8_t, 20>(rng);
@@ -115,7 +116,7 @@ int main(){
     // BFPStatic<int8_t, 1> B100{{-65}, 0};
 
     // check_invsqrt(L);
-    check_sqrt(A);
+    // check_sqrt(A);
 
     return 0;
 }

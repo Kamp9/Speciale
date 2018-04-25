@@ -43,12 +43,12 @@ typedef uint64_t uTx2;
 template <typename T>
 struct BFPDynamic: public std::vector<T>{
     int exponent;
-    bool normalized;
+    bool normalized = false;
+    bool lazy = false;
     std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
 
-
     BFPDynamic(int exponent=0) : exponent(exponent) {}
-    BFPDynamic(std::vector<T> &A, int exponent, bool normalized) : std::vector<T>(A), exponent(exponent), normalized(normalized) {}
+    BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
     BFPDynamic(std::vector<double> &V) {
         size_t N = V.size();
         std::vector<T> &A(*this);
@@ -82,16 +82,18 @@ struct BFPDynamic: public std::vector<T>{
     BFPDynamic<T> normalize() {
         std::vector<T> &A(*this);
         const size_t N = this->size();
-        // std::array<size_t, numeric_limits<T>::digits> &lazy_list(*this);
         int min_shifts = numeric_limits<T>::digits + 1;
+        bool lazy = false;
         for(int i=0; i<N; i++){
             min_shifts = min(calc_shifts(A[i]), min_shifts);
             A[i] <<= min_shifts;
             lazy_list[min_shifts] = i;
-            // cout << min_shifts << endl;
+            lazy |= min_shifts != 0;
         }
         cout << min_shifts << endl;
         this->exponent -= min_shifts;
+        this->normalized = true;
+        this->lazy = lazy;
         return *this;
     }
 
@@ -179,10 +181,7 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     for(size_t i=0;i<N;i++){
         Tx2     ABi = A[i] + (B[i] >> exp_diff);
         T       abi = ABi;
-	//        carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-	//        sAB[i]      = signbit(ABi);
-	//        carry      |= carryAB[i];
-	      carry      |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+        carry      |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
 
     AB.exponent = A.exponent + carry;

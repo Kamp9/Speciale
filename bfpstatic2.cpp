@@ -41,9 +41,9 @@ template <typename T, size_t N>
 struct BFPStatic: public std::array<T,N>{
     int exponent;
 
-  BFPStatic(int exponent=0) : exponent(exponent) {}
-  BFPStatic(const std::array<T,N> &A, int exponent) : std::array<T,N>(A), exponent(exponent) {}
-  BFPStatic(const std::vector<double> &V) {
+    BFPStatic(int exponent=0) : exponent(exponent) {}
+    BFPStatic(const std::array<T,N> &A, int exponent) : std::array<T,N>(A), exponent(exponent) {}
+    BFPStatic(const std::vector<double> &V) {
         assert(V.size() == N);
     
         std::array<T,N> &A(*this);
@@ -73,6 +73,7 @@ struct BFPStatic: public std::array<T,N>{
             A[i] = round(V[i]*power);
         }
     }
+
 
     std::vector<double> to_float() const {
         std::vector<double> values(N);
@@ -443,8 +444,8 @@ BFPStatic<T, N> bfp_sqrt2(const BFPStatic<T, N> &A) {
 
 
     cout << numeric_limits<T>::digits << endl;
-    // sqrtA.exponent = 1 + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
-    sqrtA.exponent = ((shifts + numeric_limits<T>::digits) >> 1) - (numeric_limits<T>::digits - shifts);
+    sqrtA.exponent = 1 + ((A.exponent >> 1) - ((numeric_limits<T>::digits) >> 2)) + ((numeric_limits<T>::digits + 1) * 2) + shifts;
+    // sqrtA.exponent = (numeric_limits<T>::digits * 2 - shifts) + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
 
     return sqrtA;
 }
