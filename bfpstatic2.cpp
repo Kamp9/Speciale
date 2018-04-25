@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <numeric>
 #include <bitset>
 #include <limits>
