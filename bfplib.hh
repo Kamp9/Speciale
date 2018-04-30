@@ -39,11 +39,13 @@ template <typename T> int floor_log2(T value)
 template <typename T> int calc_shifts(T num){
 	int r = 0;
 	num = abs(num);
-	while (num >>= 1) // unroll for more speed...
+
+	while (num) // unroll for more speed...
 	{
 	  r++;
+	  num >>= 1;
 	}
-	return numeric_limits<T>::digits - r - 1;
+	return numeric_limits<T>::digits - r;// - 1;
 }
 
 

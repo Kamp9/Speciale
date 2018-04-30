@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
     struct timeval tv;
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
-    auto A = gen_bfp_pos<int32_t>(rng, 10);
+    auto A = gen_bfp_pos<int8_t>(rng, 10);
     // auto B = gen_bfp<int8_t>(rng, 10);
     // auto B = gen_bfp<int8_t>(rng, 10);
     // vector<int8_t>A2(-15,-107,66,-111,-13);

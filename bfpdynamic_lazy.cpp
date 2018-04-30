@@ -43,12 +43,16 @@ typedef uint64_t uTx2;
 template <typename T>
 struct BFPDynamic: public std::vector<T>{
     int exponent;
-    bool normalized = false;
-    bool lazy = false;
-    std::array<size_t, numeric_limits<T>::digits> lazy_list {};
+    int lazy_min = numeric_limits<T>::digits; // numeric_limits<T>::digits + 2; // 1?
+    // std::array<int64_t, numeric_limits<T>::digits> lazy_list;
+    std::vector<int64_t> lazy_list;
 
     BFPDynamic(int exponent=0) : exponent(exponent) {}
-    BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
+
+    BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {
+        // lazy_list.fill(-1);
+    }
+
     BFPDynamic(std::vector<double> &V) {
         size_t N = V.size();
         std::vector<T> &A(*this);
@@ -87,12 +91,11 @@ struct BFPDynamic: public std::vector<T>{
         for(int i=0; i<N; i++){
             min_shifts = min(calc_shifts(A[i]), min_shifts);
             A[i] <<= min_shifts;
-            lazy_list[min_shifts] = i + 1; // AD!!
-            lazy |= min_shifts != 0;
+            lazy_list.push_back(min_shifts);
+            // lazy_list[min_shifts] = i;
         }
         this->exponent -= min_shifts;
-        this->normalized = true;
-        this->lazy = lazy;
+        this->lazy_min = min_shifts;
         return *this;
     }
 
@@ -109,7 +112,7 @@ struct BFPDynamic: public std::vector<T>{
         s << "{" << vector<int64_t>(A.begin(),A.end()) << "," << A.exponent << "}";
         return s;
     }
-}; 
+};
 
 
 template <typename T>
@@ -132,10 +135,9 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     }
     // We should make a case when exp_diff are 0
 
-
     AB.exponent = A.exponent + carry;
-    AB.lazy = carry;
-    AB.normalized = true;
+    // AB.lazy = carry;
+    // AB.normalized = true;
     return AB;
 }
 
@@ -289,30 +291,28 @@ BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
 template <typename T>
 BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
 
-    cout << sqrt(45765.0) << endl;
-    // typename make_unsigned<T>::type uT;
-    // typedef std::make_unsigned<T>::type uT;
     size_t N = A.size();
     BFPDynamic<T> sqrtA;
 
     int min_shifts = numeric_limits<T>::digits + 2;
     int bits = numeric_limits<T>::digits + 1;
     int bitshalfs = bits >> 1;
-
     // Add one bit to a, root, and rem datatypes by making them unsigned.
     typename make_unsigned<T>::type a;
     typename make_unsigned<T>::type root;
     typename make_unsigned<T>::type rem;
+    // cout << A.lazy_list << endl;
 
-    for(int i = 0; i < numeric_limits<T>::digits; i++){
-        cout << A.lazy_list[i] << endl;
-    }
-
+    // for(int i = 0; i < numeric_limits<T>::digits; i++){
+    //     cout << A.lazy_list[i] << endl;
+    // }
     for (size_t i=0; i < N; i++){
-        a = A[i];
+        a = A[i] >> (A.lazy_list[i] - A.lazy_min);
+        a >>= (A.exponent & 1);
         rem = 0;
         root = 0;
         for(int i=0; i<bitshalfs; i++){
+
             root <<= 1;
             rem = ((rem << 2) + (a >> (bits - 2)));
             a <<= 2;
@@ -323,15 +323,16 @@ BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
             }else
                 root--;
         }
-        root >>= 1;
-        
-        min_shifts = min(calc_shifts(T(root)), min_shifts);
-        sqrtA.lazy_list[min_shifts] = i;
-        sqrtA.push_back(root << min_shifts);
+        // root >>= 1;
+
+        min_shifts = min(calc_shifts(root), min_shifts);
+        sqrtA.lazy_list.push_back(min_shifts);
+        sqrtA.push_back(root << (min_shifts - 1));
     }
-    sqrtA.exponent = A.exponent - min_shifts;
-    // sqrtA.exponent = 1 + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
-    // sqrtA.exponent = ((shifts + numeric_limits<T>::digits) >> 1) - (numeric_limits<T>::digits - shifts);
+
+    sqrtA.exponent = A.exponent - min_shifts - (A.exponent >> 1);
+    sqrtA.lazy_min = min_shifts;
+
     return sqrtA;
 }
 
