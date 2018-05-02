@@ -45,13 +45,15 @@ int main(int argc, char *argv[]){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
     auto A = gen_bfp_pos<int8_t>(rng, 10);
-    // auto B = gen_bfp<int8_t>(rng, 10);
+    auto B = gen_bfp_pos<int8_t>(rng, 10);
     // auto B = gen_bfp<int8_t>(rng, 10);
     // vector<int8_t>A2(-15,-107,66,-111,-13);
     // BFPDynamic<int8_t> A{A2, 0, false};
     // check_sqrt2(A);
-    cout << A << endl;
-    check_sqrt(A.normalize());
+    // cout << (A * B).to_float() << endl;
+    // cout << A << endl;
+    check_mul(A, B);
+    // cout << A << endl;
     // cout << A.normalized << endl;
     // cout << A.normalize().lazy_list << endl;
     // cout << A.normalized +  << endl;

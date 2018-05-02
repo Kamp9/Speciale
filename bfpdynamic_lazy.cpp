@@ -44,6 +44,8 @@ template <typename T>
 struct BFPDynamic: public std::vector<T>{
     int exponent;
     int lazy_min = numeric_limits<T>::digits; // numeric_limits<T>::digits + 2; // 1?
+    int normalized = false;
+
     // std::array<int64_t, numeric_limits<T>::digits> lazy_list;
     std::vector<int64_t> lazy_list;
 
@@ -86,16 +88,18 @@ struct BFPDynamic: public std::vector<T>{
     BFPDynamic<T> normalize() {
         std::vector<T> &A(*this);
         const size_t N = this->size();
-        int min_shifts = numeric_limits<T>::digits + 1;
+        int min_shifts = numeric_limits<int>::max();
         bool lazy = false;
+        int bits = numeric_limits<T>::digits + 1;
         for(int i=0; i<N; i++){
-            min_shifts = min(calc_shifts(A[i]), min_shifts);
+            min_shifts = min(calc_shifts(bits, A[i]), min_shifts);
             A[i] <<= min_shifts;
             lazy_list.push_back(min_shifts);
             // lazy_list[min_shifts] = i;
         }
-        this->exponent -= min_shifts;
-        this->lazy_min = min_shifts;
+        exponent -= min_shifts;
+        lazy_min = min_shifts;
+        normalized = true;
         return *this;
     }
 
@@ -103,8 +107,15 @@ struct BFPDynamic: public std::vector<T>{
         const size_t N = this->size();
         std::vector<double> values(N);
         const std::vector<T> &A(*this);
-
-        for(int i=0;i<N;i++) values[i] = pow(2.0,exponent)*A[i];
+        if (normalized){
+             for(int i=0;i<N;i++){
+                values[i] = pow(2.0,exponent) * (A[i] >> (lazy_list[i] - lazy_min));
+            }
+        }else{
+            for(int i=0;i<N;i++){
+                values[i] = pow(2.0,exponent) * A[i];
+            }
+        }
         return values;
     }
 
@@ -156,60 +167,61 @@ BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 
 
 template <typename T>
-BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-  size_t N = A.size();
-  // assert(N==B.size());
-  BFPDynamic<T> AB;
-  Tx2 max_value = 0;
-
-  for (size_t i = 0; i < N; i++) {
-    Tx2 ABi = Tx2(A[i]) * B[i];
-    max_value = max(max_value, std::abs(ABi));
-  }
-  
-  int shifts = 1 + floor_log2(max_value) - (numeric_limits<T>::digits);
-  if (shifts < 0)
-    shifts = 0;
-  
-  for (size_t i = 0; i < N; i++){
-    Tx2 ABi = Tx2(A[i]) * B[i];
-    bool rounding = (ABi >> (shifts - 1)) & 1;
-    bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-    AB.push_back((ABi >> shifts) + rounding - rounding2);
-  }
-  AB.exponent = A.exponent + B.exponent + shifts;
-  return AB;
-}
-
-
-template <typename T>
-BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-    size_t N = A.size();
-    // assert(N==B.size());
-
+BFPDynamic<T> operator*(BFPDynamic<T> &A, BFPDynamic<T> &B){
     BFPDynamic<T> AB;
-    Tx2 max_value = 0;
-
-    for (size_t i = 0; i < N; i++) {
-        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        max_value = max(max_value, std::abs(ABi));
+    size_t N = A.size();
+    int min_shifts = numeric_limits<int>::max();
+    int bits = numeric_limits<T>::digits + 1;
+    int double_bits = bits * 2;
+    if (!A.normalized){
+        A.normalize();
     }
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
-    if (shifts < 0)
-        shifts = 0;
 
+    if (!B.normalized){
+        B.normalize();
+    }
     for (size_t i = 0; i < N; i++){
-        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        bool rounding = ((ABi >> (shifts - 1)) & 1);
-        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
+        Tx2 ABi = Tx2(A[i] >> (A.lazy_list[i] - A.lazy_min)) * (B[i] >> (B.lazy_list[i] - B.lazy_min));
+        min_shifts = min(calc_shifts(double_bits, ABi), min_shifts);
+        AB.lazy_list.push_back(min_shifts);
 
-        AB.push_back((ABi >> shifts) + rounding - rounding2);
+        AB.push_back(((ABi << min_shifts) >> bits));
     }
-
-    AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
-
+    AB.lazy_min = min_shifts;
+    AB.normalized = true;
+    AB.exponent = A.exponent + B.exponent - min_shifts + bits;
     return AB;
 }
+
+
+// template <typename T>
+// BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+//     size_t N = A.size();
+//     // assert(N==B.size());
+
+//     BFPDynamic<T> AB;
+//     Tx2 max_value = 0;
+
+//     for (size_t i = 0; i < N; i++) {
+//         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+//         max_value = max(max_value, std::abs(ABi));
+//     }
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     if (shifts < 0)
+//         shifts = 0;
+
+//     for (size_t i = 0; i < N; i++){
+//         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+//         bool rounding = ((ABi >> (shifts - 1)) & 1);
+//         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
+
+//         AB.push_back((ABi >> shifts) + rounding - rounding2);
+//     }
+
+//     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
+
+//     return AB;
+// }
 
 template <typename T>
 BFPDynamic<T> bfp_pow(const BFPDynamic<T> &A, const BFPDynamic<T> &p) {
@@ -325,7 +337,7 @@ BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
         }
         // root >>= 1;
 
-        min_shifts = min(calc_shifts(root), min_shifts);
+        min_shifts = min(calc_shifts(bits, root), min_shifts);
         sqrtA.lazy_list.push_back(min_shifts);
         sqrtA.push_back(root << (min_shifts - 1));
     }
@@ -585,17 +597,19 @@ template <typename T> void check_sub(const T& A, const T& B){
   //      << sB << "\n\n";
 }
 
-template <typename T> void check_mul(const T& A, const T& B){
+template <typename T> void check_mul(T& A, T& B){
   assert(A.size() == B.size());
   size_t N = A.size();
+
   cout << "******************** Checking multiplication of: ********************\n"
        << A << " *\n" << B << " = \n\n"
        << A.to_float() << " *\n"  << B.to_float() << "\n\n";
 
   auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A*B;
+  cout << AB << endl;
+  // cout << A.nor
   auto ABfloat = A.to_float() * B.to_float();
-
   vector<bool> sA(N), sB(N);
   for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
 
@@ -604,10 +618,6 @@ template <typename T> void check_mul(const T& A, const T& B){
 
   cout << "Floating point in BFP-representation:\n"
        << T(Afloat) << " *\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
-
-  cout << "Result of BFP-multiplication:\n"
-       << AB << "\n"
-       << T(ABfloat) << " wanted.\n\n";
 
   cout << "Result of BFP-multiplication converted to floating point:\n"
        << AB.to_float() << "\n"
@@ -619,6 +629,14 @@ template <typename T> void check_mul(const T& A, const T& B){
        <<  (AB.to_float() - ABfloat) << "\n"
        << "Error compared to rounded exact:\n"
        << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+
+  cout << "AB.exponent: " << AB.exponent << endl;
+  AB.exponent = 0;
+
+  cout << "Result of BFP-multiplication:\n"
+       << AB.to_float() << "\n"
+       << T(ABfloat) << " wanted.\n\n";
+
 
   // cout << "signs:\n"
   //      << sA << "\n"

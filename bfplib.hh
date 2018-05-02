@@ -36,16 +36,16 @@ template <typename T> int floor_log2(T value)
 }
 
 // Should be unit tested since negative should get one off
-template <typename T> int calc_shifts(T num){
+template <typename T> int calc_shifts(int bits, T num){
 	int r = 0;
 	num = abs(num);
-
 	while (num) // unroll for more speed...
 	{
 	  r++;
 	  num >>= 1;
 	}
-	return numeric_limits<T>::digits - r;// - 1;
+	// cout << bits - r - 1 << endl;
+	return bits - r - 1;// - 1;
 }
 
 
