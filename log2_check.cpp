@@ -7,7 +7,7 @@
 #include <cxxabi.h>
 
 
-template <typename T> void test_msb(boost::random::mt19937 rng, int N)
+template <typename T> void log2_check(boost::random::mt19937 rng, int N)
 {
   boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
 
@@ -41,10 +41,10 @@ int main()
   
   const int N = 1000;
 
-  test_msb<uint8_t> (rng,N);
-  test_msb<uint16_t>(rng,N);
-  test_msb<uint32_t>(rng,N);
-  test_msb<uint64_t>(rng,N);    
+  log2_check<uint8_t> (rng,N);
+  log2_check<uint16_t>(rng,N);
+  log2_check<uint32_t>(rng,N);
+  log2_check<uint64_t>(rng,N);    
     
   return 0;
 }
