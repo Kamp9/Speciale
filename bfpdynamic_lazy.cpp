@@ -45,7 +45,7 @@ struct BFPDynamic: public std::vector<T>{
     int exponent;
     int lazy_min = numeric_limits<T>::digits; // numeric_limits<T>::digits + 2; // 1?
     int normalized = false;
-
+    int contains_nagative = false;
     // std::array<int64_t, numeric_limits<T>::digits> lazy_list;
     std::vector<int64_t> lazy_list;
 
@@ -95,6 +95,7 @@ struct BFPDynamic: public std::vector<T>{
             min_shifts = min(calc_shifts(bits, A[i]), min_shifts);
             A[i] <<= min_shifts;
             lazy_list.push_back(min_shifts);
+            contains_nagative |= signbit(A[i]);
             // lazy_list[min_shifts] = i;
         }
         exponent -= min_shifts;
@@ -297,25 +298,29 @@ BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
 }
 
 
-// #define BITSPERLONG 32
-// #define TOP2BITS(x) ((x & (3L << (BITSPERLONG-2))) >> (BITSPERLONG-2))
-
 template <typename T>
-BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
+BFPDynamic<T> bfp_sqrt2(BFPDynamic<T> &A) {
 
-    size_t N = A.size();
     BFPDynamic<T> sqrtA;
+    size_t N = A.size();
 
-    int min_shifts = numeric_limits<T>::digits + 2;
+    int min_shifts = numeric_limits<int>::max();
     int bits = numeric_limits<T>::digits + 1;
     int bitshalfs = bits >> 1;
+
+    int double_bits = bits * 2;
+
+    if (!A.normalized){
+        A.normalize();
+    }
+
     // Add one bit to a, root, and rem datatypes by making them unsigned.
     typename make_unsigned<T>::type a;
     typename make_unsigned<T>::type root;
     typename make_unsigned<T>::type rem;
     // cout << A.lazy_list << endl;
 
-    // for(int i = 0; i < numeric_limits<T>::digits; i++){
+    // for(int i = 0; i < numeric_limits<T>::digits; i++){  
     //     cout << A.lazy_list[i] << endl;
     // }
     for (size_t i=0; i < N; i++){
@@ -328,23 +333,23 @@ BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
             root <<= 1;
             rem = ((rem << 2) + (a >> (bits - 2)));
             a <<= 2;
-            root ++;
+            root++;
             if(root <= rem){
                 rem -= root;
                 root++;
             }else
                 root--;
         }
-        // root >>= 1;
+        root >>= 1;
 
         min_shifts = min(calc_shifts(bits, root), min_shifts);
         sqrtA.lazy_list.push_back(min_shifts);
-        sqrtA.push_back(root << (min_shifts - 1));
+        sqrtA.push_back(root << (min_shifts));
     }
-
+    cout << sqrtA.lazy_list << endl;
     sqrtA.exponent = A.exponent - min_shifts - (A.exponent >> 1);
     sqrtA.lazy_min = min_shifts;
-
+    sqrtA.normalized = true;
     return sqrtA;
 }
 
@@ -698,17 +703,18 @@ template <typename T> void check_pow(const T& A, const T& p){
 }
 
 
-template <typename T> void check_sqrt(const T& A){
+template <typename T> void check_sqrt(T& A){
   size_t N = A.size();
   cout << "******************** Checking square root function of: ********************\n"
        << "sqrt " << A << " = \n\n";
 
   // auto Afloat = A.to_float();
   auto sqrtA = bfp_sqrt2(A);
+  auto Asqrt = sqrtA.to_float();
   auto sqrtAfloat = Vsqrt(A.to_float());
 
   cout << "Result of BFP-square root:\n"
-       << sqrtA << "\n"
+       << T(Asqrt) << "\n"
        << T(sqrtAfloat) << " wanted.\n\n";
 
   cout << "Is the result correct? " << (sqrtA.to_float() == T(sqrtAfloat).to_float()? "Yes.\n" : "No.\n");

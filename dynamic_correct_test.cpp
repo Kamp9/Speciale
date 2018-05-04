@@ -45,14 +45,22 @@ int main(int argc, char *argv[]){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
     auto A = gen_bfp_pos<int8_t>(rng, 10);
-    auto B = gen_bfp_pos<int8_t>(rng, 10);
+    // auto B = gen_bfp_pos<int8_t>(rng, 10);
     // auto B = gen_bfp<int8_t>(rng, 10);
     // vector<int8_t>A2(-15,-107,66,-111,-13);
     // BFPDynamic<int8_t> A{A2, 0, false};
     // check_sqrt2(A);
     // cout << (A * B).to_float() << endl;
     // cout << A << endl;
-    check_mul(A, B);
+    check_sqrt(A);
+
+    //     sqrt {{7,63,62,41,109,38,47,43,113,118},9} = 
+
+    // {6,4,4,4,4,4,4,4,4,4}
+    // Result of BFP-square root:
+    // {{16,80,80,64,112,64,64,64,112,112},1}
+    // {{30,90,89,72,118,70,78,74,120,123},1} wanted.
+
     // cout << A << endl;
     // cout << A.normalized << endl;
     // cout << A.normalize().lazy_list << endl;
