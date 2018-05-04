@@ -3,6 +3,7 @@
 #include <numeric>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ void print_bit_rep(double doubleValue){
 }
 
 // Langsom O(n)-version af floor(log2(x)) for heltal: mest betydende satte bit
-template <typename T> int floor_log2(T value)
+template <typename T> int floor_log2_slow(T value)
 {
   int i=0;
   while(value > 0){
@@ -76,23 +77,48 @@ template <typename T> int calc_shifts(int bits, T num){
 
 // template <typename T> msb(const &T x);
 
-// template <> msb<uint8_t>(const uint32_t &value)
-// {
-//   //  const uint8_t table[256] = {0,1,1,2,...};
-//   return table[value];    
-// }
+template <typename T> int floor_log2(const T& value)
+{
+  //  fprintf(stderr,"msb<%s> not implemented.\n", typeid(T).name());
+  exit(-1);
+}
 
-// template <> msb<uint16_t>(const uint16_t &value)
-// {
-//   // sådan cirka
-//   int v = value > 0xff? (value >> 8) : value;
-//   int m = value > 0xff? 16 | 0;
-//   return  msb<uint8_t>(v) | m;
-// }
-// template <> msb<uint32_t>(const uint32_t &value)
-// {
-//   ///  .... bla bla bla
-// }
+template <> int floor_log2<uint8_t>(const uint8_t &value)
+{
+  const uint8_t table[256] = {0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 
+			      4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+			      5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 
+			      6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 
+			      6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 
+			      6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 
+			      7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			      7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			      7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			      7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			      7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			      7, 7, 7, 7, 7, 7, 7};
+   return table[value];    
+}
+
+template <> int floor_log2<uint16_t>(const uint16_t &value)
+{
+  int m = value > 0xff? 8 : 0;
+  return floor_log2<uint8_t>(value >> m) | m;
+}
+
+template <> int floor_log2<uint32_t>(const uint32_t &value)
+{
+  int m = value > 0xffff? 16 : 0;
+  return floor_log2<uint16_t>(value >> m) | m;
+}
+
+template <> int floor_log2<uint64_t>(const uint64_t &value)
+{
+  int m = value > 0xffffffff? 32 : 0;
+  return floor_log2<uint32_t>(value >> m) | m;
+}
+
+
 
 // template <> msb<uint64_t>(const uint64_t &value)
 // {
