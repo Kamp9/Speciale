@@ -27,9 +27,8 @@ template <typename T> void log2_check(boost::random::mt19937 rng, int N)
       fprintf(stderr,"Error in  floor_log2(%d): !(%d = %d = %d)\n", (int)x, msb1,msb2,msb3);
       success = false;
     }
-    //    else fprintf(stderr,"SMUKT! floor_log2(%d): %d = %d = %d\n", (int)x, msb1,msb2,msb3);
   }
-  fprintf(stderr,"%s test of floor_log2<%s>.\n",success?"Successful":"Errors in",type_name);
+  fprintf(stderr,"%s check of %d applications of floor_log2<%s>.\n",success?"Successful":"Errors in",N, type_name);
 }
 
 int main()
