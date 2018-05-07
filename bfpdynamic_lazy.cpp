@@ -305,30 +305,31 @@ BFPDynamic<T> bfp_sqrt2(BFPDynamic<T> &A) {
     size_t N = A.size();
 
     int min_shifts = numeric_limits<int>::max();
-    int bits = numeric_limits<T>::digits + 1;
+
+    int bits = numeric_limits<uTx2>::digits;
     int bitshalfs = bits >> 1;
-    int double_bits = bits * 2;
 
     if (!A.normalized){
         A.normalize();
     }
 
     // Add one bit to a, root, and rem datatypes by making them unsigned.
-    typename make_unsigned<T>::type a;
-    typename make_unsigned<T>::type root;
-    typename make_unsigned<T>::type rem;
-    // cout << A.lazy_list << endl;
-
+    // typename make_unsigned<T>::type a;
+    // typename make_unsigned<T>::type root;
+    // typename make_unsigned<T>::type rem;
+    uTx2 a;
+    uTx2 root;
+    uTx2 rem;
     // for(int i = 0; i < numeric_limits<T>::digits; i++){  
     //     cout << A.lazy_list[i] << endl;
     // }
+
     for (size_t i=0; i < N; i++){
-        a = A[i] >> (A.lazy_list[i] - A.lazy_min);
-        a >>= (A.exponent & 1);
+        a = (A[i] >> (A.lazy_list[i] - A.lazy_min)) << (6 + (A.exponent & 1));
+        // a >>= (A.exponent & 1);
         rem = 0;
         root = 0;
         for(int i=0; i<bitshalfs; i++){
-
             root <<= 1;
             rem = ((rem << 2) + (a >> (bits - 2)));
             a <<= 2;
@@ -340,13 +341,13 @@ BFPDynamic<T> bfp_sqrt2(BFPDynamic<T> &A) {
                 root--;
         }
         root >>= 1;
-
-        min_shifts = min(calc_shifts(bits, root), min_shifts);
+        bool rounding = root < rem;
+        root += rounding;
+        min_shifts = min(calc_shifts(bitshalfs, root), min_shifts);
         sqrtA.lazy_list.push_back(min_shifts);
-        sqrtA.push_back(root << (min_shifts));
+        sqrtA.push_back((root << min_shifts));
     }
-    cout << sqrtA.lazy_list << endl;
-    sqrtA.exponent = A.exponent - min_shifts - (A.exponent >> 1);
+    sqrtA.exponent = 1 + (A.exponent >> 1) - min_shifts - (bitshalfs >> 1);
     sqrtA.lazy_min = min_shifts;
     sqrtA.normalized = true;
     return sqrtA;
@@ -711,7 +712,6 @@ template <typename T> void check_sqrt(T& A){
   auto sqrtA = bfp_sqrt2(A);
   auto Asqrt = sqrtA.to_float();
   auto sqrtAfloat = Vsqrt(A.to_float());
-
   cout << "Result of BFP-square root:\n"
        << T(Asqrt) << "\n"
        << T(sqrtAfloat) << " wanted.\n\n";
