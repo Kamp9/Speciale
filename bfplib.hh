@@ -38,7 +38,7 @@ template <typename T> int floor_log2(T value)
 // Should be unit tested since negative should get one off
 template <typename T> int calc_shifts(int bits, T num){
 	int r = 0;
-	num = abs(num);
+	// num = abs(num);
 	while (num) // unroll for more speed...
 	{
 	  r++;

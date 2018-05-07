@@ -36,7 +36,7 @@ template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
 
 // TODO: Derive double-length type automatically or pass as template parameter.
 typedef int64_t Tx2;
-typedef uint64_t uTx2;
+typedef uint16_t uTx2;
 
 
 // BFPDynamic definition
@@ -251,51 +251,51 @@ BFPDynamic<T> bfp_pow(const BFPDynamic<T> &A, const BFPDynamic<T> &p) {
 
 //...nok bedre at basere loesningen paa denne:
 //https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
-template <typename T>
-BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
-    size_t N = A.size();
-    // assert(N==B.size());
+// template <typename T>
+// BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
+//     size_t N = A.size();
+//     // assert(N==B.size());
     
-    BFPDynamic<T> sqrtA;
-    uTx2 max_value = 0;
+//     BFPDynamic<T> sqrtA;
+//     uTx2 max_value = 0;
 
-    for (size_t i=0; i < N; i++){
-      uTx2 sqrtAi = uTx2(A[i]) << (sizeof(T)*8 + (A.exponent & 1));
-      uTx2 y = (sqrtAi >> 1);
-      uTx2 z = 0;
-      uTx2 y1;
+//     for (size_t i=0; i < N; i++){
+//       uTx2 sqrtAi = uTx2(A[i]) << (sizeof(T)*8 + (A.exponent & 1));
+//       uTx2 y = (sqrtAi >> 1);
+//       uTx2 z = 0;
+//       uTx2 y1;
 
-      while (y != z) {
-            z = y;
-            y1 = (y + sqrtAi / y);
-            y = (y1 >> 1) + (y1 & 1);
-      }
-      max_value = max(max_value, y - (y1 & 1));
-    }
+//       while (y != z) {
+//             z = y;
+//             y1 = (y + sqrtAi / y);
+//             y = (y1 >> 1) + (y1 & 1);
+//       }
+//       max_value = max(max_value, y - (y1 & 1));
+//     }
 
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
 
-    if (shifts < 0){
-      shifts = 0;
-    }
-    for (size_t i=0; i < N; i++){
-        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-        uTx2 y = (sqrtAi >> 1);
-        uTx2 z = 0;
-        uTx2 y1;
-        while (y != z) {
-            z = y;
-            y1 = (y + sqrtAi / y);
-            y = (y1 >> 1) + (y1 & 1);
-        }
-        y -= (y1 & 1);
+//     if (shifts < 0){
+//       shifts = 0;
+//     }
+//     for (size_t i=0; i < N; i++){
+//         uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+//         uTx2 y = (sqrtAi >> 1);
+//         uTx2 z = 0;
+//         uTx2 y1;
+//         while (y != z) {
+//             z = y;
+//             y1 = (y + sqrtAi / y);
+//             y = (y1 >> 1) + (y1 & 1);
+//         }
+//         y -= (y1 & 1);
 
-        sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
-        }
-    sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
+//         sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
+//         }
+//     sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
-    return sqrtA;
-}
+//     return sqrtA;
+// }
 
 
 template <typename T>
@@ -307,7 +307,6 @@ BFPDynamic<T> bfp_sqrt2(BFPDynamic<T> &A) {
     int min_shifts = numeric_limits<int>::max();
     int bits = numeric_limits<T>::digits + 1;
     int bitshalfs = bits >> 1;
-
     int double_bits = bits * 2;
 
     if (!A.normalized){
