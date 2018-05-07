@@ -29,31 +29,31 @@ int main(){
     // calc_shifts
     cout << "CALC SHIFTS:" << endl;
     int8_t a = 1;
-    check_int(calc_shifts(a), 6);
+    // check_int(calc_shifts(a), 6);
 
-    a = 2;
-    check_int(calc_shifts(a), 5);
+    // a = 2;
+    // check_int(calc_shifts(a), 5);
 
-    a = 3;
-    check_int(calc_shifts(a), 5);
+    // a = 3;
+    // check_int(calc_shifts(a), 5);
 
-    a = 63;
-    check_int(calc_shifts(a), 1);
+    // a = 63;
+    // check_int(calc_shifts(a), 1);
 
-    a = 64;
-    check_int(calc_shifts(a), 0);
+    // a = 64;
+    // check_int(calc_shifts(a), 0);
 
-    a = 65;
-    check_int(calc_shifts(a), 0);
+    // a = 65;
+    // check_int(calc_shifts(a), 0);
 
-    a = 127;
-    check_int(calc_shifts(a), 0);
+    // a = 127;
+    // check_int(calc_shifts(a), 0);
     
-    a = -1;
-    check_int(calc_shifts(a), 6);
+    // a = -1;
+    // check_int(calc_shifts(a), 6);
 
-    a = -2;
-    check_int(calc_shifts(a), 5);
+    // a = -2;
+    // check_int(calc_shifts(a), 5);
 
 
 
@@ -190,36 +190,13 @@ int main(){
 
     // SQUARE ROOT2
     cout << endl << "SQUARE ROOT:" << endl;
-
-    BFPStatic<int8_t, 1> A501{{1}, 0};
-    BFPStatic<int8_t, 1> C501{{{1}}};
     check(bfp_sqrt(A501), C501);
-
-    BFPStatic<int8_t, 1> A502{{9}, 0};
-    BFPStatic<int8_t, 1> C502{{{3}}};
     check(bfp_sqrt(A502), C502);
-
-    BFPStatic<int8_t, 1> A503{{100}, 0};
-    BFPStatic<int8_t, 1> C503{{{10}}};
     check(bfp_sqrt(A503), C503);
-
-    BFPStatic<int8_t, 1> A504{{2}, 0};
-    BFPStatic<int8_t, 1> C504{{{1.375}}};
     check(bfp_sqrt(A504), C504);
-
-    BFPStatic<int8_t, 1> A505{{2}, 2};
-    BFPStatic<int8_t, 1> C505{{{2.75}}};
     check(bfp_sqrt(A505), C505);
-
-    BFPStatic<int8_t, 1> A506{{2}, 2};
-    BFPStatic<int8_t, 1> C506{{11}, -2};
     check(bfp_sqrt(A506), C506);
-
-    BFPStatic<int8_t, 1> A507{{1}, 10};
-    BFPStatic<int8_t, 1> C507{{32}, 0};
     check(bfp_sqrt(A507), C507);
-
-
 
 
     return 0;
