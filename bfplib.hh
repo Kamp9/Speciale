@@ -80,6 +80,7 @@ template <typename T> int calc_shifts(int bits, T num){
 template <typename T> int floor_log2(T value)
 {
   //  fprintf(stderr,"msb<%s> not implemented.\n", typeid(T).name());
+  cout << "msb not implemented" << endl;
   exit(-1);
 }
 
@@ -129,6 +130,31 @@ template <> int floor_log2<uint64_t>(uint64_t value)
   return floor_log2<uint32_t>(value >> m) | m;
 }
 
+
+// template <> int floor_log2<int8_t>(int8_t value)
+// {
+//   const uint8_t table[16] = {0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3};
+//   int m = value > 0xf? 4 : 0;
+//   return table[value>>m] | m;
+// }
+
+// template <> int floor_log2<int16_t>(int16_t value)
+// {
+//   int m = value > 0xff? 8 : 0;
+//   return floor_log2<int8_t>(value >> m) | m;
+// }
+
+// template <> int floor_log2<int32_t>(int32_t value)
+// {
+//   int m = value > 0xffff? 16 : 0;
+//   return floor_log2<int16_t>(value >> m) | m;
+// }
+
+// template <> int floor_log2<int64_t>(int64_t value)
+// {
+//   int m = value > 0xffffffff? 32 : 0;
+//   return floor_log2<int32_t>(value >> m) | m;
+// }
 
 
 // template <> int floor_log2<uint64_t>(uint64_t value)

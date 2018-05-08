@@ -38,6 +38,11 @@ template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
 // typedef int64_t Tx2;
 // typedef uint16_t uTx2;
 
+template<typename T> struct uT {typedef T type;};
+template<> struct uT<int8_t>  {typedef uint8_t type;};
+template<> struct uT<int16_t> {typedef uint16_t type;};
+template<> struct uT<int32_t> {typedef uint32_t type;};
+
 template<typename T> struct Tx2 {typedef T type;};
 template<> struct Tx2<int8_t>   {typedef int16_t type;};
 template<> struct Tx2<int16_t>  {typedef int32_t type;};
@@ -101,7 +106,9 @@ struct BFPDynamic: public std::vector<T>{
         bool lazy = false;
         int bits = numeric_limits<T>::digits + 1;
         for(int i=0; i<N; i++){
-            min_shifts = min(calc_shifts(bits, A[i]), min_shifts);
+            // min_shifts = min(calc_shifts(bits, A[i]), min_shifts);
+            typename uT<T>::type absA = A[i] ^ (typename uT<T>::type(-1 * signbit(A[i])));
+            min_shifts = min(bits - floor_log2(absA) - 2, min_shifts);
             A[i] <<= min_shifts;
             lazy_list.push_back(min_shifts);
             contains_nagative |= signbit(A[i]);
@@ -136,31 +143,74 @@ struct BFPDynamic: public std::vector<T>{
 };
 
 
-// template <typename T>
-// BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-//     if(A.exponent < B.exponent) return B+A;
-//     size_t N = A.size();
-//     assert(N == B.size());
+template <typename T>
+BFPDynamic<T> operator+(BFPDynamic<T> &A, BFPDynamic<T> &B){
+    if(A.exponent < B.exponent) return B+A;
+    size_t N = A.size();
+    BFPDynamic<T> AB;
 
-//     BFPDynamic<T> AB;
+    int bits = numeric_limits<T>::digits + 1;
+    int min_shifts = numeric_limits<int>::max();
+    int exp_diff = A.exponent - B.exponent;
 
-//     int exp_diff = A.exponent - B.exponent;
-//     bool carry = false;
-//     for(size_t i=0;i<N;i++){
-//         Tx2 ABi = Tx2(A[i]) + (B[i] >> (exp_diff));
-//         T abi = ABi;
-//         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-//         AB.lazy_list[carry] = i;
+    if (!A.normalized){
+        A.normalize();
+    }
 
-//         AB.push_back(ABi >> carry);
-//     }
-//     // We should make a case when exp_diff are 0
+    if (!B.normalized){
+        B.normalize();
+    }
 
-//     AB.exponent = A.exponent + carry;
-//     // AB.lazy = carry;
-//     // AB.normalized = true;
-//     return AB;
-// }
+    // should normalize up to T size
+    bool carry = false;
+    for(size_t i=0;i<N;i++){
+        // typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff);
+
+        typename Tx2<T>::type ABi = 
+                        typename Tx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min))
+                              + (B[i] >> ((B.lazy_list[i] - B.lazy_min) + exp_diff));
+
+        bool rounding = (B[i] >> (exp_diff - 1) & 1);
+        ABi += rounding;
+        // ABi -= ;
+        // cout << (B[i] >> (exp_diff - 1) & 1) << endl;
+        // bool rounding = ;
+        // ABi += rounding;
+
+        typename uTx2<T>::type absABi = ABi ^ (typename Tx2<T>::type(-1 * signbit(ABi)));
+        min_shifts = min(bits - floor_log2(absABi) - 1, min_shifts);
+
+        AB.lazy_list.push_back(min_shifts);
+        AB.push_back((ABi << min_shifts) >> 1);
+    }
+
+    AB.exponent = A.exponent - min_shifts + 1;
+    AB.lazy_min = min_shifts;
+    AB.normalized = true;
+    return AB;
+}
+
+
+    // size_t N = A.size();
+    // assert(N == B.size());
+
+
+    // int exp_diff = A.exponent - B.exponent;
+    // bool carry = false;
+    // for(size_t i=0;i<N;i++){
+    //     Tx2 ABi = Tx2(A[i]) + (B[i] >> (exp_diff));
+    //     T abi = ABi;
+    //     carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+    //     AB.lazy_list[carry] = i;
+
+    //     AB.push_back(ABi >> carry);
+    // }
+    // // We should make a case when exp_diff are 0
+
+    // AB.exponent = A.exponent + carry;
+    // // AB.lazy = carry;
+    // // AB.normalized = true;
+    // return AB;
 
 
 template <typename T>
@@ -176,32 +226,36 @@ BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 }
 
 
-// template <typename T>
-// BFPDynamic<T> operator*(BFPDynamic<T> &A, BFPDynamic<T> &B){
-//     BFPDynamic<T> AB;
-//     size_t N = A.size();
-//     int min_shifts = numeric_limits<int>::max();
-//     int bits = numeric_limits<T>::digits + 1;
-//     int double_bits = bits * 2;
-//     if (!A.normalized){
-//         A.normalize();
-//     }
+template <typename T>
+BFPDynamic<T> operator*(BFPDynamic<T> &A, BFPDynamic<T> &B){
+    BFPDynamic<T> AB;
+    size_t N = A.size();
+    int min_shifts = numeric_limits<int>::max();
+    int bits = numeric_limits<T>::digits + 1;
+    int double_bits = bits * 2;
 
-//     if (!B.normalized){
-//         B.normalize();
-//     }
-//     for (size_t i = 0; i < N; i++){
-//         Tx2 ABi = Tx2(A[i] >> (A.lazy_list[i] - A.lazy_min)) * (B[i] >> (B.lazy_list[i] - B.lazy_min));
-//         min_shifts = min(calc_shifts(double_bits, ABi), min_shifts);
-//         AB.lazy_list.push_back(min_shifts);
+    if (!A.normalized){
+        A.normalize();
+    }
+    if (!B.normalized){
+        B.normalize();
+    }
 
-//         AB.push_back(((ABi << min_shifts) >> bits));
-//     }
-//     AB.lazy_min = min_shifts;
-//     AB.normalized = true;
-//     AB.exponent = A.exponent + B.exponent - min_shifts + bits;
-//     return AB;
-// }
+    for (size_t i = 0; i < N; i++){
+        typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) * (B[i] >> (B.lazy_list[i] - B.lazy_min));
+        min_shifts = min(calc_shifts(double_bits, ABi), min_shifts);
+        // min_shifts = min(bits - floor_log2(ABi) - 2, min_shifts);
+        AB.lazy_list.push_back(min_shifts);
+        // SKal have rounding på inden min_shifts udregnes!
+        bool rounding = ((ABi << min_shifts) >> (bits - 1)) & 1;
+        cout << rounding << endl;
+        AB.push_back(((ABi << min_shifts) >> bits) + rounding);
+    }
+    AB.lazy_min = min_shifts;
+    AB.normalized = true;
+    AB.exponent = A.exponent + B.exponent - min_shifts + bits;
+    return AB;
+}
 
 
 // template <typename T>
@@ -308,44 +362,29 @@ BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 
 
 template <typename T>
-BFPDynamic<T> bfp_sqrt2(BFPDynamic<T> &A) {
-
+BFPDynamic<T> bfp_sqrt(BFPDynamic<T> &A) {
     BFPDynamic<T> sqrtA;
     size_t N = A.size();
 
     int min_shifts = numeric_limits<int>::max();
-    // typename LongT<T>::type x;
 
-    int bits = (numeric_limits<T>::digits + 1) * 2;
-    int bitshalfs = bits >> 1;
+    int bitsdouble = (numeric_limits<T>::digits + 1) * 2;
+    int bits = bitsdouble >> 1;
     if (!A.normalized){
         A.normalize();
     }
 
-    // Add one bit to a, root, and rem datatypes by making them unsigned.
-    // typename make_unsigned<T>::type a;
-    // typename make_unsigned<T>::type root;
-    // typename make_unsigned<T>::type rem;
     typename uTx2<T>::type a;
     typename uTx2<T>::type root;
     typename uTx2<T>::type rem;
-    // cout << sizeof(a) * 8 << endl;
-    // uTx2 a;
-    // uTx2 root;
-    // uTx2 rem;
 
     for (size_t i=0; i < N; i++){
-        // cout << bitshalfs - 2 << endl;
-        // (bits >> 1) - 2    6   14 
-        a = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bitshalfs - 2 + (A.exponent & 1));
-        // a >>= (A.exponent & 1);
-        cout << uint64_t((A[i] >> (A.lazy_list[i] - A.lazy_min))) << endl;
-
+        a = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bits - 2 + (A.exponent & 1));
         rem = 0;
         root = 0;
-        for(int i=0; i<bitshalfs; i++){
+        for(int i=0; i<bits; i++){
             root <<= 1;
-            rem = ((rem << 2) + (a >> (bits - 2)));
+            rem = ((rem << 2) + (a >> (bitsdouble - 2)));
             a <<= 2;
             root++;
             if(root <= rem){
@@ -355,22 +394,14 @@ BFPDynamic<T> bfp_sqrt2(BFPDynamic<T> &A) {
                 root--;
         }
         root >>= 1;
+
         bool rounding = root < rem;
         root += rounding;
-        // cout << root << endl;
-        // cout << bitshalfs - floor_log2(root) << endl; 
-        // cout << root << endl;
-        // cout << bitshalfs - floor_log2(root) - 2 << endl;
-        // cout << calc_shifts(bitshalfs, root) << endl << endl;
-
-        // cout << root << endl;
-
-        min_shifts = min(bitshalfs - floor_log2(root) - 2, min_shifts);
-        // cout << min_shifts << endl;
+        min_shifts = min(bits - floor_log2(root) - 2, min_shifts);
         sqrtA.lazy_list.push_back(min_shifts);
         sqrtA.push_back((root << min_shifts));
     }
-    sqrtA.exponent = 1 + (A.exponent >> 1) - min_shifts - (bitshalfs >> 1);
+    sqrtA.exponent = 1 + (A.exponent >> 1) - min_shifts - (bits >> 1);
     sqrtA.lazy_min = min_shifts;
     sqrtA.normalized = true;
     return sqrtA;
@@ -418,7 +449,7 @@ BFPDynamic<T> bfp_invsqrt(const BFPDynamic<T> &A){
 }
 
 
-template <typename T >
+template <typename T>
 BFPDynamic<T> bfp_invsqrtfloat(const BFPDynamic<T> &A) {
     size_t N = A.size();
     // assert(N==B.size());
@@ -441,6 +472,65 @@ BFPDynamic<T> bfp_invsqrtfloat(const BFPDynamic<T> &A) {
     return BFPDynamic<T>(invsqrtAfloat);
 }
 
+
+template <typename T> 
+BFPDynamic<T> bfp_log(BFPDynamic<T> &A) {
+    BFPDynamic<T> logA;
+    size_t N = A.size();
+
+    int min_shifts = numeric_limits<int>::max();
+
+    int bitsdouble = (numeric_limits<T>::digits + 1) * 2;
+    int bits = bitsdouble >> 1;
+
+    if (!A.normalized){
+        A.normalize();
+    }
+
+    typename uTx2<T>::type n;
+    typename Tx2<T>::type b;
+
+    for (size_t i=0; i < N; i++){
+        n = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bits - 2);
+        // if(n <= 8)
+        //     return (short)(2 * n);
+
+        b = bits - 1;
+        while((b > 2) && (typename Tx2<T>::type(n) > 0)){
+            --b;
+            n <<= 1;
+        }
+
+        n &= 7 << (bits - 4);
+        n >>= (bits - 4);
+        
+        T n2 = n + 8 * (b - 1);
+        min_shifts = min(bits - floor_log2(n2) - 2, min_shifts);
+        logA.lazy_list.push_back(min_shifts);
+        logA.push_back((n2 << min_shifts));
+    }
+    cout << min_shifts << endl;
+    logA.exponent = A.exponent - min_shifts;
+    logA.lazy_min = min_shifts;
+    logA.normalized = true;
+    return logA;
+}
+
+short bitlog(unsigned long n)
+{
+    short b;
+    if(n <= 8)
+        return (short)(2 * n);
+
+    b=31;
+    while((b > 2) && ((long)n > 0)){
+        --b;
+        n <<= 1;
+    }
+    n &= 0x70000000;
+    n >>= 28;
+    return (short)n + 8 * (b - 1) >> 1;
+}
 
 // template <typename T >
 // BFPDynamic<T> bfp_exp(const BFPDynamic<T> &A) {
@@ -518,6 +608,17 @@ template <typename T> vector<T> Vsqrt(const vector<T> &A){
     return sqrtA;
 }
 
+
+template <typename T> vector<T> Vlog(const vector<T> &A){
+    vector<T> logA(A.size());
+
+    for(int i=0;i<logA.size();i++)
+        logA[i] = log2(A[i]);
+
+    return logA;
+}
+
+
 template <typename T> vector<T> Vinvsqrt(const vector<T> &A){
     vector<T> invsqrtA(A.size());
 
@@ -540,7 +641,7 @@ template <typename T> vector<T> Vexp(const vector<T> &A){
 
 
 // BFPdynamic checkers for operations +, -, *, and /
-template <typename T> void check_add(const T& A, const T& B){
+template <typename T> void check_add(T& A, T& B){
     assert(A.size() == B.size());
   size_t N = A.size();
   cout << "******************** Checking addition of: ********************\n"
@@ -550,6 +651,9 @@ template <typename T> void check_add(const T& A, const T& B){
   auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A+B;
   auto ABfloat = A.to_float() + B.to_float();
+
+  auto ABnorm = AB.to_float();
+
 
   cout << ABfloat << endl;
 
@@ -563,8 +667,9 @@ template <typename T> void check_add(const T& A, const T& B){
        << T(Afloat) << " +\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
 
   cout << "Result of BFP-addition:\n"
-       << AB << "\n"
+       << T(ABnorm) << "\n"
        << T(ABfloat) << " wanted.\n\n";
+
 
   cout << "Result of BFP-addition converted to floating point:\n"
        << AB.to_float() << "\n"
@@ -635,8 +740,8 @@ template <typename T> void check_mul(T& A, T& B){
 
   auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A*B;
-  cout << AB << endl;
-  // cout << A.nor
+  auto ABnorm = AB.to_float();
+
   auto ABfloat = A.to_float() * B.to_float();
   vector<bool> sA(N), sB(N);
   for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
@@ -658,13 +763,12 @@ template <typename T> void check_mul(T& A, T& B){
        << "Error compared to rounded exact:\n"
        << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
-  cout << "AB.exponent: " << AB.exponent << endl;
-  AB.exponent = 0;
+  // cout << "AB.exponent: " << AB.exponent << endl;
+  // AB.exponent = 0;
 
   cout << "Result of BFP-multiplication:\n"
-       << AB.to_float() << "\n"
+       << T(ABnorm) << "\n"
        << T(ABfloat) << " wanted.\n\n";
-
 
   // cout << "signs:\n"
   //      << sA << "\n"
@@ -732,7 +836,7 @@ template <typename T> void check_sqrt(T& A){
        << "sqrt " << A << " = \n\n";
 
   // auto Afloat = A.to_float();
-  auto sqrtA = bfp_sqrt2(A);
+  auto sqrtA = bfp_sqrt(A);
   auto Asqrt = sqrtA.to_float();
   auto sqrtAfloat = Vsqrt(A.to_float());
   cout << "Result of BFP-square root:\n"
@@ -760,4 +864,20 @@ template <typename T> void check_invsqrt(const T& A){
 
   cout << "Is the result correct? " << (invsqrtA.to_float() == T(invsqrtAfloat).to_float()? "Yes.\n" : "No.\n");
   auto invsqrtA2 = bfp_invsqrtfloat(A);
+}
+
+
+template <typename T> void check_log(T& A){
+  size_t N = A.size();
+  cout << "******************** Checking log function of: ********************\n"
+       << "sqrt " << A << " = \n\n";
+
+  auto logA = bfp_log(A);
+  auto Alog = logA.to_float();
+  auto logAfloat = Vlog(A.to_float());
+  cout << "Result of BFP-square root:\n"
+       << T(Alog) << "\n"
+       << T(logAfloat) << " wanted.\n\n";
+
+  cout << "Is the result correct? " << (logA.to_float() == T(logAfloat).to_float()? "Yes.\n" : "No.\n");
 }

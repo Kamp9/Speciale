@@ -6,8 +6,10 @@ template <typename T> void check(const T& A, const T& B){
     assert(A.size() == B.size());
     size_t N = A.size();
 
-    auto Afloat = A.to_float(); 
+    auto Afloat = A.to_float();
     auto Bfloat = T(B).to_float();
+    cout << Afloat << endl;
+    cout << Bfloat << endl;
     for(int i=0;i<N;i++){
         if (Afloat[0] != Bfloat[0]){
             cout << "Test Failed: " << Afloat[0] << " != " << Bfloat[0] << endl;
@@ -26,34 +28,35 @@ void check_int(int i, int a){
 }
 
 int main(){
-    // calc_shifts
-    cout << "CALC SHIFTS:" << endl;
-    int8_t a = 1;
-    check_int(calc_shifts(a), 6);
+    // floor_log2
+    // cout << "CALC SHIFTS:" << endl;
+    // int8_t a = 1;
 
-    a = 2;
-    check_int(calc_shifts(a), 5);
+    // check_int(floor_log2(a), 6);
 
-    a = 3;
-    check_int(calc_shifts(a), 5);
+    // a = 2;
+    // check_int(floor_log2(a), 5);
 
-    a = 63;
-    check_int(calc_shifts(a), 1);
+    // a = 3;
+    // check_int(floor_log2(a), 5);
 
-    a = 64;
-    check_int(calc_shifts(a), 0);
+    // a = 63;
+    // check_int(floor_log2(a), 1);
 
-    a = 65;
-    check_int(calc_shifts(a), 0);
+    // a = 64;
+    // check_int(floor_log2(a), 0);
 
-    a = 127;
-    check_int(calc_shifts(a), 0);
+    // a = 65;
+    // check_int(floor_log2(a), 0);
+
+    // a = 127;
+    // check_int(floor_log2(a), 0);
     
-    a = -1;
-    check_int(calc_shifts(a), 6);
+    // a = -1;
+    // check_int(floor_log2(a), 6);
 
-    a = -2;
-    check_int(calc_shifts(a), 5);
+    // a = -2;
+    // check_int(floor_log2(a), 5);
 
 
     // ADDITION
@@ -63,16 +66,16 @@ int main(){
 	auto b1 = vector<double>{1};
     BFPDynamic<int8_t> A100{a1, 0};
     BFPDynamic<int8_t> C100{{b1}};
-    check(A100.normalize(), C100.normalize());
+    check(A100, C100);
 
 
-    cout << endl << "SQRT2:" << endl;
+ //    cout << endl << "SQRT2:" << endl;
 
 	auto a2 = vector<int8_t>{100};
-	auto b2 = vector<double>{10};
+	auto b2 = vector<double>{1};
     BFPDynamic<int8_t> A500{a1, 0};
     BFPDynamic<int8_t> C500{{b1}};
-    check(bfp_sqrt2(A500.normalize()), C500.normalize());
+    check(bfp_sqrt2(A500), C500 );
 
 
 
