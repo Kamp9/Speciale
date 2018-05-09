@@ -168,15 +168,16 @@ BFPDynamic<T> operator+(BFPDynamic<T> &A, BFPDynamic<T> &B){
 
         typename Tx2<T>::type ABi = 
                         typename Tx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min))
-                              + (B[i] >> ((B.lazy_list[i] - B.lazy_min) + exp_diff));
-
-        bool rounding = (B[i] >> (exp_diff - 1) & 1);
+                              + ((B[i] >> (B.lazy_list[i] - B.lazy_min)) >> exp_diff);
+        // cout << ((B[i] >> (B.lazy_list[i] - B.lazy_min)) >> exp_diff) << endl;
+        
+        // int rounding = B[i] >> exp_diff;
+        bool rounding = ((B[i] >> (B.lazy_list[i] - B.lazy_min)) >> (exp_diff - 1)) & 1;
+        cout << rounding << endl;
         ABi += rounding;
-        // ABi -= ;
-        // cout << (B[i] >> (exp_diff - 1) & 1) << endl;
-        // bool rounding = ;
-        // ABi += rounding;
-
+        // cout << (A[i] >> (A.lazy_list[i] - A.lazy_min)) << endl;
+        // cout << ((B[i] >> (B.lazy_list[i] - B.lazy_min)) >> exp_diff) << endl;
+        // cout << B[i] 
         typename uTx2<T>::type absABi = ABi ^ (typename Tx2<T>::type(-1 * signbit(ABi)));
         min_shifts = min(bits - floor_log2(absABi) - 1, min_shifts);
 
@@ -491,26 +492,32 @@ BFPDynamic<T> bfp_log(BFPDynamic<T> &A) {
     typename Tx2<T>::type b;
 
     for (size_t i=0; i < N; i++){
-        n = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bits - 2);
+        n = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << bits;
         // if(n <= 8)
         //     return (short)(2 * n);
 
-        b = bits - 1;
+        // cout << n << endl;
+        b = bitsdouble - 1;
+
         while((b > 2) && (typename Tx2<T>::type(n) > 0)){
             --b;
             n <<= 1;
         }
+        n &= 7 << (bitsdouble - 4);
+        n >>= (bitsdouble - 4);
 
-        n &= 7 << (bits - 4);
-        n >>= (bits - 4);
-        
         T n2 = n + 8 * (b - 1);
-        min_shifts = min(bits - floor_log2(n2) - 2, min_shifts);
+        cout << int(n2) << endl;
+        typename uTx2<T>::type absn2 = n2 ^ (typename Tx2<T>::type(-1 * signbit(n2)));
+        // min_shifts = min(bits - floor_log2(absn) - 1, min_shifts);
+
+        min_shifts = min(bits - floor_log2(absn2) - 2, min_shifts);
         logA.lazy_list.push_back(min_shifts);
         logA.push_back((n2 << min_shifts));
     }
-    cout << min_shifts << endl;
-    logA.exponent = A.exponent - min_shifts;
+
+    // logA.exponent = A.exponent - min_shifts;
+    logA.exponent = (A.exponent >> 1) - min_shifts - (bits >> 1);
     logA.lazy_min = min_shifts;
     logA.normalized = true;
     return logA;
