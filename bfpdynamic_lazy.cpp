@@ -109,29 +109,33 @@ struct BFPDynamic: public std::vector<T>{
     }
 
     BFPDynamic<T> denormalize() {
-        if(!normalized){
-            return *this;
-        }
+        cout << *this << endl;
+
         std::vector<T> &A(*this);
         const size_t N = this->size();
+        cout << lazy_list << endl << endl;;
         for(int i=0; i<N; i++){
             if (lazy_list[i] - lazy_min > 0) {
                 bool rounding = (A[i] >> ((lazy_list[i] - lazy_min) - 1)) & 1;
+                // cout << ((A[i] >> ((lazy_list[i] - lazy_min) - 1)) & 1) << endl;
                 A[i] = (A[i] >> (lazy_list[i] - lazy_min)) + rounding;
             }else{
                 A[i] = (A[i] >> (lazy_list[i] - lazy_min));
             } 
-
         }
         normalized = false;
         return *this;
     }
 
     std::vector<double> to_float() {
+        if(normalized){
+            this->denormalize();
+        }
+
         const size_t N = this->size();
         std::vector<double> values(N);
         const std::vector<T> &A(*this);
-        this->denormalize();
+
         for(int i=0;i<N;i++){
             values[i] = pow(2.0,exponent) * A[i];
         }
@@ -165,18 +169,11 @@ BFPDynamic<T> operator+(BFPDynamic<T> &A, BFPDynamic<T> &B){
     int bits = numeric_limits<T>::digits + 1;
     int min_shifts = numeric_limits<int>::max();
     int exp_diff = A.exponent - B.exponent;
-    cout << B << endl;
     bool carry = false;
     for(size_t i=0;i<N;i++){
         T Ai = A[i] >> (A.lazy_list[i] - A.lazy_min);
         T Bi = B[i] >> (B.lazy_list[i] - B.lazy_min);
         typename Tx2<T>::type ABi = typename Tx2<T>::type(Ai) + (Bi >> exp_diff);
-        // bool rounding = (Bi >> exp_diff)
-        // bool rounding = ((Ai & 1) ^ (Bi & 1)) & !signbit(ABi);
-        // cout << (Bi & 1) << endl;
-        // ABi += rounding;
-        // cout << ABi << endl;
-        // cout
 
         typename uTx2<T>::type absABi = ABi ^ (typename Tx2<T>::type(-1 * signbit(ABi)));
         min_shifts = min(bits - floor_log2(absABi) - 1, min_shifts);
@@ -189,6 +186,8 @@ BFPDynamic<T> operator+(BFPDynamic<T> &A, BFPDynamic<T> &B){
         bool rounding2 = (ABi & 1) & (min_shifts == 0);
         ABi += rounding | rounding2;
         cout << (rounding | rounding2) << endl;
+        // cout << rounding << endl;
+        // cout << rounding2 << endl << endl;
 
         AB.lazy_list.push_back(min_shifts);
         AB.push_back((ABi << min_shifts) >> 1);
@@ -253,12 +252,12 @@ BFPDynamic<T> operator*(BFPDynamic<T> &A, BFPDynamic<T> &B){
     for (size_t i = 0; i < N; i++){
         typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) * (B[i] >> (B.lazy_list[i] - B.lazy_min));
         min_shifts = min(calc_shifts(double_bits, ABi), min_shifts);
-        // min_shifts = min(bits - floor_log2(ABi) - 2, min_shifts);
         AB.lazy_list.push_back(min_shifts);
-        // SKal have rounding på inden min_shifts udregnes!
-        bool rounding = ((ABi << min_shifts) >> (bits - 1)) & 1;
-        cout << rounding << endl;
-        AB.push_back(((ABi << min_shifts) >> bits) + rounding);
+
+        bool rounding = (ABi & 1) & (min_shifts == 0);
+        ABi += rounding;
+
+        AB.push_back((ABi << min_shifts) >> bits);
     }
     AB.lazy_min = min_shifts;
     AB.normalized = true;
@@ -664,38 +663,47 @@ template <typename T> void check_add(T& A, T& B){
        << A << " +\n" << B << " = \n\n"
        << A.to_float() << " +\n"  << B.to_float() << "\n\n";
 
-  auto Afloat = A.to_float(), Bfloat = B.to_float();
   auto AB = A+B;
-  AB.denormalize();
+  auto AB2 = AB.to_float();
   
   auto ABfloat = A.to_float() + B.to_float();
-  cout << ABfloat << endl;
-
-  vector<bool> sA(N), sB(N);
-  for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
-
-  cout << "\nFloating point:\n"
-       << Afloat << " +\n" << Bfloat << " =\n" << ABfloat << "\n\n";
-
-  cout << "Floating point in BFP-representation:\n"
-       << T(Afloat) << " +\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
-
-  cout << "Result of BFP-addition:\n"
+  cout << "Result of BFP-square root:\n"
        << T(AB) << "\n"
        << T(ABfloat) << " wanted.\n\n";
 
-
-  cout << "Result of BFP-addition converted to floating point:\n"
-       << AB.to_float() << "\n"
-       << ABfloat << " exact,\n"
-       << T(ABfloat).to_float() << " wanted.\n\n";
-
-  cout << "Error compared to exact:\n"
-       <<  (AB.to_float() - ABfloat) << "\n"
-       << "Error compared to rounded exact:\n"
-       << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
-
   cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
+
+
+  // auto Afloat = A.to_float(), Bfloat = B.to_float();
+  // auto AB = A+B;
+  
+  // auto ABfloat = A.to_float() + B.to_float();
+
+  // vector<bool> sA(N), sB(N);
+  // for(int i=0;i<N;i++){ sA[i] = signbit(A[i]); sB[i] = signbit(B[i]); }
+
+  // cout << "\nFloating point:\n"
+  //      << Afloat << " +\n" << Bfloat << " =\n" << ABfloat << "\n\n";
+
+  // cout << "Floating point in BFP-representation:\n"
+  //      << T(Afloat) << " +\n" << T(Bfloat) << " =\n" << T(ABfloat) << "\n\n";
+
+  // cout << "Result of BFP-addition:\n"
+  //      << T(AB) << "\n"
+  //      << T(ABfloat) << " wanted.\n\n";
+
+
+  // cout << "Result of BFP-addition converted to floating point:\n"
+  //      << AB.to_float() << "\n"
+  //      << ABfloat << " exact,\n"
+  //      << T(ABfloat).to_float() << " wanted.\n\n";
+
+  // cout << "Error compared to exact:\n"
+  //      <<  (AB.to_float() - ABfloat) << "\n"
+  //      << "Error compared to rounded exact:\n"
+  //      << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
+
+  // cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
 
 }
 
@@ -848,7 +856,10 @@ template <typename T> void check_sqrt(T& A){
 
   // auto Afloat = A.to_float();
   auto sqrtA = bfp_sqrt(A);
+  cout << sqrtA << endl;
   auto Asqrt = sqrtA.to_float();
+  cout << sqrtA << endl;
+
   auto sqrtAfloat = Vsqrt(A.to_float());
   cout << "Result of BFP-square root:\n"
        << T(Asqrt) << "\n"
