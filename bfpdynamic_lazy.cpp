@@ -62,6 +62,7 @@ struct BFPDynamic: public std::vector<T>{
     int contains_nagative = false;
     // std::array<int64_t, numeric_limits<T>::digits> lazy_list;
     std::vector<int64_t> lazy_list;
+    std::vector<bool> round_list;
 
     BFPDynamic(int exponent=0) : exponent(exponent) {}
 
@@ -81,10 +82,29 @@ struct BFPDynamic: public std::vector<T>{
 
         exponent -= std::numeric_limits<T>::digits;
         double power = pow(2.0,-exponent);
+        // bool change = false;
         for(int i=0;i<N;i++){
+            if (round(V[i]*power) > std::numeric_limits<T>::max()){
+                power -= 1;
+                break;
+            }
+        }
+
+        for (int i=0;i<N;i++){
             assert(round(V[i]*power) >= std::numeric_limits<T>::min());
             assert(round(V[i]*power) <= std::numeric_limits<T>::max());
             A.push_back(round(V[i]*power));
+            
+            // if(round(V[i]*power) < std::numeric_limits<T>::min()){
+            //     cout << "limit" << endl;
+            //     A.push_back(round(V[i]*power) + 1);
+            // }else if (round(V[i]*power) > std::numeric_limits<T>::max()){
+            //     cout << "limit" << endl;
+            //     A.push_back(round(V[i]*power) - 1);
+            // }else{
+            // A.push_back(round(V[i]*power));
+            // }
+            
         }
     }
 
@@ -99,6 +119,7 @@ struct BFPDynamic: public std::vector<T>{
             min_shifts = min(bits - floor_log2(absA) - 2, min_shifts);
             A[i] <<= min_shifts;
             lazy_list.push_back(min_shifts);
+            round_list.push_back(false);
             contains_nagative |= signbit(A[i]);
             // lazy_list[min_shifts] = i;
         }
@@ -109,19 +130,11 @@ struct BFPDynamic: public std::vector<T>{
     }
 
     BFPDynamic<T> denormalize() {
-        cout << *this << endl;
-
         std::vector<T> &A(*this);
         const size_t N = this->size();
-        cout << lazy_list << endl << endl;;
         for(int i=0; i<N; i++){
-            if (lazy_list[i] - lazy_min > 0) {
-                bool rounding = (A[i] >> ((lazy_list[i] - lazy_min) - 1)) & 1;
-                // cout << ((A[i] >> ((lazy_list[i] - lazy_min) - 1)) & 1) << endl;
-                A[i] = (A[i] >> (lazy_list[i] - lazy_min)) + rounding;
-            }else{
-                A[i] = (A[i] >> (lazy_list[i] - lazy_min));
-            } 
+            bool rounding = ((A[i] >> ((lazy_list[i] - lazy_min) - 1)) & 1) && (lazy_list[i] - lazy_min > 0) && (A[i] != numeric_limits<T>::max()) && !round_list[i];
+            A[i] = (A[i] >> (lazy_list[i] - lazy_min)) + rounding;
         }
         normalized = false;
         return *this;
@@ -169,29 +182,24 @@ BFPDynamic<T> operator+(BFPDynamic<T> &A, BFPDynamic<T> &B){
     int bits = numeric_limits<T>::digits + 1;
     int min_shifts = numeric_limits<int>::max();
     int exp_diff = A.exponent - B.exponent;
-    bool carry = false;
+    int msb_pos = 1 << (numeric_limits<T>::digits);
+    
     for(size_t i=0;i<N;i++){
         T Ai = A[i] >> (A.lazy_list[i] - A.lazy_min);
         T Bi = B[i] >> (B.lazy_list[i] - B.lazy_min);
+
         typename Tx2<T>::type ABi = typename Tx2<T>::type(Ai) + (Bi >> exp_diff);
 
+        bool rounding = ((Bi >> (exp_diff - 1)) & 1) && (exp_diff > 0);
+        bool rounding2 = (ABi & 1) && ((ABi & msb_pos) || (min_shifts == 0));
+        ABi += rounding || rounding2;
         typename uTx2<T>::type absABi = ABi ^ (typename Tx2<T>::type(-1 * signbit(ABi)));
         min_shifts = min(bits - floor_log2(absABi) - 1, min_shifts);
-
-        bool rounding = false;
-        if (exp_diff > 0){
-            rounding = (Bi >> (exp_diff - 1)) & 1;
-        }
-
-        bool rounding2 = (ABi & 1) & (min_shifts == 0);
-        ABi += rounding | rounding2;
-        cout << (rounding | rounding2) << endl;
-        // cout << rounding << endl;
-        // cout << rounding2 << endl << endl;
-
         AB.lazy_list.push_back(min_shifts);
+        AB.round_list.push_back(rounding || rounding2);
         AB.push_back((ABi << min_shifts) >> 1);
     }
+
     AB.exponent = A.exponent - min_shifts + 1;
     AB.lazy_min = min_shifts;
     AB.normalized = true;
@@ -481,54 +489,107 @@ BFPDynamic<T> bfp_invsqrtfloat(const BFPDynamic<T> &A) {
 }
 
 
-template <typename T> 
-BFPDynamic<T> bfp_log(BFPDynamic<T> &A) {
+static unsigned int const PowersOf10[] = 
+    {1, 10, 100, 1000, 10000, 100000,
+     1000000, 10000000, 100000000, 1000000000};
+
+
+template <typename T>
+BFPDynamic<T> bfp_log10(BFPDynamic<T> &A) {
     BFPDynamic<T> logA;
     size_t N = A.size();
 
     int min_shifts = numeric_limits<int>::max();
-
-    int bitsdouble = (numeric_limits<T>::digits + 1) * 2;
-    int bits = bitsdouble >> 1;
+    int bits = numeric_limits<T>::digits + 1;
 
     if (!A.normalized){
         A.normalize();
     }
 
-    typename uTx2<T>::type n;
-    typename Tx2<T>::type b;
-
     for (size_t i=0; i < N; i++){
-        n = typename Tx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << bits;
-        // if(n <= 8)
-        //     return (short)(2 * n);
+        typename uT<T>::type v = A[i] >> (A.lazy_list[i] - A.lazy_min); // plus rounding??
 
-        // cout << n << endl;
-        b = bitsdouble - 1;
+        T t = (floor_log2(v) + 1) * 1233 >> 12;
+        T log = t - (v < PowersOf10[t]);
+        
+        // bool rounding = root < rem;
+        // root += rounding;
+        typename uTx2<T>::type abslog = log ^ (typename Tx2<T>::type(-1 * signbit(log)));
+        min_shifts = min(bits - floor_log2(abslog) - 2, min_shifts);
 
-        while((b > 2) && (!signbit(n))){
-            --b;
-            n <<= 1;
-        }
-        n &= 7 << (bitsdouble - 4);
-        n >>= (bitsdouble - 4);
-
-        T n2 = n + (b - 1);
-        // cout << int(n2) << endl;
-        typename uTx2<T>::type absn2 = n2 ^ (typename Tx2<T>::type(-1 * signbit(n2)));
-        // min_shifts = min(bits - floor_log2(absn) - 1, min_shifts);
-
-        min_shifts = min(bits - floor_log2(absn2) - 2, min_shifts);
         logA.lazy_list.push_back(min_shifts);
-        logA.push_back((n2 << min_shifts));
+        logA.push_back((log << min_shifts));
     }
-
-    // logA.exponent = A.exponent - min_shifts;
-    logA.exponent = (A.exponent >> 1) - min_shifts - (bits >> 1);
+    logA.exponent = 1 + (A.exponent >> 1) - min_shifts - (bits >> 1);
     logA.lazy_min = min_shifts;
     logA.normalized = true;
     return logA;
 }
+
+
+
+// int bfp_log(unsigned int v){
+//     // int r;          // result goes here
+//     int t;          // temporary
+
+//     static unsigned int const PowersOf10[] = 
+//         {1, 10, 100, 1000, 10000, 100000,
+//          1000000, 10000000, 100000000, 1000000000};
+
+//     t = (floor_log2(v) + 1) * 1233 >> 12; // (use a lg2 method from above)
+//     return t - (v < PowersOf10[t]);
+
+// }
+
+
+// template <typename T> 
+// BFPDynamic<T> bfp_log(BFPDynamic<T> &A) {
+//     BFPDynamic<T> logA;
+//     size_t N = A.size();
+
+//     int min_shifts = numeric_limits<int>::max();
+
+//     int bitsdouble = (numeric_limits<T>::digits + 1) * 2;
+//     int bits = bitsdouble >> 1;
+
+//     if (!A.normalized){
+//         A.normalize();
+//     }
+
+//     typename uTx2<T>::type n;
+//     typename Tx2<T>::type b;
+
+//     for (size_t i=0; i < N; i++){
+//         n = typename Tx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << bits;
+//         // if(n <= 8)
+//         //     return (short)(2 * n);
+
+//         // cout << n << endl;
+//         b = bitsdouble - 1;
+
+//         while((b > 2) && (!signbit(n))){
+//             --b;
+//             n <<= 1;
+//         }
+//         n &= 7 << (bitsdouble - 4);
+//         n >>= (bitsdouble - 4);
+
+//         T n2 = n + (b - 1);
+//         // cout << int(n2) << endl;
+//         typename uTx2<T>::type absn2 = n2 ^ (typename Tx2<T>::type(-1 * signbit(n2)));
+//         // min_shifts = min(bits - floor_log2(absn) - 1, min_shifts);
+
+//         min_shifts = min(bits - floor_log2(absn2) - 2, min_shifts);
+//         logA.lazy_list.push_back(min_shifts);
+//         logA.push_back((n2 << min_shifts));
+//     }
+
+//     // logA.exponent = A.exponent - min_shifts;
+//     logA.exponent = (A.exponent >> 1) - min_shifts - (bits >> 1);
+//     logA.lazy_min = min_shifts;
+//     logA.normalized = true;
+//     return logA;
+// }
 
 short bitlog(unsigned long n)
 {
@@ -624,14 +685,14 @@ template <typename T> vector<T> Vsqrt(const vector<T> &A){
 }
 
 
-template <typename T> vector<T> Vlog(const vector<T> &A){
-    vector<T> logA(A.size());
+// template <typename T> vector<T> Vlog(const vector<T> &A){
+//     vector<T> logA(A.size());
 
-    for(int i=0;i<logA.size();i++)
-        logA[i] = log2(A[i]);
+//     for(int i=0;i<logA.size();i++)
+//         logA[i] = log2(A[i]);
 
-    return logA;
-}
+//     return logA;
+// }
 
 
 template <typename T> vector<T> Vinvsqrt(const vector<T> &A){
@@ -655,6 +716,16 @@ template <typename T> vector<T> Vexp(const vector<T> &A){
 }
 
 
+template <typename T> vector<T> Vlog10(const vector<T> &A){
+    vector<T> logA(A.size());
+
+    for(int i=0;i<logA.size();i++)
+        logA[i] = log10(A[i]);
+
+    return logA;
+}
+
+
 // BFPdynamic checkers for operations +, -, *, and /
 template <typename T> void check_add(T& A, T& B){
     assert(A.size() == B.size());
@@ -667,7 +738,8 @@ template <typename T> void check_add(T& A, T& B){
   auto AB2 = AB.to_float();
   
   auto ABfloat = A.to_float() + B.to_float();
-  cout << "Result of BFP-square root:\n"
+
+  cout << "Result of BFP-addition:\n"
        << T(AB) << "\n"
        << T(ABfloat) << " wanted.\n\n";
 
@@ -889,15 +961,15 @@ template <typename T> void check_invsqrt(const T& A){
 }
 
 
-template <typename T> void check_log(T& A){
+template <typename T> void check_log10(T& A){
   size_t N = A.size();
-  cout << "******************** Checking log function of: ********************\n"
-       << "sqrt " << A << " = \n\n";
+  cout << "******************** Checking log10 function of: ********************\n"
+       << "log " << A << " = \n\n";
 
-  auto logA = bfp_log(A);
+  auto logA = bfp_log10(A);
   auto Alog = logA.to_float();
-  auto logAfloat = Vlog(A.to_float());
-  cout << "Result of BFP-square root:\n"
+  auto logAfloat = Vlog10(A.to_float());
+  cout << "Result of BFP-log10:\n"
        << T(Alog) << "\n"
        << T(logAfloat) << " wanted.\n\n";
 

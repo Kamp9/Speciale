@@ -31,7 +31,7 @@ BFPDynamic<T> gen_bfp_pos(boost::random::mt19937 &rng, const size_t N) {
     for(size_t i = 0; i < N; i++){
         elems.push_back(rand_elem(rng));
     }
-    boost::random::uniform_int_distribution<T> rand_exp(0, 1); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
     BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
@@ -45,17 +45,30 @@ int main(int argc, char *argv[]){
     gettimeofday(&tv, 0);
 
     rng.seed(tv.tv_usec);
-    auto A = gen_bfp_pos<int8_t>(rng, 10);
-    auto B = gen_bfp_pos<int8_t>(rng, 10);
-    // auto a = vector<int8_t>{10};
-    // auto b = vector<int8_t>{110};
-    // BFPDynamic<int8_t> A{a, 0};
-    // BFPDynamic<int8_t> B{b, 1};
-    check_add(A, B);
+
+    auto A = gen_bfp_pos<int8_t>(rng, 100);
+    // auto B = gen_bfp_pos<int8_t>(rng, 100);
+    // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
+    // auto b = vector<int8_t>{73,122,39,25,98,64,126,73,122,10};
+
+    // auto a = std::vector<int8_t> {100};
+    // auto b = std::vector<int8_t> {108};
+    // BFPDynamic<int8_t> A{a, -1};
+    // BFPDynamic<int8_t> B{b, -3};
+
+    // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
+    // auto b = vector<int8_t>{73,122,39,25,98,64,126,73,122,10};
+
+    // BFPDynamic<int8_t> A{a, -5};
+    // BFPDynamic<int8_t> B{b, -8};
 
 
+    // check_add(A, B);
+    check_sqrt(A);
     // BFPStatic<int8_t, 1> A100{{-65}, 1};
     // BFPStatic<int8_t, 1> B100{{-65}, 0};
+
+
 
     // cout << bitlog(123) << endl;
     // auto B = gen_bfp_pos<int8_t>(rng, 10);
