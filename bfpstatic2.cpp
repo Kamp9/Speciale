@@ -237,7 +237,7 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
 
         AB[i] = (ABi >> shifts) + rounding - rounding2;
-    }
+    }    AB.exponent = A.exponent + B.exponent + shifts;
 
     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
 
@@ -502,7 +502,7 @@ BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
     V.push_back(scalar);
 
     BFPStatic<T, 1> B = BFPStatic<T, 1>(V);
-
+    auto Bi = B[0];
     // should be able to avoid going through A two times with max value for BFP struct in metadata.
     Tx2 max_value = 0;
     for (size_t i = 0; i < N; i++) {
@@ -523,7 +523,7 @@ BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
     Ab.exponent = A.exponent + B.exponent + shifts;
     return Ab;
 }
-    
+
 
 
 // Vector operations +, -, *, and /

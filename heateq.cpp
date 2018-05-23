@@ -51,11 +51,24 @@ int main(){
     }
 
     uint iterations = 0;
-    uint max_iterations = 100;
+    uint max_iterations = 10;
     while (iterations < max_iterations){
         iterations++;
-        BFPStatic<int32_t, N> temp = (north + south + center + west + east); //* 0.2;
+        BFPStatic<int32_t, N> temp = bfp_mul_scalar((north + south + center + west + east), 0.2);
         center = temp;
+        // cout << center << endl;
     }
+    vector<double> res_grid = center.to_float();
+    cout << res_grid << endl;
+
+    cout << "output: " << endl;;
+    for (int i=0; i<(ydim-2); ++i) {
+        for (int j=0; j<(xdim-2); ++j) {
+            cout << res_grid[i*4+j] << "\t, ";
+        }
+        cout << endl;
+    }
+    cout << "]";
+
     return 0;
 }
