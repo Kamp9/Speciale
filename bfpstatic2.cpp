@@ -40,12 +40,10 @@ typedef uint64_t uTx2;
 template <typename T, size_t N>
 struct BFPStatic: public std::array<T,N>{
     int exponent;
-
     BFPStatic(int exponent=0) : exponent(exponent) {}
     BFPStatic(const std::array<T,N> &A, int exponent) : std::array<T,N>(A), exponent(exponent) {}
     BFPStatic(const std::vector<double> &V) {
         assert(V.size() == N);
-    
         std::array<T,N> &A(*this);
 
         exponent = std::numeric_limits<T>::min();
@@ -172,7 +170,6 @@ BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     else{
         for(size_t i=0;i<N;i++){
             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            // does not work when exp_diff = 0
             bool rounding = (B[i] >> (exp_diff - 1)) & 1;
             AB[i] = ABi + rounding;
         }
@@ -201,10 +198,10 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
     for (size_t i = 0; i < N; i++) {
         Tx2 ABi = Tx2(A[i]) * B[i];
-        max_value = max(max_value, std::abs(ABi));
+        max_value = max(max_value, ABi ^ Tx2(-1 * signbit(ABi)));
     }
 
-    int shifts = 1 + floor_log2(max_value) - (numeric_limits<T>::digits);
+    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
     if (shifts < 0)
         shifts = 0;
 
@@ -226,16 +223,18 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
     for (size_t i = 0; i < N; i++) {
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        max_value = max(max_value, std::abs(ABi));
+        max_value = max(max_value, ABi ^ Tx2(-1 * signbit(ABi)));
     }
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+
+    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
+
     if (shifts < 0)
         shifts = 0;
 
     for (size_t i = 0; i < N; i++){
         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         bool rounding = ((ABi >> (shifts - 1)) & 1);
-        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
+        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
 
         AB[i] = (ABi >> shifts) + rounding - rounding2;
     }
@@ -309,6 +308,8 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
 
     return sqrtA;
 }
+
+
 
 
 
@@ -473,7 +474,7 @@ BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
 }
 
 
-template <typename T, size_t N >
+template <typename T, size_t N>
 BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
     vector<double> invsqrtAfloat(A.size());
     for (size_t i=0; i < N; i++){
@@ -494,21 +495,35 @@ BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
 }
 
 
-// template <typename T, size_t N >
-// BFPStatic<T, N> bfp_exp(const BFPStatic<T, N> &A) {
-//     BFPStatic<T,N> expA;
-//     for (size_t i = 0; i < N; i++){
-//         double sum = 1.0 + A[i];
-//         double term = x;                 // term for k = 1 is just x
-//         for (int k = 2; k < 50; k++){
-//             term = term * x / (double)k; // term[k] = term[k-1] * x / k
-//             sum = sum + term;
-//         }
-//         expA[i] = sum;
-//     }
-//     expA.exponent = 0;
-//     return expA;
-// }
+template <typename T, size_t N>
+BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
+    BFPStatic<T,N> Ab;
+    vector<double> V;
+    V.push_back(scalar);
+
+    BFPStatic<T, 1> B = BFPStatic<T, 1>(V);
+
+    // should be able to avoid going through A two times with max value for BFP struct in metadata.
+    Tx2 max_value = 0;
+    for (size_t i = 0; i < N; i++) {
+        Tx2 ABi = Tx2(A[i]) * Bi;
+        max_value = max(max_value, ABi ^ Tx2(-1 * signbit(ABi)));
+    }
+
+    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    if (shifts < 0)
+        shifts = 0;
+
+    for (size_t i=0; i < N; i++){
+        Tx2 ABi = Tx2(A[i]) * Bi;
+        bool rounding = (ABi >> (shifts - 1)) & 1;
+        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
+        Ab[i] = (ABi >> shifts) + rounding - rounding2;
+    }
+    Ab.exponent = A.exponent + B.exponent + shifts;
+    return Ab;
+}
+    
 
 
 // Vector operations +, -, *, and /
@@ -579,19 +594,6 @@ template <typename T> vector<T> Vinvsqrt(const vector<T> &A){
 
     return invsqrtA;
 }
-
-
-// template <typename T> vector<T> Vinvsqrtugly(const vector<T> &A){
-//     vector<T> invsqrtA(A.size());
-
-//     __m128 B=_mm_load1_ps(&A); //, B=_mm_load1_ps(&b), C=_mm_load1_ps(&c);
-//     // __m128 Thresh=_mm_load1_ps(&thresh);
-//     __m128 john = _mm_rsqrt_ss(&B);
-//     // invsqrtA[i] = __m128 _mm_rsqrt_ss(__m128 A[i]);
-
-//     return invsqrtA;
-// }
-
 
 
 template <typename T> vector<T> Vexp(const vector<T> &A){
