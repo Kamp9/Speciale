@@ -395,7 +395,7 @@ BFPDynamic<T> bfp_sqrt(BFPDynamic<T> &A) {
     typename uTx2<T>::type rem;
 
     for (size_t i=0; i < N; i++){
-        a = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bits - 2 + (A.exponent & 1));
+        a = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bits - 2 + (A.exponent & 1)); // rounding ??
         rem = 0;
         root = 0;
         for(int i=0; i<bits; i++){
@@ -507,10 +507,11 @@ BFPDynamic<T> bfp_log10(BFPDynamic<T> &A) {
     }
 
     for (size_t i=0; i < N; i++){
-        typename uT<T>::type v = A[i] >> (A.lazy_list[i] - A.lazy_min); // plus rounding??
-
-        T t = (floor_log2(v) + 1) * 1233 >> 12;
-        T log = t - (v < PowersOf10[t]);
+        // typename uT<T>::type v = A[i] >> (A.lazy_list[i] - A.lazy_min); // plus rounding??
+        typename uTx2<T>::type v = typename uTx2<T>::type(A[i] >> (A.lazy_list[i] - A.lazy_min)) << (bits - 2);
+        
+        typename Tx2<T>::type t = (floor_log2(v) + 1) * 1233 >> 12;
+        typename Tx2<T>::type log = t - (v < PowersOf10[t]);
         
         // bool rounding = root < rem;
         // root += rounding;

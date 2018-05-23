@@ -35,17 +35,32 @@ template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
 }
 
 // TODO: Derive double-length type automatically or pass as template parameter.
-typedef int64_t Tx2;
-typedef uint64_t uTx2;
+// typedef int64_t Tx2;
+// typedef uint64_t uTx2;
+
+template<typename T> struct uT {typedef T type;};
+template<> struct uT<int8_t>  {typedef uint8_t type;};
+template<> struct uT<int16_t> {typedef uint16_t type;};
+template<> struct uT<int32_t> {typedef uint32_t type;};
+
+template<typename T> struct Tx2 {typedef T type;};
+template<> struct Tx2<int8_t>   {typedef int16_t type;};
+template<> struct Tx2<int16_t>  {typedef int32_t type;};
+template<> struct Tx2<int32_t>  {typedef int64_t type;};
+
+template<typename T> struct uTx2 {typedef T type;};
+template<> struct uTx2<int8_t>  {typedef uint16_t type;};
+template<> struct uTx2<int16_t> {typedef uint32_t type;};
+template<> struct uTx2<int32_t> {typedef uint64_t type;};
 
 
 // BFPDynamic definition
 template <typename T>
 struct BFPDynamic: public std::vector<T>{
     int exponent;
-    bool normalized = false;
-    bool lazy = false;
-    std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
+    // bool normalized = false;
+    // bool lazy = false;
+    // std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
 
     BFPDynamic(int exponent=0) : exponent(exponent) {}
     BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
@@ -79,23 +94,23 @@ struct BFPDynamic: public std::vector<T>{
         }
     }
 
-    BFPDynamic<T> normalize() {
-        std::vector<T> &A(*this);
-        const size_t N = this->size();
-        int min_shifts = numeric_limits<T>::digits + 1;
-        bool lazy = false;
-        for(int i=0; i<N; i++){
-            min_shifts = min(calc_shifts(A[i]), min_shifts);
-            A[i] <<= min_shifts;
-            lazy_list[min_shifts] = i;
-            lazy |= min_shifts != 0;
-        }
-        cout << min_shifts << endl;
-        this->exponent -= min_shifts;
-        this->normalized = true;
-        this->lazy = lazy;
-        return *this;
-    }
+    // BFPDynamic<T> normalize() {
+    //     std::vector<T> &A(*this);
+    //     const size_t N = this->size();
+    //     int min_shifts = numeric_limits<T>::digits + 1;
+    //     bool lazy = false;
+    //     for(int i=0; i<N; i++){
+    //         min_shifts = min(calc_shifts(A[i]), min_shifts);
+    //         A[i] <<= min_shifts;
+    //         lazy_list[min_shifts] = i;
+    //         lazy |= min_shifts != 0;
+    //     }
+    //     cout << min_shifts << endl;
+    //     this->exponent -= min_shifts;
+    //     this->normalized = true;
+    //     this->lazy = lazy;
+    //     return *this;
+    // }
 
     std::vector<double> to_float() const {
         const size_t N = this->size();
@@ -170,36 +185,50 @@ template <typename T>
 BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     if(A.exponent < B.exponent) return B+A;
     size_t N = A.size();
-    // assert(N == B.size());
 
     BFPDynamic<T> AB;
-    //    bitset<N> carryAB;
-    //    bitset<N> sAB;
     int exp_diff = A.exponent - B.exponent;
     bool carry = false;
 
     for(size_t i=0;i<N;i++){
-        Tx2     ABi = A[i] + (B[i] >> exp_diff);
-        T       abi = ABi;
-        carry      |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-    }
+        // typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
+        // T abi  = ABi;
+        // carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
 
-    AB.exponent = A.exponent + carry;
+        typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (signbit(B[i]) && ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
+        bool rounding = (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0)) && !signbit(B[i]);
+        bool rounding2 = ((B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1))) && signbit(B[i]);
+        ABi = ABi + rounding - rounding2;
+        T abi  = ABi;
+        carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+    }
 
     if(carry){
         for(size_t i=0;i<N;i++){
+            cout << "carry" << endl;
+            T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
 
-            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            bool rounding = ABi & 1;
-            AB.push_back((ABi >> 1) + rounding);
+            bool roundingA = A[i] & 1;
+            bool roundingB = ((B[i] & 1) && (exp_diff > 0));
+            // cout << roundingA << endl;
+            cout << int(B[i]) << endl;
+            cout << (B[i] >> (exp_diff + 1)) << endl;
+            cout << exp_diff << endl;
+            // bool rounding3 = (B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1)) && signbit(B[i]);
+            // cout << ((roundingA + roundingB + roundingB2) >> 1) << endl;
+            // ABi += (roundingA + roundingB) >> 1;
+            AB.push_back(ABi);
         }
-    }
-    else{
+    }else{
         for(size_t i=0;i<N;i++){
-            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            // does not work when exp_diff = 0
-            bool rounding = (B[i] >> (exp_diff - 1)) & 1;
-            AB.push_back(ABi + rounding);
+            cout << "no carry" << endl;
+            T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
+            bool roundingA = A[i] & 1;
+            bool roundingB = (B[i] >> exp_diff) & 1;
+            bool roundingB2 = ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0);
+            bool rounding3 = (B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1)) && signbit(B[i]);
+            ABi = (ABi << 1) + roundingA + roundingB + roundingB2 - rounding3;
+            AB.push_back(ABi);
         }
     }
     AB.exponent = A.exponent + carry;
@@ -208,272 +237,329 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 }
 
 
-template <typename T>
-BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-  size_t N = A.size();
-  // assert(N==B.size());
-  BFPDynamic<T> nB(N);
+            // T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
+            // bool roundingA = A[i] & 1;
+            // bool roundingB = (B[i] >> exp_diff) & 1;
+            // bool roundingB2 = ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0);
+            // AB.push_back((ABi << 1) + roundingA + roundingB + roundingB2);
 
-  for (size_t i = 0; i < N; i++){ nB.push_back(-B[i]); }
-  nB.exponent = B.exponent;
+            // cout << "no carry" << endl;
+            // typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (signbit(B[i]) && ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
+            // bool rounding = (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0)) && !signbit(B[i]);
+            // bool rounding2 = ((B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1))) && signbit(B[i]);
+            // AB.push_back(ABi + rounding - rounding2);
 
-  return A + nB;
-}
+
+// Working for positive:
+// template <typename T>
+// BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+//     if(A.exponent < B.exponent) return B+A;
+//     size_t N = A.size();
+
+//     BFPDynamic<T> AB;
+//     int exp_diff = A.exponent - B.exponent;
+//     bool carry = false;
+
+//     for(size_t i=0;i<N;i++){
+//         typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
+//         T abi  = ABi;
+//         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+//     }
+
+//     AB.exponent = A.exponent + carry;
+
+//     if(carry){
+//         for(size_t i=0;i<N;i++){
+//             cout << "carry" << endl;
+//             typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff);
+//             // bool rounding = (((B[i] >> (exp_diff - 2)) & 1) && (exp_diff > 1));
+//             bool rounding2 = ABi & 1;
+//             cout << ABi << endl;
+//             // cout << rounding << endl;
+//             cout << rounding2 << endl;
+//             AB.push_back((ABi >> 1) +  rounding2); //(rounding || rounding2));
+//         }
+//     }else{
+//         for(size_t i=0;i<N;i++){
+//             cout << "no carry" << endl;
+//             typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff);
+//             bool rounding = (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
+//             AB.push_back(ABi + rounding);
+//         }
+//     }
+//     AB.exponent = A.exponent + carry;
+
+//     return AB;
+// }
 
 
-template <typename T>
-BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-  size_t N = A.size();
-  // assert(N==B.size());
-  BFPDynamic<T> AB;
-  Tx2 max_value = 0;
 
-  for (size_t i = 0; i < N; i++) {
-    Tx2 ABi = Tx2(A[i]) * B[i];
-    max_value = max(max_value, std::abs(ABi));
-  }
+// template <typename T>
+// BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+//   size_t N = A.size();
+//   // assert(N==B.size());
+//   BFPDynamic<T> nB(N);
+
+//   for (size_t i = 0; i < N; i++){ nB.push_back(-B[i]); }
+//   nB.exponent = B.exponent;
+
+//   return A + nB;
+// }
+
+
+// template <typename T>
+// BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+//   size_t N = A.size();
+//   // assert(N==B.size());
+//   BFPDynamic<T> AB;
+//   Tx2 max_value = 0;
+
+//   for (size_t i = 0; i < N; i++) {
+//     Tx2 ABi = Tx2(A[i]) * B[i];
+//     max_value = max(max_value, std::abs(ABi));
+//   }
   
-  int shifts = 1 + floor_log2(max_value) - (numeric_limits<T>::digits);
-  if (shifts < 0)
-    shifts = 0;
+//   int shifts = 1 + floor_log2(max_value) - (numeric_limits<T>::digits);
+//   if (shifts < 0)
+//     shifts = 0;
   
-  for (size_t i = 0; i < N; i++){
-    Tx2 ABi = Tx2(A[i]) * B[i];
-    bool rounding = (ABi >> (shifts - 1)) & 1;
-    bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-    AB.push_back((ABi >> shifts) + rounding - rounding2);
-  }
-  AB.exponent = A.exponent + B.exponent + shifts;
-  return AB;
-}
+//   for (size_t i = 0; i < N; i++){
+//     Tx2 ABi = Tx2(A[i]) * B[i];
+//     bool rounding = (ABi >> (shifts - 1)) & 1;
+//     bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
+//     AB.push_back((ABi >> shifts) + rounding - rounding2);
+//   }
+//   AB.exponent = A.exponent + B.exponent + shifts;
+//   return AB;
+// }
 
 
-template <typename T>
-BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-    size_t N = A.size();
-    // assert(N==B.size());
+// template <typename T>
+// BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+//     size_t N = A.size();
+//     // assert(N==B.size());
 
-    BFPDynamic<T> AB;
-    Tx2 max_value = 0;
+//     BFPDynamic<T> AB;
+//     Tx2 max_value = 0;
 
-    for (size_t i = 0; i < N; i++) {
-        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        max_value = max(max_value, std::abs(ABi));
-    }
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
-    if (shifts < 0)
-        shifts = 0;
+//     for (size_t i = 0; i < N; i++) {
+//         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+//         max_value = max(max_value, std::abs(ABi));
+//     }
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     if (shifts < 0)
+//         shifts = 0;
 
-    for (size_t i = 0; i < N; i++){
-        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        bool rounding = ((ABi >> (shifts - 1)) & 1);
-        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
+//     for (size_t i = 0; i < N; i++){
+//         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+//         bool rounding = ((ABi >> (shifts - 1)) & 1);
+//         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
 
-        AB.push_back((ABi >> shifts) + rounding - rounding2);
-    }
+//         AB.push_back((ABi >> shifts) + rounding - rounding2);
+//     }
 
-    AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
+//     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
 
-    return AB;
-}
+//     return AB;
+// }
 
-template <typename T>
-BFPDynamic<T> bfp_pow(const BFPDynamic<T> &A, const BFPDynamic<T> &p) {
-    size_t N = A.size();
-    // assert(N==B.size());
+// template <typename T>
+// BFPDynamic<T> bfp_pow(const BFPDynamic<T> &A, const BFPDynamic<T> &p) {
+//     size_t N = A.size();
+//     // assert(N==B.size());
 
-    BFPDynamic<T> Ap;
-    Tx2 max_value = 0;
-    for (size_t i = 0; i < N; i++){
-        Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
-        max_value = max(max_value, Api);
-    }
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     BFPDynamic<T> Ap;
+//     Tx2 max_value = 0;
+//     for (size_t i = 0; i < N; i++){
+//         Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
+//         max_value = max(max_value, Api);
+//     }
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
 
-    for (size_t i = 0; i < N; i++){
-        Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
-        Ap.push_back(Api >> shifts);
-    }
+//     for (size_t i = 0; i < N; i++){
+//         Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
+//         Ap.push_back(Api >> shifts);
+//     }
 
-    Ap.exponent = A.exponent + shifts - numeric_limits<T>::digits;
-    return Ap;
-}
+//     Ap.exponent = A.exponent + shifts - numeric_limits<T>::digits;
+//     return Ap;
+// }
 
-//Denne bruger floating point
-//https://stackoverflow.com/questions/19611198/finding-square-root-without-using-sqrt-function
+// //Denne bruger floating point
+// //https://stackoverflow.com/questions/19611198/finding-square-root-without-using-sqrt-function
 
-//...nok bedre at basere loesningen paa denne:
-//https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
-template <typename T>
-BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
-    size_t N = A.size();
-    // assert(N==B.size());
+// //...nok bedre at basere loesningen paa denne:
+// //https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
+// template <typename T>
+// BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
+//     size_t N = A.size();
+//     // assert(N==B.size());
     
-    BFPDynamic<T> sqrtA;
-    uTx2 max_value = 0;
+//     BFPDynamic<T> sqrtA;
+//     uTx2 max_value = 0;
 
-    for (size_t i=0; i < N; i++){
-      uTx2 sqrtAi = uTx2(A[i]) << (sizeof(T)*8 + (A.exponent & 1));
-      uTx2 y = (sqrtAi >> 1);
-      uTx2 z = 0;
-      uTx2 y1;
+//     for (size_t i=0; i < N; i++){
+//       uTx2 sqrtAi = uTx2(A[i]) << (sizeof(T)*8 + (A.exponent & 1));
+//       uTx2 y = (sqrtAi >> 1);
+//       uTx2 z = 0;
+//       uTx2 y1;
 
-      while (y != z) {
-        	z = y;
-        	y1 = (y + sqrtAi / y);
-        	y = (y1 >> 1) + (y1 & 1);
-      }
-      max_value = max(max_value, y - (y1 & 1));
-    }
+//       while (y != z) {
+//         	z = y;
+//         	y1 = (y + sqrtAi / y);
+//         	y = (y1 >> 1) + (y1 & 1);
+//       }
+//       max_value = max(max_value, y - (y1 & 1));
+//     }
 
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
 
-    if (shifts < 0){
-      shifts = 0;
-    }
-    for (size_t i=0; i < N; i++){
-        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-        uTx2 y = (sqrtAi >> 1);
-        uTx2 z = 0;
-        uTx2 y1;
-        while (y != z) {
-            z = y;
-            y1 = (y + sqrtAi / y);
-            y = (y1 >> 1) + (y1 & 1);
-        }
-        y -= (y1 & 1);
+//     if (shifts < 0){
+//       shifts = 0;
+//     }
+//     for (size_t i=0; i < N; i++){
+//         uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+//         uTx2 y = (sqrtAi >> 1);
+//         uTx2 z = 0;
+//         uTx2 y1;
+//         while (y != z) {
+//             z = y;
+//             y1 = (y + sqrtAi / y);
+//             y = (y1 >> 1) + (y1 & 1);
+//         }
+//         y -= (y1 & 1);
 
-        sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
-        }
-    sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
+//         sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
+//         }
+//     sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
-    return sqrtA;
-}
-
-
-#define BITSPERLONG 32
-#define TOP2BITS(x) ((x & (3L << (BITSPERLONG-2))) >> (BITSPERLONG-2))
-
-template <typename T>
-BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
-    size_t N = A.size();
-    BFPDynamic<T> sqrtA;
-    uTx2 max_value = 0;
-
-    for (size_t i=0; i < N; i++){
-        unsigned long x = A[i] << (A.exponent & 1);
-        unsigned long a = 0L;                   /* accumulator      */
-        unsigned long r = 0L;                   /* remainder        */
-        unsigned long e = 0L;                   /* trial product    */
-
-        for (int j = 0; j < BITSPERLONG; j++){
-            r = (r << 2) + TOP2BITS(x); x <<= 2;
-            a <<= 1;
-            e = (a << 1) + 1;
-            if (r >= e){
-                  r -= e;
-                  a++;
-            }
-        }
-        max_value = max(max_value, a);
-        // max_value = max(max_value, A[i]);
-    }
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
-
-    if (shifts > 0){
-        for (size_t i=0; i < N; i++){
-            unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
-            unsigned long a = 0L;                   /* accumulator      */
-            unsigned long r = 0L;                   /* remainder        */
-            unsigned long e = 0L;                   /* trial product    */
-
-            for (int j = 0; j < BITSPERLONG; j++){
-                r = (r << 2) + TOP2BITS(x); x <<= 2;
-                a <<= 1;
-                e = (a << 1) + 1;
-                if (r >= e){
-                      r -= e;
-                      a++;
-                }
-            }
-            bool rounding = ((a >> (shifts - 1)) & 1);
-            sqrtA.push_back((a >> shifts) + rounding);
-        }
-    }else{
-        for (size_t i=0; i < N; i++){
-            unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
-            unsigned long a = 0L;                   /* accumulator      */
-            unsigned long r = 0L;                   /* remainder        */
-            unsigned long e = 0L;                   /* trial product    */
-
-            for (int j = 0; j < BITSPERLONG; j++){
-                r = (r << 2) + TOP2BITS(x); x <<= 2;
-                a <<= 1;
-                e = (a << 1) + 1;
-                if (r >= e){
-                      r -= e;
-                      a++;
-                }
-            }
-            bool rounding = ((a >> (shifts - 1)) & 1);
-            sqrtA.push_back((a << abs(shifts)) + rounding);
-        }
-    }
-
-    // sqrtA.exponent = 1 + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
-    sqrtA.exponent = ((shifts + numeric_limits<T>::digits) >> 1) - (numeric_limits<T>::digits - shifts);
-
-    return sqrtA;
-}
+//     return sqrtA;
+// }
 
 
+// #define BITSPERLONG 32
+// #define TOP2BITS(x) ((x & (3L << (BITSPERLONG-2))) >> (BITSPERLONG-2))
+
+// template <typename T>
+// BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
+//     size_t N = A.size();
+//     BFPDynamic<T> sqrtA;
+//     uTx2 max_value = 0;
+
+//     for (size_t i=0; i < N; i++){
+//         unsigned long x = A[i] << (A.exponent & 1);
+//         unsigned long a = 0L;                   /* accumulator      */
+//         unsigned long r = 0L;                   /* remainder        */
+//         unsigned long e = 0L;                   /* trial product    */
+
+//         for (int j = 0; j < BITSPERLONG; j++){
+//             r = (r << 2) + TOP2BITS(x); x <<= 2;
+//             a <<= 1;
+//             e = (a << 1) + 1;
+//             if (r >= e){
+//                   r -= e;
+//                   a++;
+//             }
+//         }
+//         max_value = max(max_value, a);
+//         // max_value = max(max_value, A[i]);
+//     }
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+
+//     if (shifts > 0){
+//         for (size_t i=0; i < N; i++){
+//             unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
+//             unsigned long a = 0L;                   /* accumulator      */
+//             unsigned long r = 0L;                   /* remainder        */
+//             unsigned long e = 0L;                   /* trial product    */
+
+//             for (int j = 0; j < BITSPERLONG; j++){
+//                 r = (r << 2) + TOP2BITS(x); x <<= 2;
+//                 a <<= 1;
+//                 e = (a << 1) + 1;
+//                 if (r >= e){
+//                       r -= e;
+//                       a++;
+//                 }
+//             }
+//             bool rounding = ((a >> (shifts - 1)) & 1);
+//             sqrtA.push_back((a >> shifts) + rounding);
+//         }
+//     }else{
+//         for (size_t i=0; i < N; i++){
+//             unsigned long x = A[i] << (A.exponent & 1); // >> (A.exponent & 1);
+//             unsigned long a = 0L;                   /* accumulator      */
+//             unsigned long r = 0L;                   /* remainder        */
+//             unsigned long e = 0L;                   /* trial product    */
+
+//             for (int j = 0; j < BITSPERLONG; j++){
+//                 r = (r << 2) + TOP2BITS(x); x <<= 2;
+//                 a <<= 1;
+//                 e = (a << 1) + 1;
+//                 if (r >= e){
+//                       r -= e;
+//                       a++;
+//                 }
+//             }
+//             bool rounding = ((a >> (shifts - 1)) & 1);
+//             sqrtA.push_back((a << abs(shifts)) + rounding);
+//         }
+//     }
+
+//     // sqrtA.exponent = 1 + ((A.exponent >> 1) - ((shifts + numeric_limits<T>::digits) >> 1)) + (shifts >> 1);
+//     sqrtA.exponent = ((shifts + numeric_limits<T>::digits) >> 1) - (numeric_limits<T>::digits - shifts);
+
+//     return sqrtA;
+// }
 
 
-// https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
-template <typename T >
-BFPDynamic<T> bfp_invsqrt(const BFPDynamic<T> &A){
-    size_t N = A.size();
-    // assert(N==B.size());
-
-    BFPDynamic<T> invsqrtA;
-    auto half = BFPDynamic<T>{{1}, -1};
-    auto x2 = A * half;
-    auto threehalfs = BFPDynamic<T>{{3}, -1};
-    auto y = A;
-
-    y.exponent++;
-    auto i = (BFPDynamic<T>{{0x5f3759df}, 0}) - y;
-    cout << (i[0] >> 20) << endl;
-    i.exponent = i[0] >> 25;
-
-    auto johni = (i[0] << 8) >> 30;
-    auto res = johni * (threehalfs[0] - (x2[0] * johni * johni));
-    return res;
-}
 
 
-template <typename T >
-BFPDynamic<T> bfp_invsqrtfloat(const BFPDynamic<T> &A) {
-    size_t N = A.size();
-    // assert(N==B.size());
+// // https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
+// template <typename T >
+// BFPDynamic<T> bfp_invsqrt(const BFPDynamic<T> &A){
+//     size_t N = A.size();
+//     // assert(N==B.size());
 
-    vector<double> invsqrtAfloat(A.size());
-    for (size_t i=0; i < N; i++){
-        int32_t j;
-        float x2, y;
-        const float threehalfs = 1.5F;
-        x2 = A[i] * 0.5F;
+//     BFPDynamic<T> invsqrtA;
+//     auto half = BFPDynamic<T>{{1}, -1};
+//     auto x2 = A * half;
+//     auto threehalfs = BFPDynamic<T>{{3}, -1};
+//     auto y = A;
 
-        y = A[i];
-        j = *(int32_t *) &y;
-        j = 0x5f3759df - (j >> 1);
-        cout << j << endl;
-        y = *(float *) &j;
-        y = y * (threehalfs - (x2 * y * y));
-        invsqrtAfloat.push_back(y);
-    }
-    return BFPDynamic<T>(invsqrtAfloat);
-}
+//     y.exponent++;
+//     auto i = (BFPDynamic<T>{{0x5f3759df}, 0}) - y;
+//     cout << (i[0] >> 20) << endl;
+//     i.exponent = i[0] >> 25;
+
+//     auto johni = (i[0] << 8) >> 30;
+//     auto res = johni * (threehalfs[0] - (x2[0] * johni * johni));
+//     return res;
+// }
+
+
+// template <typename T >
+// BFPDynamic<T> bfp_invsqrtfloat(const BFPDynamic<T> &A) {
+//     size_t N = A.size();
+//     // assert(N==B.size());
+
+//     vector<double> invsqrtAfloat(A.size());
+//     for (size_t i=0; i < N; i++){
+//         int32_t j;
+//         float x2, y;
+//         const float threehalfs = 1.5F;
+//         x2 = A[i] * 0.5F;
+
+//         y = A[i];
+//         j = *(int32_t *) &y;
+//         j = 0x5f3759df - (j >> 1);
+//         cout << j << endl;
+//         y = *(float *) &j;
+//         y = y * (threehalfs - (x2 * y * y));
+//         invsqrtAfloat.push_back(y);
+//     }
+//     return BFPDynamic<T>(invsqrtAfloat);
+// }
 
 
 // template <typename T >
