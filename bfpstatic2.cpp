@@ -41,8 +41,8 @@ template <typename T, size_t N>
 struct BFPStatic: public std::array<T,N>{
     int exponent;
     BFPStatic(int exponent=0) : exponent(exponent) {}
-    BFPStatic(const std::array<T,N> &A, int exponent) : std::array<T,N>(A), exponent(exponent) {}
-    BFPStatic(const std::vector<double> &V) {
+    BFPStatic(std::array<T,N> &A, int exponent) : std::array<T,N>(&A), exponent(exponent) {}
+    BFPStatic(std::vector<double> &V) {
         assert(V.size() == N);
         std::array<T,N> &A(*this);
 
@@ -71,7 +71,6 @@ struct BFPStatic: public std::array<T,N>{
             A[i] = round(V[i]*power);
         }
     }
-
 
     std::vector<double> to_float() const {
         std::vector<double> values(N);
@@ -186,7 +185,6 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> nB;
     for (size_t i = 0; i < N; i++){ nB[i] = -B[i]; }
     nB.exponent = B.exponent;
-
     return A + nB;
 }
 
@@ -308,9 +306,6 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
 
     return sqrtA;
 }
-
-
-
 
 
 /**
@@ -494,7 +489,7 @@ BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
     return BFPStatic<T,N>(invsqrtAfloat);
 }
 
-
+    
 template <typename T, size_t N>
 BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
     BFPStatic<T,N> Ab;
@@ -525,6 +520,76 @@ BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
 }
 
 
+template <typename T, size_t N>
+BFPStatic<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t xdim){
+    BFPStatic<T, N> iteration;
+
+    vector<double> V;
+    V.push_back(0.2);
+
+    BFPStatic<T, 1> B = BFPStatic<T, 1>(V);
+    auto Bi = B[0];
+    Tx2 max_value = 0;
+    
+    for(size_t i=1; i<ydim-1; i++){
+        for(size_t j=1; j<xdim-1; j++){
+            Tx2 Ai = (Tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]) * Bi;
+            max_value = max(max_value, Ai ^ Tx2(-1 * signbit(Ai)));
+        }
+    }
+
+    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    if (shifts < 0)
+        shifts = 0;
+
+    for(size_t i=1; i<ydim-1; i++){
+        for(size_t j=1; j<xdim-1; j++){
+            Tx2 Ai = Tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1] * Bi;
+            iteration[i] = Ai >> shifts;
+        }
+    }
+
+    for (int i=0; i<ydim; i++) {   // borders
+        iteration[i*ydim]        = A[i*ydim];
+        iteration[i*ydim+xdim-1] = A[i*ydim+xdim-1];
+    }
+
+    for (int i=0; i<xdim; i++) {
+        iteration[i]        = A[i];
+        iteration[ydim-1*i] = A[ydim-1*i];
+    }
+
+    iteration.exponent = A.exponent + B.exponent + shifts;
+    return iteration;
+}
+
+
+template <typename T, size_t N>
+BFPStatic<T, N> bfp_abs(const BFPStatic<T, N> &A){
+    BFPStatic<T, N> absA;
+
+    for (size_t i=0; i < N; i++){
+        absA[i] = abs(A[i]);
+    }
+    absA.exponent = A.exponent;
+
+    return absA;
+}
+
+template <typename T, size_t N>
+double bfp_sum_abs(const BFPStatic<T, N> &A){
+    BFPStatic<T, N> sumA;
+    // How much do we need???
+    Tx2 accumulator = 0;
+    
+    for (size_t i=0; i < N; i++){
+        accumulator += abs(A[i]);
+    }
+    return pow(2.0, A.exponent) * accumulator;
+}
+
+
+    
 
 // Vector operations +, -, *, and /
 template <typename T> vector<T> operator+(const vector<T> &A, const vector<T> &B){

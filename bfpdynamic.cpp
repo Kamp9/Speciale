@@ -181,60 +181,53 @@ struct BFPDynamic: public std::vector<T>{
 //     }
 // }
 
+
+
 template <typename T>
 BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     if(A.exponent < B.exponent) return B+A;
+    
     size_t N = A.size();
 
     BFPDynamic<T> AB;
+
     int exp_diff = A.exponent - B.exponent;
     bool carry = false;
 
+    int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
     for(size_t i=0;i<N;i++){
-        // typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
-        // T abi  = ABi;
-        // carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-
-        typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (signbit(B[i]) && ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
-        bool rounding = (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0)) && !signbit(B[i]);
-        bool rounding2 = ((B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1))) && signbit(B[i]);
-        ABi = ABi + rounding - rounding2;
+        typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
+        ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
         T abi  = ABi;
         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
-
+    cout << exp_diff2 << endl;
     if(carry){
         for(size_t i=0;i<N;i++){
             cout << "carry" << endl;
-            T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
+            typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
+            bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
 
-            bool roundingA = A[i] & 1;
-            bool roundingB = ((B[i] & 1) && (exp_diff > 0));
-            // cout << roundingA << endl;
-            cout << int(B[i]) << endl;
-            cout << (B[i] >> (exp_diff + 1)) << endl;
-            cout << exp_diff << endl;
-            // bool rounding3 = (B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1)) && signbit(B[i]);
-            // cout << ((roundingA + roundingB + roundingB2) >> 1) << endl;
-            // ABi += (roundingA + roundingB) >> 1;
-            AB.push_back(ABi);
+            ABi = (ABi >> exp_diff2);
+            ABi += rounding;
+            AB.push_back((ABi >> 1));
         }
     }else{
         for(size_t i=0;i<N;i++){
             cout << "no carry" << endl;
-            T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
-            bool roundingA = A[i] & 1;
-            bool roundingB = (B[i] >> exp_diff) & 1;
-            bool roundingB2 = ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0);
-            bool rounding3 = (B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1)) && signbit(B[i]);
-            ABi = (ABi << 1) + roundingA + roundingB + roundingB2 - rounding3;
-            AB.push_back(ABi);
+            typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
+            bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
+            bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
+            AB.push_back((ABi >> exp_diff2) + rounding - rounding2);
         }
     }
     AB.exponent = A.exponent + carry;
 
     return AB;
 }
+
+
+
 
 
             // T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
@@ -292,6 +285,30 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 //     return AB;
 // }
 
+
+// template <typename T>
+// BFPDynamic<T> bfp_heateq(const BFPDynamic<T> &A, size_t ydim, size_t xdim){
+//     if(A.exponent < B.exponent) return B+A;
+    
+//     size_t N = A.size();
+//     BFPDynamic<T> iteration;
+
+//     max_value = 0;
+//     for(size_t y=1; y<ydim-1; y++){
+//         for(size_t x=1; x<xdim-1; x++){
+//             max_value = (max_value, A[(i-1)*ydim+j] + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]);
+//         }
+//     }
+
+
+//     for(size_t y=1; y<ydim-1; y++){
+//         for(size_t x=1; x<xdim-1; x++){
+//             iteration.push_back(A[(i-1)*ydim+j] + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + grid[i*ydim+j+1]);
+//         }
+//     }
+
+//     return iteration;
+// }
 
 
 // template <typename T>

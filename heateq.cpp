@@ -5,6 +5,9 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
+#include "boost/multi_array.hpp"
+#include <cassert>
+
 #include "bfpstatic2.cpp"
 
 // using namespace std;
@@ -17,9 +20,9 @@ int main(){
 
     size_t const ydim = 6;
     size_t const xdim = 6;
-    size_t const N = (ydim - 2) * (xdim - 2);
+    size_t const N = ydim * xdim;
     auto grid = new double[ydim][xdim];
-    // #pragma omp parallel for collapse(2)
+
     for (int i=0; i<ydim; i++) {      // Initialize the grid
         for (int j=0;j<xdim;j++) {
             grid[i][j] = 0;
@@ -34,41 +37,28 @@ int main(){
         grid[ydim-1][i] = 40.0;
     }
 
-    BFPStatic<int32_t, N> north;
-    BFPStatic<int32_t, N> south;
-    BFPStatic<int32_t, N> center;
-    BFPStatic<int32_t, N> west;
-    BFPStatic<int32_t, N> east;
-
-    for (int i=1; i<ydim-1; i++) {
-        for(int j=1;j<xdim-1;j++) {
-            north[(i-1)*(ydim-2)+(j-1)]  = grid[i-1][j];
-            south[(i-1)*(ydim-2)+(j-1)]  = grid[i+1][j]; 
-            center[(i-1)*(ydim-2)+(j-1)] = grid[i][j]; 
-            west[(i-1)*(ydim-2)+(j-1)]   = grid[i][j-1]; 
-            east[(i-1)*(ydim-2)+(j-1)]   = grid[i][j+1];
+    vector<double> grid_1d;
+    for (int i = 0; i < ydim; i++){
+        for (int j = 0; j < xdim; j++){
+            grid_1d.push_back(grid[i][j]);
         }
     }
+
+    auto bfp_grid = BFPStatic<int32_t, N>(grid_1d);
+
+    double delta = 1;
+    double epsilon = 0.01;
 
     uint iterations = 0;
-    uint max_iterations = 10;
-    while (iterations < max_iterations){
-        iterations++;
-        BFPStatic<int32_t, N> temp = bfp_mul_scalar((north + south + center + west + east), 0.2);
-        center = temp;
-        // cout << center << endl;
-    }
-    vector<double> res_grid = center.to_float();
-    cout << res_grid << endl;
+    uint max_iterations = 20;
 
-    cout << "output: " << endl;;
-    for (int i=0; i<(ydim-2); ++i) {
-        for (int j=0; j<(xdim-2); ++j) {
-            cout << res_grid[i*4+j] << "\t, ";
-        }
-        cout << endl;
+    while (iterations < max_iterations && delta > epsilon){
+        iterations++;
+        auto temp = bfp_heat_iteration(bfp_grid, ydim, xdim);
+        delta = bfp_sum_abs(temp - bfp_grid);
+        cout << delta << endl;
+        bfp_grid = temp;
     }
-    cout << "]";
 
     return 0;
 }
