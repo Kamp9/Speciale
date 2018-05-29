@@ -201,16 +201,18 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
         T abi  = ABi;
         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
+    // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
     cout << exp_diff2 << endl;
     if(carry){
         for(size_t i=0;i<N;i++){
             cout << "carry" << endl;
-            bool sign = signbit((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
-            typename Tx2<T>::type ABi2 = (typename Tx2<T>::type(abs(A[i])) << exp_diff2) + abs(B[i]);
-            bool rounding = (ABi2 >> (exp_diff2)) & 1 && !sign;
-            AB.push_back(((-sign ^ ((ABi2 >> (exp_diff2)))) + sign + rounding) >> 1);
-        }
 
+            bool sign = signbit((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
+            typename Tx2<T>::type ABi = abs((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
+            ABi = -sign ^ (ABi >> exp_diff2);
+            bool rounding = (ABi & 1);
+            AB.push_back((ABi >> 1) + rounding);
+        }
     }else{
         for(size_t i=0;i<N;i++){
             cout << "no carry" << endl;
@@ -320,17 +322,17 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 // }
 
 
-// template <typename T>
-// BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-//   size_t N = A.size();
-//   // assert(N==B.size());
-//   BFPDynamic<T> nB(N);
+template <typename T>
+BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+  size_t N = A.size();
+  // assert(N==B.size());
+  BFPDynamic<T> nB(N);
 
-//   for (size_t i = 0; i < N; i++){ nB.push_back(-B[i]); }
-//   nB.exponent = B.exponent;
+  for (size_t i = 0; i < N; i++){ nB.push_back(-B[i]); }
+  nB.exponent = B.exponent;
 
-//   return A + nB;
-// }
+  return A + nB;
+}
 
 
 // template <typename T>
