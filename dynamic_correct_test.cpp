@@ -60,15 +60,13 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp_neg<int8_t>(rng, 5);
-    auto B = gen_bfp_neg<int8_t>(rng, 5);
-    // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
-    // auto b = vector<int8_t>{73,122,39,25,98,64,126,73,122,10};
+    auto A = gen_bfp_neg<int32_t>(rng, 100);
+    auto B = gen_bfp_pos<int32_t>(rng, 100);
 
-    // auto a = std::vector<int8_t> {-100};
-    // auto b = std::vector<int8_t> {-101};
-    // BFPDynamic<int8_t> A{a, 6};
-    // BFPDynamic<int8_t> B{b, 6};
+    // auto a = vector<int8_t>{-55,-76,-83,-25,-78};
+    // auto b = vector<int8_t>{-26,-101,-115,-36,-45};
+    // BFPDynamic<int8_t> A{a, 10};
+    // BFPDynamic<int8_t> B{b, 9};
 
     // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
     // auto b = vector<int8_t>{73,122,39,25,98,64,126,73,122,10};

@@ -555,9 +555,21 @@ BFPStatic<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t
     }
 
     for (int i=0; i<xdim; i++) {
-        iteration[i]        = A[i];
-        iteration[ydim-1*i] = A[ydim-1*i];
+        iteration[i] = A[i];
+        iteration[xdim*(ydim-1)+i] = A[xdim*(ydim-1)+i];
     }
+
+
+    // for (int i=0; i<ydim; i++) {      // And borders
+    //     grid[i][0]      = -273.15;
+    //     grid[i][xdim-1] = -273.15;
+    // }
+
+    // for (int i=0; i<xdim; i++) {
+    //     grid[0][i]      = -273.15;
+    //     grid[ydim-1][i] = 40.0;
+    // }
+
 
     iteration.exponent = A.exponent + B.exponent + shifts;
     return iteration;

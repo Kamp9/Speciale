@@ -205,13 +205,12 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     if(carry){
         for(size_t i=0;i<N;i++){
             cout << "carry" << endl;
-            typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
-            bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
-
-            ABi = (ABi >> exp_diff2);
-            ABi += rounding;
-            AB.push_back((ABi >> 1));
+            bool sign = signbit((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
+            typename Tx2<T>::type ABi2 = (typename Tx2<T>::type(abs(A[i])) << exp_diff2) + abs(B[i]);
+            bool rounding = (ABi2 >> (exp_diff2)) & 1 && !sign;
+            AB.push_back(((-sign ^ ((ABi2 >> (exp_diff2)))) + sign + rounding) >> 1);
         }
+
     }else{
         for(size_t i=0;i<N;i++){
             cout << "no carry" << endl;
@@ -227,21 +226,31 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 }
 
 
+            // typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + B[i];
+            // typename Tx2<T>::type ABi2 = (typename Tx2<T>::type(abs(A[i])) << exp_diff2) + abs(B[i]);
+            // bool rounding = ((ABi2 >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
+            // bool rounding2 = ((ABi2 & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi2);
+            // // cout << ABi << endl;
+            // AB.push_back(-1 * (((ABi2) >> (exp_diff2))) >> 1);
 
 
-
-            // T ABi = (A[i] >> 1) + (B[i] >> (exp_diff + 1));
-            // bool roundingA = A[i] & 1;
-            // bool roundingB = (B[i] >> exp_diff) & 1;
-            // bool roundingB2 = ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0);
-            // AB.push_back((ABi << 1) + roundingA + roundingB + roundingB2);
-
-            // cout << "no carry" << endl;
-            // typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) + (B[i] >> exp_diff) + (signbit(B[i]) && ((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0));
-            // bool rounding = (((B[i] >> (exp_diff - 1)) & 1) && (exp_diff > 0)) && !signbit(B[i]);
-            // bool rounding2 = ((B[i] & ((1 << exp_diff) -1)) == (1 << (exp_diff - 1))) && signbit(B[i]);
-            // AB.push_back(ABi + rounding - rounding2);
-
+    // if(carry){
+    //     for(size_t i=0;i<N;i++){
+    //         cout << "carry" << endl;
+    //         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
+    //         bool rounding = ((ABi >> exp_diff2) & 1);
+    //         AB.push_back((ABi >> (exp_diff2 + 1)) + rounding); // + rounding);
+    //     }
+    // }else{
+    //     for(size_t i=0;i<N;i++){
+    //         cout << "no carry" << endl;
+    //         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
+    //         bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
+    //         bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
+    //         AB.push_back((ABi >> exp_diff2) + rounding - rounding2);
+    //     }
+    // }
+    // AB.exponent = A.exponent + carry;
 
 // Working for positive:
 // template <typename T>
