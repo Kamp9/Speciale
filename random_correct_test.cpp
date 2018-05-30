@@ -75,13 +75,12 @@ int main(){
     gettimeofday(&tv, 0);
     rng.seed(tv.tv_usec);
 
-    auto C = gen_bfp<int8_t, 10>(rng);
-    auto D = gen_bfp<int8_t, 10>(rng);
-    auto A = gen_bfp_pos<int8_t, 10>(rng);
-    auto B = gen_bfp_pos<int8_t, 10>(rng);
-
-    // BFPStatic<int8_t, 5> L{{56,-29,14,39,-43},2};
-    // BFPStatic<int8_t, 5> M{{-52,22,-51,46,106},-3};
+    // auto C = gen_bfp_no_0<int8_t, 10>(rng);
+    // auto D = gen_bfp_no_0<int8_t, 10>(rng);
+    auto A = gen_bfp<int8_t, 10>(rng);
+    auto B = gen_bfp<int8_t, 10>(rng);
+    check_add(A, B);
+    // BFPStatic<int8_t, 3> A{{100, 12, 51}, 0};
 
     // sqrt {{15,27,19,6,62},9}
     
@@ -107,7 +106,9 @@ int main(){
     // BFPStatic<int8_t, 1> P{{100},0};
     // BFPStatic<int8_t, 1> Q{{100},0};
 
-    check_add(A ,B);
+    // cout << A << endl;
+    // cout << bfp_mul_scalar(A, 0.2) << endl;
+
     // check_sqrt(A);
     // auto S = gen_bfp<int8_t, 20>(rng);
     // auto R = gen_bfp<int8_t, 20>(rng);

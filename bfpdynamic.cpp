@@ -202,11 +202,8 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
     // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
-    cout << exp_diff2 << endl;
     if(carry){
         for(size_t i=0;i<N;i++){
-            cout << "carry" << endl;
-
             bool sign = signbit((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
             typename Tx2<T>::type ABi = abs((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
             ABi = -sign ^ (ABi >> exp_diff2);
@@ -215,7 +212,6 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
         }
     }else{
         for(size_t i=0;i<N;i++){
-            cout << "no carry" << endl;
             typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
             bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
             bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);

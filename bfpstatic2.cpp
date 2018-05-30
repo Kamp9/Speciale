@@ -21,6 +21,7 @@
 
 using namespace std;
 
+
 template <typename T> ostream &operator<<(ostream &s, const vector<T> &xs){
     s << "{"; for(int i=0;i<xs.size();i++) s << xs[i] << (i+1<xs.size()?"," : ""); s << "}";
     return s;
@@ -41,7 +42,7 @@ template <typename T, size_t N>
 struct BFPStatic: public std::array<T,N>{
     int exponent;
     BFPStatic(int exponent=0) : exponent(exponent) {}
-    BFPStatic(std::array<T,N> &A, int exponent) : std::array<T,N>(&A), exponent(exponent) {}
+    BFPStatic(std::array<T,N> &A, int exponent) : std::array<T,N>(A), exponent(exponent) {}
     BFPStatic(std::vector<double> &V) {
         assert(V.size() == N);
         std::array<T,N> &A(*this);
@@ -140,40 +141,41 @@ struct BFPStatic: public std::array<T,N>{
 //     }
 // }
 
-template <typename T,size_t N>
-BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
+template <typename T, size_t N>
+BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
     if(A.exponent < B.exponent) return B+A;
+    
+    // size_t N = A.size();
 
-    BFPStatic<T,N> AB;
-    bitset<N> carryAB;
-    bitset<N> sAB;
+    BFPStatic<T, N> AB;
+
     int exp_diff = A.exponent - B.exponent;
     bool carry = false;
 
+    int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
     for(size_t i=0;i<N;i++){
-        Tx2     ABi = A[i] + (B[i] >> exp_diff);
-        T       abi = ABi;
-        carryAB[i]  = (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-        sAB[i]      = signbit(ABi);
-        carry      |= carryAB[i];
+        Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+        ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
+        T abi  = ABi;
+        carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
-
-    AB.exponent = A.exponent + carry;
+    // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
     if(carry){
         for(size_t i=0;i<N;i++){
-            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            bool rounding = ABi & 1;
+            bool sign = signbit((Tx2(A[i]) << exp_diff2) + B[i]);
+            Tx2 ABi = abs((Tx2(A[i]) << exp_diff2) + B[i]);
+            ABi = -sign ^ (ABi >> exp_diff2);
+            bool rounding = (ABi & 1);
             AB[i] = (ABi >> 1) + rounding;
         }
-    }
-    else{
+    }else{
         for(size_t i=0;i<N;i++){
-            Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-            bool rounding = (B[i] >> (exp_diff - 1)) & 1;
-            AB[i] = ABi + rounding;
+            Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+            bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
+            bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
+            AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
         }
     }
-
     AB.exponent = A.exponent + carry;
 
     return AB;
@@ -521,7 +523,14 @@ BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
 
 
 template <typename T, size_t N>
-BFPStatic<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t xdim){
+struct heat_result {
+    BFPStatic<T, N> bfp_grid;
+    double delta;
+};
+
+
+template <typename T, size_t N>
+heat_result<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t xdim){
     BFPStatic<T, N> iteration;
 
     vector<double> V;
@@ -541,10 +550,12 @@ BFPStatic<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t
     int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
     if (shifts < 0)
         shifts = 0;
-
+    
+    Tx2 accumulator = 0;
     for(size_t i=1; i<ydim-1; i++){
         for(size_t j=1; j<xdim-1; j++){
-            Tx2 Ai = Tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1] * Bi;
+            Tx2 Ai = (Tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]) * Bi;
+            accumulator += abs(Ai - A[i*ydim+j]);
             iteration[i] = Ai >> shifts;
         }
     }
@@ -559,20 +570,9 @@ BFPStatic<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t
         iteration[xdim*(ydim-1)+i] = A[xdim*(ydim-1)+i];
     }
 
-
-    // for (int i=0; i<ydim; i++) {      // And borders
-    //     grid[i][0]      = -273.15;
-    //     grid[i][xdim-1] = -273.15;
-    // }
-
-    // for (int i=0; i<xdim; i++) {
-    //     grid[0][i]      = -273.15;
-    //     grid[ydim-1][i] = 40.0;
-    // }
-
-
     iteration.exponent = A.exponent + B.exponent + shifts;
-    return iteration;
+    heat_result<T, N> res{iteration, pow(2.0, A.exponent) * accumulator};
+    return res;
 }
 
 
@@ -589,13 +589,15 @@ BFPStatic<T, N> bfp_abs(const BFPStatic<T, N> &A){
 }
 
 template <typename T, size_t N>
-double bfp_sum_abs(const BFPStatic<T, N> &A){
+double bfp_sum_abs(const BFPStatic<T, N> &A, const size_t ydim, const size_t xdim){
     BFPStatic<T, N> sumA;
     // How much do we need???
     Tx2 accumulator = 0;
     
-    for (size_t i=0; i < N; i++){
-        accumulator += abs(A[i]);
+    for(size_t i=1; i<ydim-1; i++){
+        for(size_t j=1; j<xdim-1; j++){
+            accumulator += abs(A[i*ydim+j]);
+        }
     }
     return pow(2.0, A.exponent) * accumulator;
 }

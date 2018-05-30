@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp<int32_t>(rng, 10);
-    auto B = gen_bfp<int32_t>(rng, 10);
+    auto A = gen_bfp<int8_t>(rng, 10);
+    auto B = gen_bfp<int8_t>(rng, 10);
 
     // auto a = vector<int8_t>{-55,-76,-83,-25,-78};
     // auto b = vector<int8_t>{-26,-101,-115,-36,-45};
