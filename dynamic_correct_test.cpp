@@ -45,7 +45,7 @@ BFPDynamic<T> gen_bfp_neg(boost::random::mt19937 &rng, const size_t N) {
     for(size_t i = 0; i < N; i++){
         elems.push_back(rand_elem(rng));
     }
-    boost::random::uniform_int_distribution<T> rand_exp(0, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
     BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
@@ -60,17 +60,13 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    // auto A = gen_bfp_pos<int8_t>(rng, 5);
-    // auto B = gen_bfp_pos<int8_t>(rng, 5);
-    BFPDynamic<int8_t> A{{{117,59,22,109,60}},-9};
-    BFPDynamic<int8_t> B{{{25,62,127,26,90}}, -5};
-    // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
-    // auto b = vector<int8_t>{73,122,39,25,98,64,126,73,122,10};
+    auto A = gen_bfp<int8_t>(rng, 10);
+    auto B = gen_bfp<int8_t>(rng, 10);
 
-    // auto a = std::vector<int8_t> {-100};
-    // auto b = std::vector<int8_t> {-101};
-    // BFPDynamic<int8_t> A{a, 6};
-    // BFPDynamic<int8_t> B{b, 6};
+    // auto a = vector<int8_t>{-55,-76,-83,-25,-78};
+    // auto b = vector<int8_t>{-26,-101,-115,-36,-45};
+    // BFPDynamic<int8_t> A{a, 10};
+    // BFPDynamic<int8_t> B{b, 9};
 
     // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
     // auto b = vector<int8_t>{73,122,39,25,98,64,126,73,122,10};
@@ -80,7 +76,7 @@ int main(int argc, char *argv[]){
 
 
     // check_add(A, B);
-    check_add(A, B);
+    check_sub(A, B);
     // BFPStatic<int8_t, 1> A100{{-65}, 1};
     // BFPStatic<int8_t, 1> B100{{-65}, 0};
 
