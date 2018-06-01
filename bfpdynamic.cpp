@@ -63,8 +63,8 @@ struct BFPDynamic: public std::vector<T>{
     // std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
 
     BFPDynamic(int exponent=0) : exponent(exponent) {}
-    BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
-    BFPDynamic(std::vector<double> &V) {
+    BFPDynamic(const std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
+    BFPDynamic(const std::vector<double> &V) {
         size_t N = V.size();
         std::vector<T> &A(*this);
 
