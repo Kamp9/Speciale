@@ -57,6 +57,7 @@ int main(){
         grid[0][i]      = -273.15;
         grid[ydim-1][i] = 40.0;
     }
+
     vector<double> grid_1d;
     for (int i = 0; i < ydim; i++){
         for (int j = 0; j < xdim; j++){
@@ -86,7 +87,7 @@ int main(){
         delta = res.delta;
         cout << delta << endl;
     }
-    cout << iterations << endl;     
+    cout << iterations << endl;
     end = clock();
     elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "elapsed-time: " << elapsed_secs << endl;
