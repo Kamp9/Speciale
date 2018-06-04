@@ -91,7 +91,6 @@ struct View : public BFPDynamic<T> {
 template <typename T>
 BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
     if(A.exponent < B.exponent) return B+A;
-    // size_t N = A.size();
 
     assert(A.ydim == B.ydim);
     assert(A.xdim == B.xdim);
@@ -136,9 +135,42 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
     return AB;
 }
 
+
+template <typename T, size_t N>
+BFPDynamic<T> bfp_mul_scalar(const View<T> &A, const double scalar){
+    BFPDynamic<T> Ab;
+    vector<double> V;
+    V.push_back(scalar);
+
+    BFPDynamic<T> B = BFPDynamic<T>(V);
+    auto Bi = B[0];
+    // should be able to avoid going through A two times with max value for BFP struct in metadata.
+    typename Tx2<T>::type max_value = 0;
+    for(size_t i=0;i<A.ydim;i++){
+        for (size_t j=0;j<A.xdim;j++){
+            typename Tx2<T>::type ABi = typename Tx2<T>::type(A(i,j)) * Bi;
+            max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
+        }
+    }
+
+    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    if (shifts < 0)
+        shifts = 0;
+
+    for(size_t i=0;i<A.ydim;i++){
+        for (size_t j=0;j<A.xdim;j++){
+            typename Tx2<T>::type ABi = typename Tx2<T>::type(A(i,j)) * Bi;
+            bool rounding = (ABi >> (shifts - 1)) & 1;
+            bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
+            Ab.push_back((ABi >> shifts) + rounding - rounding2);
+        }
+    }
+    Ab.exponent = A.exponent + B.exponent + shifts;
+    return Ab;
+}
+
+
 vector<double> make_grid(const size_t ydim, const size_t xdim){
-     // auto grid = new double[ydim][xdim];
-    // BAH!
     double grid[ydim][xdim];
 
     for (int i=0; i<ydim; i++) {      // Initialize the grid
@@ -166,11 +198,36 @@ vector<double> make_grid(const size_t ydim, const size_t xdim){
     return grid_1d;
 }
 
+
+extern "C" //This is important to get the function from the -lblas library you will use when compiling
+{
+    double daxpy_(int *n, double *a, double *A, int *incA, double *B, int *incB);
+//The daxpy fortran function shown above multiplies a first matrix 'A' by a constant 'a'
+//and adds the result to a second matrix 'B.' Both matrices are of size 'n.'
+}
+
+
+// void daxpy(int n, double a, double *A, int incA, double *B, int incB);
+void daxpy(int n, double a, double *A, int incA, double *B, int incB)
+{
+    daxpy_(&n, &a, A, &incA, B, &incB); //Once again, note the call notation. Important!
+}
+
 int main(){
+    // A[0] * a + B[0]
+    
+    double A[2] = {2.0, 3.0};
+    double B[2] = {4.0, 4.0};
+    int n = 2, incA=1, incB=1;
+    double a = 51.0;
+    daxpy(n, a, A, incA, B, incB);
+    cout << B[1] << endl;
+
 	// std::array<int8_t, 4> a = {100,7,8,9};
     // std::vector<int8_t> a({2,4,6,8});
 	// BFPDynamic<int8_t> A(a, 0);
 	// BFPDynamic<int8_t> *pA = &A;
+
     const size_t ydim = 10;
     const size_t xdim = 10;
 
@@ -188,7 +245,6 @@ int main(){
     auto center = View<int8_t>(pA, ydim-2, xdim-2, 1 + ydim, stride);
 
     cout << north + south + west + east + center << endl;
-    // cout << north + south + west + east + center << endl;
 
 	return 0;
 }
