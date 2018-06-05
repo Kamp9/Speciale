@@ -186,7 +186,6 @@ struct BFPDynamic: public std::vector<T>{
 template <typename T>
 BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     if(A.exponent < B.exponent) return B+A;
-    
     size_t N = A.size();
 
     BFPDynamic<T> AB;
