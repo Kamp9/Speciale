@@ -48,18 +48,17 @@ using namespace std;
 
 
 template <typename T>
-struct View : public BFPDynamic<T> {
+struct View {
 	size_t ydim;
 	size_t xdim;
 	size_t offset0;
     size_t offset1;
-	size_t stride0;
+	size_t stride0;    
     size_t stride1;
-    int exponent;
+    BFPDynamic<T> *base;
     // T* base_pts[N];
     View(BFPDynamic<T> *base, size_t ydim, size_t xdim, size_t offset0, size_t offset1, size_t stride0, size_t stride1):
-    	BFPDynamic<T>(*base), ydim(ydim), xdim(xdim), offset0(offset0), offset1(offset1), stride0(stride0), stride1(stride1){
-            exponent = base->exponent;
+    	base(base), ydim(ydim), xdim(xdim), offset0(offset0), offset1(offset1), stride0(stride0), stride1(stride1){
          //    for(int i = 0; i < ydim; i+= stride){
          //        for(int j = 0; j < xdim; j+= stride){
     	    // 		base_pts[i*xdim + j] = &((*base)[offset + i*xdim + j]);
@@ -68,7 +67,7 @@ struct View : public BFPDynamic<T> {
         }
 
     const T operator()(const size_t i, const size_t j) const{
-        return (*this)[(i+offset0)*stride0 +
+        return (*base)[(i+offset0)*stride0 +
                        (j+offset1)*stride1];
     }
 };
@@ -92,13 +91,12 @@ struct View : public BFPDynamic<T> {
 
 template <typename T>
 BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
-    if(A.exponent < B.exponent) return B+A;
-
+    if(A.base->exponent < B.base->exponent) return B+A;
     assert(A.ydim == B.ydim);
     assert(A.xdim == B.xdim);
 
     BFPDynamic<T> AB;
-    int exp_diff = A.exponent - B.exponent;
+    int exp_diff = A.base->exponent - B.base->exponent;
     bool carry = false;
 
     int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
@@ -133,7 +131,7 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
             }
         }
     }
-    AB.exponent = A.exponent + carry;
+    AB.exponent = A.base->exponent + carry;
     return AB;
 }
 
@@ -230,7 +228,7 @@ void daxpy(int n, double a, double *A, int incA, double *B, int incB)
     daxpy_(&n, &a, A, &incA, B, &incB); //Once again, note the call notation. Important!
 }
 
-
+    
 
 template <typename T>
 void print_grid(BFPDynamic<T> &A, size_t ydim, size_t xdim){
@@ -247,10 +245,10 @@ void print_grid(BFPDynamic<T> &A, size_t ydim, size_t xdim){
 
 template <typename T>
 void print_view(View<T> &A){
-    cout << "e: " << A.exponent << endl;
+    cout << "e: " << A.base->exponent << endl;
     for(size_t i=0; i<A.ydim; i++){
         for(size_t j=0; j<A.xdim; j++){
-            printf("%.7f \t", A(i, j) * pow(2.0, A.exponent));
+            printf("%.7f \t", A(i, j) * pow(2.0, A.base->exponent));
         }
         cout << endl;
     }
@@ -259,28 +257,28 @@ void print_view(View<T> &A){
 
 
 template <typename T>
-void bfp_update(const View<T> &V, BFPDynamic<T> &A){
+void bfp_update(BFPDynamic<T> &A, const View<T> &V){
     vector<double> b;
 
     b.push_back(0.2);
     BFPDynamic<T> B = BFPDynamic<T>(b);
     auto Bi = B[0];
     // should be able to avoid going through A two times with max value for BFP struct in metadata.
-    typename Tx2<T>::type max_value = 0;
-    for(size_t i=0;i<V.ydim;i++){
-        for (size_t j=0;j<V.xdim;j++){
-            // cout << int(V(i,j)) << endl;
-            typename Tx2<T>::type ABi = typename Tx2<T>::type(V(i,j)) * Bi;
-            max_value = max(max_value, typename Tx2<T>::type(ABi ^ typename Tx2<T>::type(-signbit(ABi))));
-            // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
-        }
-    }
-    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
-    if (shifts < 0)
-        shifts = 0;
+    // typename Tx2<T>::type max_value = 0;
+    // for(size_t i=0;i<V.ydim;i++){
+    //     for (size_t j=0;j<V.xdim;j++){
+    //         // cout << int(V(i,j)) << endl;
+    //         typename Tx2<T>::type ABi = typename Tx2<T>::type(V(i,j)) * Bi;
+    //         max_value = max(max_value, typename Tx2<T>::type(ABi ^ typename Tx2<T>::type(-signbit(ABi))));
+    //         // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
+    //     }
+    // }
+    // int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    // if (shifts < 0)
+    //     shifts = 0;
+
     // HMMM
-    shifts = 8;
-    cout << shifts << endl;
+    int shifts = numeric_limits<T>::digits + 1;
 
     size_t ydim = V.ydim + 2;
     for(size_t i=1;i<V.ydim+1;i++){
@@ -288,15 +286,13 @@ void bfp_update(const View<T> &V, BFPDynamic<T> &A){
             typename Tx2<T>::type ABi = typename Tx2<T>::type(V(i-1,j-1)) * Bi;
             bool rounding = (ABi >> (shifts - 1)) & 1;
             bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-            // cout << int(A[i*ydim+j]) << endl;
             A[i*ydim+j] = (ABi >> shifts) + rounding - rounding2;
-            // cout << (ABi >> shifts) + rounding - rounding2 << endl;
             // Ab.push_back((ABi >> shifts) + rounding - rounding2);
             // cout << int(A[i*ydim+j]) << endl;
 
         }
     }
-    A.exponent = A.exponent;// + B.exponent + shifts;
+    // A.exponent = A.exponent;// + B.exponent + shifts;
 }
 
 
@@ -315,28 +311,19 @@ int main(){
 	// BFPDynamic<int8_t> A(a, 0);
 	// BFPDynamic<int8_t> *pA = &A;
 
-    const size_t ydim = 6;
-    const size_t xdim = 6;
+    size_t ydim = 6;
+    size_t xdim = 6;
 
     auto grid_1d = make_grid(ydim, xdim);
     auto A = BFPDynamic<int8_t>(grid_1d);
-
-    // BFPDynamic<int8_t> A = bfp_grid;
-
-    // size_t stride = 1;
-    // size_t offset = 1;
-    // auto north = View<int8_t>(&A, ydim-2, xdim-2, 1, stride);
-    // auto south = View<int8_t>(&A, ydim-2, xdim-2, 1 + 2*ydim, stride);
-    // auto west = View<int8_t>(&A, ydim-2, xdim-2, ydim, stride);
-    // auto east = View<int8_t>(&A, ydim-2, xdim-2, 2 + ydim, stride);
-    // auto center = View<int8_t>(&A, ydim-2, xdim-2, 1 + ydim, stride);
+    auto &Ap = A;
 
     // xdim??
-    auto center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
-    auto north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
-    auto south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
-    auto west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
-    auto east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
+    auto center = View<int8_t>(&Ap, ydim-2, xdim-2, 1, 1, ydim, 1);
+    auto north  = View<int8_t>(&Ap, ydim-2, xdim-2, 0, 1, ydim, 1);
+    auto south  = View<int8_t>(&Ap, ydim-2, xdim-2, 2, 1, ydim, 1);
+    auto west   = View<int8_t>(&Ap, ydim-2, xdim-2, 1, 0, ydim, 1);
+    auto east   = View<int8_t>(&Ap, ydim-2, xdim-2, 1, 2, ydim, 1);
 
     int iterations = 0;
     int max_iterations = 4;
@@ -370,17 +357,13 @@ int main(){
         auto view_cnesw = View<int8_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         print_view(center);
+        bfp_update<int8_t>(A, view_cnesw);
 
-        bfp_update<int8_t>(view_cnesw, A);
-
-        print_view(center);
-
-        center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
-        north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
-        south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
-        west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
-        east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
-
+        // center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
+        // north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
+        // south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
+        // west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
+        // east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
 
         // print_grid(A, ydim, xdim);
     }
