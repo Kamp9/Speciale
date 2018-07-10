@@ -193,26 +193,28 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     int exp_diff = A.exponent - B.exponent;
     bool carry = false;
 
+    typedef typename Tx2<T>::type tx2;
+
     int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
     for(size_t i=0;i<N;i++){
-        typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
-        ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
-        T abi  = ABi;
-        carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
+        tx2 ABi = (tx2(A[i]) << exp_diff2) + (B[i]);
+        ABi     = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
+        T abi   = ABi;
+        carry  |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
     }
     // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
     if(carry){
         for(size_t i=0;i<N;i++){
-            bool sign = signbit((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
-            typename Tx2<T>::type ABi = abs((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
-            ABi = -sign ^ (ABi >> exp_diff2);
+            bool sign = signbit((tx2(A[i]) << exp_diff2) + B[i]);
+            tx2 ABi   = abs((tx2(A[i]) << exp_diff2) + B[i]);
+            ABi       = -sign ^ (ABi >> exp_diff2);
             bool rounding = (ABi & 1);
             AB[i] = (ABi >> 1) + rounding;
         }
     }else{
         for(size_t i=0;i<N;i++){
-            typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
-            bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
+            tx2  ABi       = (tx2(A[i]) << exp_diff2) + (B[i]);
+            bool rounding  = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
             bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
             AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
         }
@@ -335,25 +337,28 @@ BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
   size_t N = A.size();
   // assert(N==B.size());
   BFPDynamic<T> AB(N);
-  typename Tx2<T>::type max_value = 0;
+
+  typedef typename Tx2<T>::type tx2;
+  typedef typename uTx2<T>::type utx2;    
+  tx2 max_value = 0;
 
   for (size_t i = 0; i < N; i++) {
-      typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) * B[i];
+      tx2 ABi = tx2(A[i]) * B[i];
       // max_value = max(max_value, std::abs(ABi));
       // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
 
       // really needs ABi ^ but error accures from dynamic_bench_test.cpp
-      max_value = max(max_value, typename Tx2<T>::type(-1 * signbit(ABi)));
+      max_value = max(max_value, tx2(-1 * signbit(ABi)));
       // cout << (ABi ^ typename Tx2<T>::type(-1 * signbit(ABi))) << endl;
 
   }
-  int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+  int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
 
   if (shifts < 0)
       shifts = 0;
   for (size_t i = 0; i < N; i++){
-      typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) * B[i];
-      bool rounding = (ABi >> (shifts - 1)) & 1;
+      tx2 ABi        = tx2(A[i]) * B[i];
+      bool rounding  = (ABi >> (shifts - 1)) & 1;
       bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
       AB[i] = (ABi >> shifts) + rounding - rounding2;
   }
@@ -366,21 +371,24 @@ template <typename T>
 BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     size_t N = A.size();
 
+    typedef typename Tx2<T>::type  tx2;
+    typedef typename uTx2<T>::type utx2;
+    
     BFPDynamic<T> AB(N);
-    typename Tx2<T>::type max_value = 0;
+    tx2 max_value = 0;
     for (size_t i = 0; i < N; i++) {
-        typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+        tx2 ABi = (tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
-        max_value = max(max_value, typename Tx2<T>::type(-1 * signbit(ABi)));
+        max_value = max(max_value, tx2(-1 * signbit(ABi)));
     }
 
-    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
+    int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
 
     if (shifts < 0)
         shifts = 0;
 
     for (size_t i = 0; i < N; i++){
-        typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+        tx2 ABi = (tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
 
         bool rounding = ((ABi >> (shifts - 1)) & 1);
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
@@ -650,10 +658,11 @@ BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
     static short s5 = 0x51a;
     static short s7 = 0x4d;
 
-    typename Tx2<T>::type max_value = 0;
+    typedef typename Tx2<T>::type tx2;    
+    tx2 max_value = 0;
 
     for(size_t i=0;i<N;i++){
-        typename Tx2<T>::type y = typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits);
+        tx2 y = tx2(A[i]) << (numeric_limits<T>::digits);
 
         long z, prod, sum;
         z = ((long)y * y) >> 12;
@@ -663,18 +672,18 @@ BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
         sum = s3 - prod;
         prod = (z * sum) >> 16;
         sum = s1 - prod;
-        typename Tx2<T>::type Ai = ((y * sum)); // >> 13);
+        tx2 Ai = ((y * sum)); // >> 13);
         // typename Tx2<T>::type  ABi = typename Tx2<T>::type(A[i]) * B[i];
 
         max_value = max(max_value, std::abs(Ai));
     }
-    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
 
     if (shifts < 0)
         shifts = 0;
 
     for (size_t i = 0; i < N; i++){
-        typename Tx2<T>::type y = typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits);
+        tx2 y = tx2(A[i]) << (numeric_limits<T>::digits);
 
         long z, prod, sum;
         z = ((long)y * y) >> 12;
@@ -684,7 +693,7 @@ BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
         sum = s3 - prod;
         prod = (z * sum) >> 16;
         sum = s1 - prod;
-        typename Tx2<T>::type Ai = ((y * sum)); // >> 13);
+	tx2 Ai = ((y * sum)); // >> 13);
         sinA[i] = Ai >> shifts;
     }
 
