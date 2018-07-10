@@ -9,20 +9,35 @@
 #include "bfpdynamic.cpp"
 
 
+// template <typename T>
+// BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
+//     vector<T> elems;
+//     //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
+//     boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
+//     for(size_t i = 0; i < N; i++){
+//         elems.push_back(rand_elem(rng));
+//     }
+//     boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+//     BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
+//     // BFPStatic<T,N> A(elems, 0);
+//     return A; //BFPStatic<T,N>(A.to_float());
+// }
+
+
 template <typename T>
 BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
     vector<T> elems;
-    //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
     boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
-        elems.push_back(rand_elem(rng));
+        auto re = rand_elem(rng);
+        while(re == 0)
+            re = rand_elem(rng);
+        elems.push_back(re);
     }
-    boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
-    BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
-    // BFPStatic<T,N> A(elems, 0);
-    return A; //BFPStatic<T,N>(A.to_float());
+    boost::random::uniform_int_distribution<T> rand_exp(-10, 10);
+    BFPDynamic<T> A(elems, rand_exp(rng));
+    return A;
 }
-
 
 // op types:
 // 1 : +
@@ -46,9 +61,9 @@ void call_op(const int op, const BFPDynamic<T> &A){
         case 4 :
             A / A;
             break;
-        case 5 :
-            bfp_sqrt(A);
-            break;
+        // case 5 :
+        //     bfp_sqrt(A);
+        //     break;
         // case 6 :
         //     bfp_invsqrt(A);
         //     break;
@@ -71,9 +86,9 @@ void call_op_float(const int op, const vector<double> &A){
         case 4 :
             A / A;
             break;
-        case 5 :
-            Vsqrt(A);
-            break;
+        // case 5 :
+        //     Vsqrt(A);
+        //     break;
         // case 6 :
         //     bfp_invsqrt(A);
         //     break;
@@ -124,9 +139,12 @@ int main(int argc, char *argv[]){
 
             case 8 :
                 A8 = gen_bfp<int8_t>(rng, N);
-                begin = clock();
 
-                call_op(op_type, A8);
+                begin = clock();
+            
+                // test.setCallback<TYPE>(f);
+
+                call_op<int8_t>(op_type, A8);
 
                 end = clock();
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -136,7 +154,7 @@ int main(int argc, char *argv[]){
                 A16 = gen_bfp<int16_t>(rng, N);
                 begin = clock();
                 
-                call_op(op_type, A16);
+                call_op<int16_t>(op_type, A16);
                 
                 end = clock();
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -146,7 +164,7 @@ int main(int argc, char *argv[]){
                 A32 = gen_bfp<int32_t>(rng, N);
                 begin = clock();
                 
-                call_op(op_type, A32);
+                call_op<int32_t>(op_type, A32);
                 
                 end = clock();
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;

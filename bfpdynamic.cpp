@@ -28,7 +28,6 @@ template <typename T, size_t N> ostream &operator<<(ostream &s, const array<T, N
     return s;
 }
 
-
 template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
   for(int i=0;i<bits.size();i++) s << bits[i];
   return s;
@@ -63,14 +62,14 @@ struct BFPDynamic: public std::vector<T>{
     // std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
 
     BFPDynamic(int exponent=0) : exponent(exponent) {}
-    BFPDynamic(const std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
-    BFPDynamic(const std::vector<double> &V) {
+    BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
+    BFPDynamic(std::vector<double> &V) {
         size_t N = V.size();
         std::vector<T> &A(*this);
 
         exponent = std::numeric_limits<T>::min();
         for(int i = 0; i < N ;i++){
-            int e_V  = floor(log2(fabs(V[i]))) + 1; // TODO: Tjek.
+            int e_V  = floor(log2(fabs(V[i]))) + 1; // TODO: Tjek. - signbit(V[i])??
             exponent = std::max(exponent,e_V);
         }
         exponent -= std::numeric_limits<T>::digits;
@@ -323,61 +322,100 @@ BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
   // assert(N==B.size());
   BFPDynamic<T> nB(N);
 
-  for (size_t i = 0; i < N; i++){ nB.push_back(-B[i]); }
+  for (size_t i = 0; i < N; i++){ nB[i] = (-B[i]); }
   nB.exponent = B.exponent;
 
   return A + nB;
 }
 
 
-// template <typename T>
-// BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
-//   size_t N = A.size();
-//   // assert(N==B.size());
-//   BFPDynamic<T> AB;
-//   Tx2 max_value = 0;
+template <typename T>
+BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+  size_t N = A.size();
+  // assert(N==B.size());
+  BFPDynamic<T> AB;
+  typename Tx2<T>::type max_value = 0;
 
-//   for (size_t i = 0; i < N; i++) {
-//     Tx2 ABi = Tx2(A[i]) * B[i];
-//     max_value = max(max_value, std::abs(ABi));
-//   }
-  
-//   int shifts = 1 + floor_log2(max_value) - (numeric_limits<T>::digits);
-//   if (shifts < 0)
-//     shifts = 0;
-  
-//   for (size_t i = 0; i < N; i++){
-//     Tx2 ABi = Tx2(A[i]) * B[i];
-//     bool rounding = (ABi >> (shifts - 1)) & 1;
-//     bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-//     AB.push_back((ABi >> shifts) + rounding - rounding2);
-//   }
-//   AB.exponent = A.exponent + B.exponent + shifts;
-//   return AB;
-// }
+  for (size_t i = 0; i < N; i++) {
+      typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) * B[i];
+      // max_value = max(max_value, std::abs(ABi));
+      // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
+
+      // really needs ABi ^ but error accures from dynamic_bench_test.cpp
+      max_value = max(max_value, typename Tx2<T>::type(-1 * signbit(ABi)));
+      // cout << (ABi ^ typename Tx2<T>::type(-1 * signbit(ABi))) << endl;
+
+  }
+  int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+
+  if (shifts < 0)
+      shifts = 0;
+  for (size_t i = 0; i < N; i++){
+      typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) * B[i];
+      bool rounding = (ABi >> (shifts - 1)) & 1;
+      bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
+      AB.push_back((ABi >> shifts) + rounding - rounding2);
+  }
+  AB.exponent = A.exponent + B.exponent + shifts;
+  return AB;
+}
 
 
+template <typename T>
+BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+    size_t N = A.size();
+
+    BFPDynamic<T> AB;
+    typename Tx2<T>::type max_value = 0;
+    for (size_t i = 0; i < N; i++) {
+        typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+        // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
+        max_value = max(max_value, typename Tx2<T>::type(-1 * signbit(ABi)));
+    }
+
+    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
+
+    if (shifts < 0)
+        shifts = 0;
+
+    for (size_t i = 0; i < N; i++){
+        typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+
+        bool rounding = ((ABi >> (shifts - 1)) & 1);
+        bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
+        AB.push_back((ABi >> shifts) + rounding - rounding2);
+    }    
+    AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
+
+    return AB;
+}
+
+
+// D. 10 / 7
 // template <typename T>
 // BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 //     size_t N = A.size();
 //     // assert(N==B.size());
 
 //     BFPDynamic<T> AB;
-//     Tx2 max_value = 0;
+//     typename Tx2<T>::type max_value = 0;
 
 //     for (size_t i = 0; i < N; i++) {
-//         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-//         max_value = max(max_value, std::abs(ABi));
+//         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+//         // really needs ABi ^ but error accures from dynamic_bench_test.cpp
+//         max_value = max(max_value, typename Tx2<T>::type(-1 * signbit(ABi)));
+//         // max_value = max(max_value, std::abs(ABi));
 //     }
-//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     cout << max_value << endl;
+//     int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value)) - (numeric_limits<T>::digits);
 //     if (shifts < 0)
 //         shifts = 0;
 
 //     for (size_t i = 0; i < N; i++){
-//         Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+//         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
 //         bool rounding = ((ABi >> (shifts - 1)) & 1);
-//         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);  // && needed ?
-
+//         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
+//         cout << ((ABi >> shifts) + rounding - rounding2) << endl;
 //         AB.push_back((ABi >> shifts) + rounding - rounding2);
 //     }
 
@@ -601,8 +639,60 @@ BFPDynamic<T> operator-(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 //     return expA;
 // }
 
+template <typename T>
+BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
+    BFPDynamic<T> sinA;
+    size_t N = A.size();
 
-// Vector operations +, -, *, and /
+    static short s1 = 0x6488;
+    static short s3 = 0x2958;
+    static short s5 = 0x51a;
+    static short s7 = 0x4d;
+
+    typename Tx2<T>::type max_value = 0;
+
+    for(size_t i=0;i<N;i++){
+        typename Tx2<T>::type y = typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits);
+
+        long z, prod, sum;
+        z = ((long)y * y) >> 12;
+        prod = (z * s7) >> 16;
+        sum = s5 - prod;
+        prod = (z * sum) >> 16;
+        sum = s3 - prod;
+        prod = (z * sum) >> 16;
+        sum = s1 - prod;
+        typename Tx2<T>::type Ai = ((y * sum)); // >> 13);
+        // typename Tx2<T>::type  ABi = typename Tx2<T>::type(A[i]) * B[i];
+
+        max_value = max(max_value, std::abs(Ai));
+    }
+    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+
+    if (shifts < 0)
+        shifts = 0;
+
+    for (size_t i = 0; i < N; i++){
+        typename Tx2<T>::type y = typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits);
+
+        long z, prod, sum;
+        z = ((long)y * y) >> 12;
+        prod = (z * s7) >> 16;
+        sum = s5 - prod;
+        prod = (z * sum) >> 16;
+        sum = s3 - prod;
+        prod = (z * sum) >> 16;
+        sum = s1 - prod;
+        typename Tx2<T>::type Ai = ((y * sum)); // >> 13);
+        sinA.push_back(Ai >> shifts);
+    }
+
+    sinA.exponent = (A.exponent - shifts - numeric_limits<T>::digits + 2) >> 1  ; // (A.exponent & 1);
+    return sinA;
+}
+
+
+// Vector floating point operations +, -, *, and /
 template <typename T> vector<T> operator+(const vector<T> &A, const vector<T> &B){
     assert(A.size() == B.size());
     vector<T> AB(A.size());
@@ -679,6 +769,18 @@ template <typename T> vector<T> Vexp(const vector<T> &A){
         expA[i] = exp(A[i]);
 
     return expA;
+}
+
+
+template <typename T> vector<T> Vsin(const vector<T> &A){
+    vector<T> sinA(A.size());
+
+    for(int i=0;i<sinA.size();i++){
+        // Can we do better?
+        double Ai = A[i] * (M_PI / 180.0);
+        sinA[i] = sin(Ai);
+    }
+    return sinA;
 }
 
 
@@ -797,15 +899,13 @@ template <typename T> void check_mul(const T& A, const T& B){
        << ABfloat << " exact,\n"
        << T(ABfloat).to_float() << " wanted.\n\n";
     
-  cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
   cout << "Error compared to exact:\n"
        <<  (AB.to_float() - ABfloat) << "\n"
        << "Error compared to rounded exact:\n"
        << (AB.to_float() - T(ABfloat).to_float()) << "\n\n";
 
-  // cout << "signs:\n"
-  //      << sA << "\n"
-  //      << sB << "\n\n";
+  cout << "Is the result correct? " << (AB.to_float() == T(ABfloat).to_float()? "Yes.\n" : "No.\n");
+
 }
 
 template <typename T> void check_div(const T& A, const T& B){
@@ -897,4 +997,22 @@ template <typename T> void check_invsqrt(const T& A){
 
   cout << "Is the result correct? " << (invsqrtA.to_float() == T(invsqrtAfloat).to_float()? "Yes.\n" : "No.\n");
   auto invsqrtA2 = bfp_invsqrtfloat(A);
+}
+
+
+template <typename T> void check_sin(const T& A){
+  size_t N = A.size();
+  cout << "******************** Checking Sine function of: ********************\n"
+       << "sin " << A << " = \n\n";
+
+  // auto Afloat = A.to_float();
+
+  auto sinA = bfp_sin(A);
+  auto sinAfloat = Vsin(A.to_float());
+
+  cout << "Result of BFP-Sine:\n"
+       << sinA << "\n"
+       << T(sinAfloat) << " wanted.\n\n";
+
+  cout << "Is the result correct? " << (sinA.to_float() == T(sinAfloat).to_float()? "Yes.\n" : "No.\n");
 }

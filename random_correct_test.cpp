@@ -77,9 +77,9 @@ int main(){
 
     // auto C = gen_bfp_no_0<int8_t, 10>(rng);
     // auto D = gen_bfp_no_0<int8_t, 10>(rng);
-    auto A = gen_bfp<int8_t, 10>(rng);
-    auto B = gen_bfp<int8_t, 10>(rng);
-    check_add(A, B);
+    auto A = gen_bfp<int16_t, 10>(rng);
+    auto B = gen_bfp<int16_t, 10>(rng);
+    check_div(A, B);
     // BFPStatic<int8_t, 3> A{{100, 12, 51}, 0};
 
     // sqrt {{15,27,19,6,62},9}

@@ -49,7 +49,7 @@ struct BFPStatic: public std::array<T,N>{
 
         exponent = std::numeric_limits<T>::min();
         for(int i = 0; i < N ;i++){
-            int e_V  = floor(log2(fabs(V[i]))) + 1; // TODO: Tjek.
+            int e_V  = floor(log2(fabs(V[i]))) + 1; // TODO: Tjek. minus in fabs(V[i])?
             exponent = std::max(exponent,e_V);
         }
         exponent -= std::numeric_limits<T>::digits;
@@ -87,65 +87,50 @@ struct BFPStatic: public std::array<T,N>{
     }
 };
 
-// template <typename T,size_t N>
-// BFPStatic<T,N> operator+(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
-//     // Make sure that e_A >= e_B
-//     if(A.exponent < B.exponent) return B+A;
 
-//     BFPStatic<T,N> AB;
-//     bitset<N> carryAB;
-//     bitset<N> sAB;
+// template <typename T, size_t N>
+// BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
+//     if(A.exponent < B.exponent) return B+A;
+    
+//     // size_t N = A.size();
+
+//     BFPStatic<T, N> AB;
+
 //     int exp_diff = A.exponent - B.exponent;
 //     bool carry = false;
 
-//     // for(size_t i=0;i<N;i++){
-//     //     Tx2 ABi = A[i] + (B[i] >> exp_diff);
-//     //     T   abi = ABi;
-//     //     carry  |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
-//     // }
-//     Tx2 max_value = 0;
-//     for (size_t i = 0; i < N; i++){
-//         Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-//         max_value = max(max_value, std::abs(ABi) - signbit(ABi));
+//     int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
+//     for(size_t i=0;i<N;i++){
+//         Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+//         ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
+//         T abi  = ABi;
+//         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
 //     }
-
-//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
-
-//     // if statement on shifts?
-//     if(exp_diff == 0){
-//         for (size_t i = 0; i < N; i++){
-//             AB[i] = Tx2(A[i]) + B[i];
+//     // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
+//     if(carry){
+//         for(size_t i=0;i<N;i++){
+//             bool sign = signbit((Tx2(A[i]) << exp_diff2) + B[i]);
+//             Tx2 ABi = abs((Tx2(A[i]) << exp_diff2) + B[i]);
+//             ABi = -sign ^ (ABi >> exp_diff2);
+//             bool rounding = (ABi & 1);
+//             AB[i] = (ABi >> 1) + rounding;
 //         }
-//         AB.exponent = A.exponent + shifts;
-//         return AB;
-//     }
-
-//     if(shifts >= 0){
-//         for (size_t i = 0; i < N; i++){
-//             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-//             AB[i] = ABi >> shifts;
+//     }else{
+//         for(size_t i=0;i<N;i++){
+//             Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+//             bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
+//             bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
+//             AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
 //         }
-//         AB.exponent = A.exponent + shifts;
-//         return AB;
 //     }
+//     AB.exponent = A.exponent + carry;
 
-//     else{
-//         shifts = abs(shifts);
-//         for (size_t i = 0; i < N; i++){
-//             Tx2 ABi = Tx2(A[i]) + (B[i] >> exp_diff);
-//             bool rounding = (B[i] >> (exp_diff - 1)) & (!signbit(B[i]));
-//             AB[i] = (ABi << shifts) - (rounding << (shifts - 1));
-//         }
-//         AB.exponent = A.exponent - shifts;
-//         return AB;
-//     }
+//     return AB;
 // }
 
 template <typename T, size_t N>
 BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
     if(A.exponent < B.exponent) return B+A;
-    
-    // size_t N = A.size();
 
     BFPStatic<T, N> AB;
 
@@ -180,6 +165,7 @@ BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
 
     return AB;
 }
+
 
 
 template <typename T,size_t N>
@@ -237,7 +223,8 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
 
         AB[i] = (ABi >> shifts) + rounding - rounding2;
-    }    AB.exponent = A.exponent + B.exponent + shifts;
+    }    
+    // AB.exponent = A.exponent + B.exponent + shifts;
 
     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
 
@@ -491,7 +478,7 @@ BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
     return BFPStatic<T,N>(invsqrtAfloat);
 }
 
-    
+
 template <typename T, size_t N>
 BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
     BFPStatic<T,N> Ab;
@@ -603,7 +590,6 @@ double bfp_sum_abs(const BFPStatic<T, N> &A, const size_t ydim, const size_t xdi
 }
 
 
-    
 
 // Vector operations +, -, *, and /
 template <typename T> vector<T> operator+(const vector<T> &A, const vector<T> &B){

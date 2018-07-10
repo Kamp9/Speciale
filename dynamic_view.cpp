@@ -185,9 +185,13 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
 //     return Ab;
 // }
 
+//vector<double> make_grid(const size_t ydim, const size_t xdim){
+vector<double> make_grid(){
 
-vector<double> make_grid(const size_t ydim, const size_t xdim){
-    double grid[ydim][xdim];
+    size_t const ydim = 10000;
+    size_t const xdim = 10000;
+    // double grid[ydim][xdim];
+    auto grid = new double[ydim][xdim];
 
     for (int i=0; i<ydim; i++) {      // Initialize the grid
         for (int j=0;j<xdim;j++) {
@@ -297,52 +301,33 @@ void bfp_update(BFPDynamic<T> &A, const View<T> &V){
 
 
 int main(){
-    // A[0] * a + B[0]
 
-    // double A[2] = {2.0, 3.0};
-    // double B[2] = {4.0, 4.0};
-    // int n = 2, incA=1, incB=1;
-    // double a = 51.0;
-    // daxpy(n, a, A, incA, B, incB);
-    // cout << B[1] << endl;
+    const size_t ydim = 10000;
+    const size_t xdim = 10000;
 
-	// std::array<int8_t, 4> a = {100,7,8,9};
-    // std::vector<int8_t> a({2,4,6,8});
-	// BFPDynamic<int8_t> A(a, 0);
-	// BFPDynamic<int8_t> *pA = &A;
+    // auto grid_1d = make_grid(ydim, xdim);
+    auto grid_1d = make_grid();
 
-    size_t ydim = 6;
-    size_t xdim = 6;
-
-    auto grid_1d = make_grid(ydim, xdim);
     auto A = BFPDynamic<int8_t>(grid_1d);
-    auto &Ap = A;
 
     // xdim??
-    auto center = View<int8_t>(&Ap, ydim-2, xdim-2, 1, 1, ydim, 1);
-    auto north  = View<int8_t>(&Ap, ydim-2, xdim-2, 0, 1, ydim, 1);
-    auto south  = View<int8_t>(&Ap, ydim-2, xdim-2, 2, 1, ydim, 1);
-    auto west   = View<int8_t>(&Ap, ydim-2, xdim-2, 1, 0, ydim, 1);
-    auto east   = View<int8_t>(&Ap, ydim-2, xdim-2, 1, 2, ydim, 1);
+    auto center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
+    auto north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
+    auto south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
+    auto west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
+    auto east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
 
     int iterations = 0;
-    int max_iterations = 4;
+    int max_iterations = 10;
 
     double delta = 1.0;
     double epsilon = 0.005; //1e-10;
 
-    // print_grid(A, ydim, xdim);
-    // print_view(center);
-    // print_view(north);
-    // print_view(south);
-    // print_view(west);
-    // print_view(east);
 
     while (iterations < max_iterations && delta > epsilon){
-
+        cout << iterations << endl;
         iterations++;
 
-        // auto temp0 = center + north + south + west + east;
         auto bfp_cn    = center + north;
 
         auto view_cn   = View<int8_t>(&bfp_cn, ydim-2, xdim-2, 0, 0, ydim-2, 1);
@@ -356,16 +341,8 @@ int main(){
         auto bfp_cnesw = view_cne + view_sw;
         auto view_cnesw = View<int8_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
-        print_view(center);
         bfp_update<int8_t>(A, view_cnesw);
 
-        // center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
-        // north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
-        // south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
-        // west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
-        // east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
-
-        // print_grid(A, ydim, xdim);
     }
 
 	return 0;
