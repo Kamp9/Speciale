@@ -61,7 +61,7 @@ struct BFPDynamic: public std::vector<T>{
     // bool lazy = false;
     // std::array<size_t, numeric_limits<T>::digits> lazy_list = {{0}};
 
-    BFPDynamic(int exponent=0) : exponent(exponent) {}
+    BFPDynamic(size_t N, int exponent=0) : std::vector<T>(N), exponent(exponent) {}
     BFPDynamic(std::vector<T> &A, int exponent) : std::vector<T>(A), exponent(exponent) {}
     BFPDynamic(std::vector<double> &V) {
         size_t N = V.size();
@@ -187,7 +187,7 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     if(A.exponent < B.exponent) return B+A;
     size_t N = A.size();
 
-    BFPDynamic<T> AB;
+    BFPDynamic<T> AB(N);
 
     int exp_diff = A.exponent - B.exponent;
     bool carry = false;
@@ -333,7 +333,7 @@ template <typename T>
 BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
   size_t N = A.size();
   // assert(N==B.size());
-  BFPDynamic<T> AB;
+  BFPDynamic<T> AB(N);
   typename Tx2<T>::type max_value = 0;
 
   for (size_t i = 0; i < N; i++) {
@@ -365,7 +365,7 @@ template <typename T>
 BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     size_t N = A.size();
 
-    BFPDynamic<T> AB;
+    BFPDynamic<T> AB(N);
     typename Tx2<T>::type max_value = 0;
     for (size_t i = 0; i < N; i++) {
         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
