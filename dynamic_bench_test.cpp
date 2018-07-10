@@ -138,6 +138,8 @@ int main(int argc, char *argv[]){
                 call_op_float(op_type, Afloat);
 
                 end = clock();
+
+		cerr << "Block size: " << (sizeof(decltype(Afloat)::value_type) * Afloat.size()) << endl;		
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
                 break;
 
@@ -151,6 +153,8 @@ int main(int argc, char *argv[]){
                 call_op<int8_t>(op_type, A8);
 
                 end = clock();
+
+		cerr << "Block size: " << (sizeof(decltype(A8)::value_type) * A8.size()) << endl;
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
                 break;
 
@@ -161,6 +165,8 @@ int main(int argc, char *argv[]){
                 call_op<int16_t>(op_type, A16);
                 
                 end = clock();
+
+		cerr << "Block size: " << (sizeof(decltype(A16)::value_type) * A16.size()) << endl;		
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
                 break;
 
@@ -171,6 +177,8 @@ int main(int argc, char *argv[]){
                 call_op<int32_t>(op_type, A32);
                 
                 end = clock();
+
+		cerr << "Block size: " << (sizeof(decltype(A32)::value_type) * A32.size()) << endl;				
                 elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
                 break;
             default :
