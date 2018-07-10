@@ -118,12 +118,12 @@ int main(int argc, char *argv[]){
         double elapsed_secs;
 
         // Hmm
-        BFPDynamic<int32_t> A;
-        vector<double> Afloat;
+        BFPDynamic<int32_t> A(N);
+        vector<double> Afloat(N);
 
-        BFPDynamic<int8_t> A8;
-        BFPDynamic<int16_t> A16;
-        BFPDynamic<int32_t> A32;
+        BFPDynamic<int8_t> A8(N);
+        BFPDynamic<int16_t> A16(N);
+        BFPDynamic<int32_t> A32(N);
 
         switch(test_type){
             case 0 :
