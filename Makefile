@@ -19,4 +19,4 @@ random_correct_test: random_correct_test.cpp
 	$(CXX) -o $@ $^ 
 
 clean:
-	-rm deterministic_correct_test dynamic_bench_test random_correct_test *.o
+	-rm -f deterministic_correct_test dynamic_bench_test random_correct_test *.o
