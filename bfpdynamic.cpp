@@ -333,7 +333,7 @@ template <typename T>
 BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
   size_t N = A.size();
   // assert(N==B.size());
-  BFPDynamic<T> AB;
+  BFPDynamic<T> AB(N);
   typename Tx2<T>::type max_value = 0;
 
   for (size_t i = 0; i < N; i++) {
@@ -365,7 +365,7 @@ template <typename T>
 BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     size_t N = A.size();
 
-    BFPDynamic<T> AB;
+    BFPDynamic<T> AB(N);
     typename Tx2<T>::type max_value = 0;
     for (size_t i = 0; i < N; i++) {
         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];

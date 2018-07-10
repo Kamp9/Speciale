@@ -119,7 +119,11 @@ int main(int argc, char *argv[]){
 
         // Hmm
         BFPDynamic<int32_t> A(N);
+<<<<<<< HEAD
         vector<double> Afloat(N);
+=======
+        vector<double> Afloat;
+>>>>>>> f1500f22d0a35d30b58a68257fcb7d2d89060e24
 
         BFPDynamic<int8_t> A8(N);
         BFPDynamic<int16_t> A16(N);
