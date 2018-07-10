@@ -66,6 +66,7 @@ struct BFPDynamic: public std::vector<T>{
     BFPDynamic(std::vector<double> &V) {
         size_t N = V.size();
         std::vector<T> &A(*this);
+	A.resize(N);
 
         exponent = std::numeric_limits<T>::min();
         for(int i = 0; i < N ;i++){
@@ -89,7 +90,7 @@ struct BFPDynamic: public std::vector<T>{
             // else
             // cout << round(V[i]*power) << endl;
             // cout << V[i]*power << endl;
-            A.push_back(round(V[i]*power));
+            A[i] = round(V[i]*power);
         }
     }
 
@@ -206,14 +207,14 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
             typename Tx2<T>::type ABi = abs((typename Tx2<T>::type(A[i]) << exp_diff2) + B[i]);
             ABi = -sign ^ (ABi >> exp_diff2);
             bool rounding = (ABi & 1);
-            AB.push_back((ABi >> 1) + rounding);
+            AB[i] = (ABi >> 1) + rounding;
         }
     }else{
         for(size_t i=0;i<N;i++){
             typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
             bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
             bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
-            AB.push_back((ABi >> exp_diff2) + rounding - rounding2);
+            AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
         }
     }
     AB.exponent = A.exponent + carry;
@@ -227,7 +228,7 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
             // bool rounding = ((ABi2 >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
             // bool rounding2 = ((ABi2 & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi2);
             // // cout << ABi << endl;
-            // AB.push_back(-1 * (((ABi2) >> (exp_diff2))) >> 1);
+            // AB[i] = -1 * (((ABi2) >> (exp_diff2))) >> 1;
 
 
     // if(carry){
@@ -235,7 +236,7 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     //         cout << "carry" << endl;
     //         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
     //         bool rounding = ((ABi >> exp_diff2) & 1);
-    //         AB.push_back((ABi >> (exp_diff2 + 1)) + rounding); // + rounding);
+    //         AB[i] = (ABi >> (exp_diff2 + 1)) + rounding); // + rounding;
     //     }
     // }else{
     //     for(size_t i=0;i<N;i++){
@@ -243,7 +244,7 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     //         typename Tx2<T>::type ABi = (typename Tx2<T>::type(A[i]) << exp_diff2) + (B[i]);
     //         bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
     //         bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
-    //         AB.push_back((ABi >> exp_diff2) + rounding - rounding2);
+    //         AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
     //     }
     // }
     // AB.exponent = A.exponent + carry;
@@ -354,7 +355,7 @@ BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
       typename Tx2<T>::type ABi = typename Tx2<T>::type(A[i]) * B[i];
       bool rounding = (ABi >> (shifts - 1)) & 1;
       bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-      AB.push_back((ABi >> shifts) + rounding - rounding2);
+      AB[i] = (ABi >> shifts) + rounding - rounding2;
   }
   AB.exponent = A.exponent + B.exponent + shifts;
   return AB;
@@ -383,7 +384,7 @@ BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 
         bool rounding = ((ABi >> (shifts - 1)) & 1);
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
-        AB.push_back((ABi >> shifts) + rounding - rounding2);
+        AB[i] = (ABi >> shifts) + rounding - rounding2;
     }    
     AB.exponent = A.exponent - B.exponent + shifts - numeric_limits<T>::digits - 1;
 
@@ -641,8 +642,8 @@ BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 
 template <typename T>
 BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
-    BFPDynamic<T> sinA;
-    size_t N = A.size();
+    size_t N = A.size();  
+    BFPDynamic<T> sinA(N);
 
     static short s1 = 0x6488;
     static short s3 = 0x2958;
@@ -684,7 +685,7 @@ BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
         prod = (z * sum) >> 16;
         sum = s1 - prod;
         typename Tx2<T>::type Ai = ((y * sum)); // >> 13);
-        sinA.push_back(Ai >> shifts);
+        sinA[i] = Ai >> shifts;
     }
 
     sinA.exponent = (A.exponent - shifts - numeric_limits<T>::digits + 2) >> 1  ; // (A.exponent & 1);
