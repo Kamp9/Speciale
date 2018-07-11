@@ -9,35 +9,42 @@
 #include "bfpdynamic.cpp"
 
 
-// template <typename T>
-// BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
-//     vector<T> elems;
-//     //    boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min(), numeric_limits<T>::max());
-//     boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
-//     for(size_t i = 0; i < N; i++){
-//         elems.push_back(rand_elem(rng));
-//     }
-//     boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
-//     BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
-//     // BFPStatic<T,N> A(elems, 0);
-//     return A; //BFPStatic<T,N>(A.to_float());
-// }
-
-
 template <typename T>
 BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
-    vector<T> elems;
+    vector<T> elems(N);
     boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         auto re = rand_elem(rng);
         while(re == 0)
             re = rand_elem(rng);
-        elems.push_back(re);
+        elems[i] = re;
     }
     boost::random::uniform_int_distribution<T> rand_exp(-10, 10);
     BFPDynamic<T> A(elems, rand_exp(rng));
     return A;
 }
+
+// template <typename T>
+// BFPDynamic<T> gen_bfp(size_t seed, const size_t N) {
+//     vector<T> elems(N);
+//     srandom(seed);
+
+//     int64_t range_min  = numeric_limits<T>::min();
+//     int64_t range_length = int64_t(numeric_limits<T>::max()) - int64_t(numeric_limits<T>::min()) + 1;
+
+//     // cerr << "range min = " << numeric_limits<T>::min() << ", range_max = " << numeric_limits<T>::max() << endl;
+//     // cerr << "range length = " << range_length << ", range_min = " << range_min << endl;
+    
+//     for(size_t i = 0; i < N; i++){
+//       long int re = 0;
+//       while(re == 0) re = random();
+//       elems[i] = (re % range_length) + range_min;
+//     }
+//     int exponent = (random() % 20) - 10; // -10 til 10
+//     BFPDynamic<T> A(elems, exponent);
+//     return A;
+// }
+
 
 // op types:
 // 1 : +
@@ -99,11 +106,16 @@ void call_op_float(const int op, const vector<double> &A){
 
 
 int main(int argc, char *argv[]){
-    boost::random::mt19937 rng;
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    rng.seed(tv.tv_usec);
 
+
+    struct timeval tv;
+    gettimeofday(&tv, 0);    
+    boost::random::mt19937 rng;    
+    // rng.seed(tv.tv_usec);
+
+    rng.seed(42);
+    //int rng = 42; 		// Eller brug tv.tv_usec, hvis determinisme ikke oenskes
+      
     // We need three arguments
     if (argc != 4){
         cout << "3 arguments needed: test_type, op_type, and size!" << endl;
