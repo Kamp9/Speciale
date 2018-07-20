@@ -8,15 +8,16 @@ using System.Linq;
 
 namespace BFP
 {
-
-	public class InputSimulator : Process
+    [ClockedProcess]
+    public class InputSimulator : Process
+    //public class InputSimulator : Process
 	{
 
 		[TopLevelOutputBus]
 		public interface InputLine1 : IBus
 		{
-			[InitialValue]
-			bool IsValid { get; set; }
+		//	[InitialValue]
+		//	bool IsValid { get; set; }
 
 			[FixedArrayLength(100)]
 			IFixedArray<byte> Elem { get; set; }
@@ -26,8 +27,8 @@ namespace BFP
 		[TopLevelOutputBus]
 		public interface InputLine2 : IBus
 		{
-				[InitialValue]
-				bool IsValid { get; set; }
+            //		[InitialValue]
+            //	bool IsValid { get; set; }
 
 			[FixedArrayLength(100)]
 			IFixedArray<byte> Elem { get; set; }
@@ -37,8 +38,8 @@ namespace BFP
 		[TopLevelOutputBus]
 		public interface InputLine3 : IBus
 		{
-				[InitialValue]
-				bool IsValid { get; set; }
+            //	[InitialValue]
+            //	bool IsValid { get; set; }
 
 			[FixedArrayLength(100)]
 			IFixedArray<byte> Elem { get; set; }
@@ -48,8 +49,8 @@ namespace BFP
 		[TopLevelOutputBus]
 		public interface InputLine4 : IBus
 		{
-				[InitialValue]
-				bool IsValid { get; set; }
+            //	[InitialValue]
+            //	bool IsValid { get; set; }
 
 			[FixedArrayLength(100)]
 			IFixedArray<byte> Elem { get; set; }
@@ -70,36 +71,34 @@ namespace BFP
 		[OutputBus]
         private readonly InputLine4 DataB2 = Scope.CreateOrLoadBus<InputLine4>();
 
-		public override async Task Run()
+        public override async Task Run()
+        // protected override async Task OnTickAsync()
 		{
 			// Make check that InputA[0] and inputB[0] are same length.
 			await ClockAsync();
 
-			// swap A and B if A_exp is smaller than B_exp.
-
+            // swap A and B if A_exp is smaller than B_exp.
 			// using (var img = System.Drawing.Image.FromFile("data.txt"))
 			// using (var bmp = new System.Drawing.Bitmap(img))
-			{
+			await ClockAsync();
+            Console.WriteLine("Input Simulator 2222");
+
+			for(int i = 0; i < InputA.Length; i++){
+				DataA.Elem[i] = InputA[i];
+				DataB.Elem[i] = InputB[i];
+				DataB2.Elem[i] = InputB[i];
+				DataA2.Elem[i] = InputA[i];
 				await ClockAsync();
-				for(int i = 0; i < InputA.Length; i++){
-					DataA.Elem[i] = InputA[i];
-					DataB.Elem[i] = InputB[i];
-
-					DataB2.Elem[i] = InputB[i];
-					DataA2.Elem[i] = InputA[i];
-
-					await ClockAsync();
-				}
-				// Data.IsValid = true;
-
-				// var pixel = bmp.GetPixel(j, i);
-				// Data.Color[0] = pixel.R;
-				// Data.Color[1] = pixel.G;
-				// Data.Color[2] = pixel.B;
-
-
-				// Data.IsValid = false;
 			}
+			// Data.IsValid = true;
+
+			// var pixel = bmp.GetPixel(j, i);
+			// Data.Color[0] = pixel.R;
+			// Data.Color[1] = pixel.G;
+			// Data.Color[2] = pixel.B;
+
+
+			// Data.IsValid = false;
 
 			await ClockAsync();
 

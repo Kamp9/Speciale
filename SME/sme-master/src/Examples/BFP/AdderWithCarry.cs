@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace BFP
 {
-
+    [ClockedProcess]
 	public class AdderWithCarry : Process
 	{
 
@@ -30,16 +30,20 @@ namespace BFP
 		private readonly InputSimulator.InputLine3 DataA2 = Scope.CreateOrLoadBus<InputSimulator.InputLine3>();
 		private readonly InputSimulator.InputLine4 DataB2 = Scope.CreateOrLoadBus<InputSimulator.InputLine4>();
 
-		public override async Task Run()
-		{
 
-			await ClockAsync();
-
-			await ClockAsync();
+        // protected override async Task OnTickAsync()
+        public override async Task Run()
+        {
+            await ClockAsync();
+            await ClockAsync();
+            await ClockAsync();
+            await ClockAsync();
 
 			int arrayLength = DataA2.Elem[0];
 			int arrayLength2 = DataB2.Elem[0];
 			int arrayLength3 = CarryLine.Elem[0];
+
+            Console.WriteLine("ADDER WITH CARRY 1111");
 
 			await ClockAsync();
 			int size = DataA2.Elem[1];
@@ -51,7 +55,6 @@ namespace BFP
 			int Bexp = DataB2.Elem[2];
 			int exp_diff2 = CarryLine.Elem[2];
 			await ClockAsync();
-			// await ClockAsync();
 
 			bool carry_found = false;
 			int carry_index = -1;
@@ -66,25 +69,25 @@ namespace BFP
 					carry_found = true;
 				}
 
-	            bool sign = Convert.ToBoolean(((Convert.ToInt64(A) << exp_diff2) + Convert.ToInt64(B)) >> (size - 1));
+                //bool sign = Convert.ToBoolean(((Convert.ToInt64(A) << exp_diff2) + Convert.ToInt64(B)) >> (size - 1));
+                bool sign = false;
 
-	            long v = Convert.ToInt64(A) << exp_diff2;
+                long v = ((Int64) A) << exp_diff2;
 	            long abs_mask = v >> size - 1;
 
-	            long ABi = ((v + abs_mask) ^ abs_mask) + Convert.ToInt64(B);
+                long ABi = ((v + abs_mask) ^ abs_mask) + ((Int64) B);
 
 	            // ABi = Math.Abs(ABi >> exp_diff2) - Convert.ToInt64(sign);
 	            v = ABi >> exp_diff2;
 	            abs_mask = v >> size - 1;
-	            ABi = ((v + abs_mask) ^ abs_mask) + Convert.ToInt64(sign);
+                ABi = ((v + abs_mask) ^ abs_mask) + (sign ? 1 : 0); // Convert.ToInt64(sign);
 
-	            bool rounding = Convert.ToBoolean(ABi & 1);
+                bool rounding = (ABi & 1) > 0;
 
-	            OutputC[i] = (byte) (Convert.ToInt32((ABi >> c) + Convert.ToInt64(rounding)));
+                OutputC[i] = (byte) ((Int32) ((ABi >> c) + (rounding ? 1 : 0)));
 				await ClockAsync();
 
 			}
-			// await ClockAsync();
 		
 			for(int i = 0; i < OutputC.Length; i++){
 				Console.WriteLine(OutputC[i]);
@@ -92,4 +95,4 @@ namespace BFP
 			Console.WriteLine(carry_index);
 		}
 	}
-}
+}   

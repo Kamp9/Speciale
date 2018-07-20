@@ -2,7 +2,7 @@ using SME;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
-using SME.VHDL;
+// using SME.VHDL;
 
 // using System.Drawing;
 // using System.Drawing.Imaging;
@@ -11,7 +11,7 @@ using SME.VHDL;
 
 namespace BFP
 {
-
+    [ClockedProcess]
 	public class CarryCalculator : Process
 	{
 
@@ -33,16 +33,17 @@ namespace BFP
 		[OutputBus]
         private readonly CarryLine DataC = Scope.CreateOrLoadBus<CarryLine>();
 
-		public override async Task Run()
-		{
-			await ClockAsync();
+        //  public override async Task Run()
 
-			// using (var img = System.Drawing.Image.FromFile("data.txt"))
-			// using (var bmp = new System.Drawing.Bitmap(img))
+        public override async Task Run()
+        {
+            await ClockAsync();
 
-			await ClockAsync();
-			UInt17 my_int = 16;
+            await ClockAsync();
+            await ClockAsync();
 
+			// UInt17 my_int = 16;
+            Console.WriteLine("CARRY CALCULATOR222");
 			int arrayLength = DataA.Elem[0];
 			int arrayLength2 = DataB.Elem[0];
 			DataC.Elem[0] = DataA.Elem[0];
@@ -56,26 +57,25 @@ namespace BFP
 			int Aexp = DataA.Elem[2];
 			int Bexp = DataB.Elem[2];
 			int exp_diff = Aexp - Bexp;
-	        int exp_diff2 = size ^ ((exp_diff ^ size) & -Convert.ToInt32(exp_diff < size)); // min(x, y)
+            int exp_diff2 = size ^ ((exp_diff ^ size) & - ((exp_diff < size) ? 1 : 0)); // min(x, y)
 
 			DataC.Elem[2] = (byte) exp_diff2;
 
 			await ClockAsync();
+	        // bool carry = false;
 
-	        bool carry = false;
 			for(int i = 3; i < 3 + arrayLength; i++){
-
 				int A = DataA.Elem[i];
 				int B = DataB.Elem[i];
-
 				// This can maybe be done only once!
 
 		        long ABi = (((long) A) << exp_diff2) + (long) B;
 
 		        ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
-		        int abi = Convert.ToInt32(ABi);
-		        carry = (Convert.ToBoolean(A >> (size - 1)) ^ Convert.ToBoolean(abi >> (size - 1))) & (Convert.ToBoolean(B >> (size - 1)) ^ Convert.ToBoolean(abi >> (size - 1)));
-		        DataC.Elem[i] = Convert.ToByte(carry);
+                int abi = (Int32) ABi;
+                // carry = (Convert.ToBoolean(A >> (size - 1)) ^ Convert.ToBoolean(abi >> (size - 1))) & (Convert.ToBoolean(B >> (size - 1)) ^ Convert.ToBoolean(abi >> (size - 1)));
+                // carry = 0;
+                DataC.Elem[i] = 0; //Convert.ToByte(carry);
 				await ClockAsync();
 			}
 
