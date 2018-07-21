@@ -12,39 +12,12 @@
 #include <functional>
 #include <typeinfo>
 
+#include <fstream>
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "bfpdynamic.cpp"
-
-// Base:
-// 	size 
-// 	type
-
-// View:
-// 	shape
-// 	offset
-// 	stride
-// 	Base*
-
-// Op:
-// 	 +
-// 	 - 
-// 	 *
-// 	 /
-
-using namespace std;
-
-// template <typename T, size_t N> ostream &operator<<(ostream &s, const array<T, N> &xs){
-//     s << "{"; for(int i=0;i<xs.size();i++) s << int(xs[i]) << (i+1<xs.size()?"," : ""); s << "}";
-//     return s;
-// }
-
-// template <typename T, size_t N>
-// struct Base: public BFPDynamic<T>{
-//     Base(BFPDynamic<T> A, int exponent) : BFPDynamic<T>(A) {}
-// };
-
 
 
 template <typename T>
@@ -94,8 +67,9 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
     if(A.base->exponent < B.base->exponent) return B+A;
     assert(A.ydim == B.ydim);
     assert(A.xdim == B.xdim);
+    size_t N = A.base->size();
 
-    BFPDynamic<T> AB;
+    BFPDynamic<T> AB(N);
     int exp_diff = A.base->exponent - B.base->exponent;
     bool carry = false;
 
@@ -110,7 +84,6 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
             carry |= (signbit(A(i,j)) ^ signbit(abi)) & (signbit(B(i,j)) ^ signbit(abi));
         }
     }
-
     if(carry){
         for(size_t i=0;i<A.ydim;i++){
             for (size_t j=0;j<A.xdim;j++){
@@ -118,7 +91,7 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
                 typename Tx2<T>::type ABi = abs((typename Tx2<T>::type(A(i,j)) << exp_diff2) + B(i,j));
                 ABi = -sign ^ (ABi >> exp_diff2);
                 bool rounding = (ABi & 1);
-                AB.push_back((ABi >> 1) + rounding);
+                AB[i*A.ydim+j] = (ABi >> 1) + rounding;
             }
         }
     }else{
@@ -127,7 +100,7 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
                 typename Tx2<T>::type ABi = (typename Tx2<T>::type(A(i,j)) << exp_diff2) + (B(i,j));
                 bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
                 bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
-                AB.push_back((ABi >> exp_diff2) + rounding - rounding2);
+                AB[i*A.ydim+j] = (ABi >> exp_diff2) + rounding - rounding2;
             }
         }
     }
@@ -188,8 +161,8 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
 //vector<double> make_grid(const size_t ydim, const size_t xdim){
 vector<double> make_grid(){
 
-    size_t const ydim = 10000;
-    size_t const xdim = 10000;
+    size_t const ydim = 20;
+    size_t const xdim = 20;
     // double grid[ydim][xdim];
     auto grid = new double[ydim][xdim];
 
@@ -219,18 +192,18 @@ vector<double> make_grid(){
 }
 
 
-extern "C" //This is important to get the function from the -lblas library you will use when compiling
-{
-    double daxpy_(int *n, double *a, double *A, int *incA, double *B, int *incB);
-//The daxpy fortran function shown above multiplies a first matrix 'A' by a constant 'a'
-//and adds the result to a second matrix 'B.' Both matrices are of size 'n.'
-}
+// extern "C" //This is important to get the function from the -lblas library you will use when compiling
+// {
+//     double daxpy_(int *n, double *a, double *A, int *incA, double *B, int *incB);
+// //The daxpy fortran function shown above multiplies a first matrix 'A' by a constant 'a'
+// //and adds the result to a second matrix 'B.' Both matrices are of size 'n.'
+// }
 
-// void daxpy(int n, double a, double *A, int incA, double *B, int incB);
-void daxpy(int n, double a, double *A, int incA, double *B, int incB)
-{
-    daxpy_(&n, &a, A, &incA, B, &incB); //Once again, note the call notation. Important!
-}
+// // void daxpy(int n, double a, double *A, int incA, double *B, int incB);
+// void daxpy(int n, double a, double *A, int incA, double *B, int incB)
+// {
+//     daxpy_(&n, &a, A, &incA, B, &incB); //Once again, note the call notation. Important!
+// }
 
     
 
@@ -261,29 +234,27 @@ void print_view(View<T> &A){
 
 
 template <typename T>
-void bfp_update(BFPDynamic<T> &A, const View<T> &V){
+void bfp_update(BFPDynamic<T> &A, const View<T> &V){ 
     vector<double> b;
 
     b.push_back(0.2);
     BFPDynamic<T> B = BFPDynamic<T>(b);
     auto Bi = B[0];
-    // should be able to avoid going through A two times with max value for BFP struct in metadata.
-    // typename Tx2<T>::type max_value = 0;
-    // for(size_t i=0;i<V.ydim;i++){
-    //     for (size_t j=0;j<V.xdim;j++){
-    //         // cout << int(V(i,j)) << endl;
-    //         typename Tx2<T>::type ABi = typename Tx2<T>::type(V(i,j)) * Bi;
-    //         max_value = max(max_value, typename Tx2<T>::type(ABi ^ typename Tx2<T>::type(-signbit(ABi))));
-    //         // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
-    //     }
-    // }
-    // int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
-    // if (shifts < 0)
-    //     shifts = 0;
 
-    // HMMM
-    int shifts = numeric_limits<T>::digits + 1;
+    typename Tx2<T>::type max_value = 0;
+    for(size_t i=0;i<V.ydim;i++){
+        for (size_t j=0;j<V.xdim;j++){
+            // cout << int(V(i,j)) << endl;
+            typename Tx2<T>::type ABi = typename Tx2<T>::type(V(i,j)) * Bi;
+            max_value = max(max_value, typename Tx2<T>::type(ABi ^ typename Tx2<T>::type(-signbit(ABi))));
+            // max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
+        }
+    }
+    int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    if (shifts < 0)
+        shifts = 0;
 
+    // int shifts = numeric_limits<T>::digits + 1;
     size_t ydim = V.ydim + 2;
     for(size_t i=1;i<V.ydim+1;i++){
         for (size_t j=1;j<V.xdim+1;j++){
@@ -291,9 +262,6 @@ void bfp_update(BFPDynamic<T> &A, const View<T> &V){
             bool rounding = (ABi >> (shifts - 1)) & 1;
             bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
             A[i*ydim+j] = (ABi >> shifts) + rounding - rounding2;
-            // Ab.push_back((ABi >> shifts) + rounding - rounding2);
-            // cout << int(A[i*ydim+j]) << endl;
-
         }
     }
     // A.exponent = A.exponent;// + B.exponent + shifts;
@@ -301,15 +269,15 @@ void bfp_update(BFPDynamic<T> &A, const View<T> &V){
 
 
 int main(){
-
-    const size_t ydim = 10000;
-    const size_t xdim = 10000;
+    // remember to change the other one
+    const size_t ydim = 20;
+    const size_t xdim = 20;
 
     // auto grid_1d = make_grid(ydim, xdim);
     auto grid_1d = make_grid();
 
     auto A = BFPDynamic<int8_t>(grid_1d);
-
+    // print_grid(A, ydim, xdim);
     // xdim??
     auto center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
     auto north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
@@ -318,18 +286,18 @@ int main(){
     auto east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
 
     int iterations = 0;
-    int max_iterations = 10;
+    int max_iterations = 100;
 
     double delta = 1.0;
     double epsilon = 0.005; //1e-10;
 
+    ofstream myfile;
+    myfile.open ("heateq.csv");
 
     while (iterations < max_iterations && delta > epsilon){
-        cout << iterations << endl;
         iterations++;
 
         auto bfp_cn    = center + north;
-
         auto view_cn   = View<int8_t>(&bfp_cn, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         auto bfp_cne   = view_cn + east;
@@ -339,11 +307,21 @@ int main(){
         auto view_sw   = View<int8_t>(&bfp_sw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         auto bfp_cnesw = view_cne + view_sw;
+
         auto view_cnesw = View<int8_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         bfp_update<int8_t>(A, view_cnesw);
 
+        for(int i = 0; i < ydim; i++){
+            for(int j = 0; j < xdim; j++){
+                myfile << (A[i*ydim + j] * pow(2.0, A.exponent)) << ",";
+            }
+            myfile << endl;
+        }
+        myfile << endl;
+
     }
+    myfile.close();
 
 	return 0;
 }
