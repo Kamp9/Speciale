@@ -60,12 +60,12 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp<int32_t>(rng, 10);
-    auto B = gen_bfp<int32_t>(rng, 10);
+    auto A = gen_bfp<int8_t>(rng, 10);
+    auto B = gen_bfp<int8_t>(rng, 10);
 
-    // auto a = vector<int8_t>{-55,-76,-83,-25,-78};
-    // auto b = vector<int8_t>{-26,-101,-115,-36,-45};
-    // BFPDynamic<int8_t> A{a, 10};
+    // auto a = vector<int16_t>{0x7999};
+    // // auto b = vector<int16_t>{-26,-101,-115,-36,-45};
+    // BFPDynamic<int16_t> A{a, 0};
     // BFPDynamic<int8_t> B{b, 9};
 
     // auto a = vector<int8_t>{12,108,22,121,73,125,75,84,77,26};
@@ -74,9 +74,13 @@ int main(int argc, char *argv[]){
     // BFPDynamic<int8_t> A{a, -5};
     // BFPDynamic<int8_t> B{b, -8};
 
+    // cout << _sin(0x8000) << endl;
 
     check_div(A, B);
+    
     // check_sin(A);
+
+
     // int8_t a = -3;
     // int8_t b = a >> 1;
     // cout << int(b) << endl;

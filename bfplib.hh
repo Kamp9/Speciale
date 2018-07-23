@@ -130,6 +130,12 @@ template <> int floor_log2<uint64_t>(uint64_t value)
   return floor_log2<uint32_t>(value >> m) | m;
 }
 
+template <> int floor_log2<__uint128_t>(__uint128_t value)
+{
+  int m = value > 0xffffffffffffffff? 64 : 0;
+  return floor_log2<uint64_t>(value >> m) | m;
+}
+
 
 // template <> int floor_log2<int8_t>(int8_t value)
 // {

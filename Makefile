@@ -1,4 +1,5 @@
-CXX=g++ -O3 -march=native -std=c++14 
+CXX=g++ -O3 -march=native 
+#-std=c++11
 
 # all: deterministic_correct_test dynamic_bench_test random_correct_test
 all: dynamic_bench_test random_correct_test

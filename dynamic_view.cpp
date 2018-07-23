@@ -161,8 +161,8 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
 //vector<double> make_grid(const size_t ydim, const size_t xdim){
 vector<double> make_grid(){
 
-    size_t const ydim = 20;
-    size_t const xdim = 20;
+    size_t const ydim = 50;
+    size_t const xdim = 50;
     // double grid[ydim][xdim];
     auto grid = new double[ydim][xdim];
 
@@ -264,29 +264,29 @@ void bfp_update(BFPDynamic<T> &A, const View<T> &V){
             A[i*ydim+j] = (ABi >> shifts) + rounding - rounding2;
         }
     }
-    // A.exponent = A.exponent;// + B.exponent + shifts;
+  //  A.exponent = A.exponent + shifts - numeric_limits<T>::digits;// + B.exponent + shifts;
 }
 
 
 int main(){
     // remember to change the other one
-    const size_t ydim = 20;
-    const size_t xdim = 20;
+    const size_t ydim = 50;
+    const size_t xdim = 50;
 
     // auto grid_1d = make_grid(ydim, xdim);
     auto grid_1d = make_grid();
 
-    auto A = BFPDynamic<int8_t>(grid_1d);
+    auto A = BFPDynamic<int32_t>(grid_1d);
     // print_grid(A, ydim, xdim);
     // xdim??
-    auto center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
-    auto north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
-    auto south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
-    auto west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
-    auto east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
+    auto center = View<int32_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
+    auto north  = View<int32_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
+    auto south  = View<int32_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
+    auto west   = View<int32_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
+    auto east   = View<int32_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
 
     int iterations = 0;
-    int max_iterations = 100;
+    int max_iterations = 200;
 
     double delta = 1.0;
     double epsilon = 0.005; //1e-10;
@@ -295,31 +295,30 @@ int main(){
     myfile.open ("heateq.csv");
 
     while (iterations < max_iterations && delta > epsilon){
+        cout << iterations << endl;
         iterations++;
 
         auto bfp_cn    = center + north;
-        auto view_cn   = View<int8_t>(&bfp_cn, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_cn   = View<int32_t>(&bfp_cn, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         auto bfp_cne   = view_cn + east;
-        auto view_cne  = View<int8_t>(&bfp_cne, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_cne  = View<int32_t>(&bfp_cne, ydim-2, xdim-2, 0, 0, ydim-2, 1);
         
         auto bfp_sw    = south + west;
-        auto view_sw   = View<int8_t>(&bfp_sw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_sw   = View<int32_t>(&bfp_sw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         auto bfp_cnesw = view_cne + view_sw;
 
-        auto view_cnesw = View<int8_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_cnesw = View<int32_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
-        bfp_update<int8_t>(A, view_cnesw);
+        bfp_update<int32_t>(A, view_cnesw);
 
-        for(int i = 0; i < ydim; i++){
-            for(int j = 0; j < xdim; j++){
-                myfile << (A[i*ydim + j] * pow(2.0, A.exponent)) << ",";
-            }
-            myfile << endl;
+    }
+    for(int i = 0; i < ydim; i++){
+        for(int j = 0; j < xdim; j++){
+            myfile << (A[i*ydim + j] * pow(2.0, A.exponent)) << ",";
         }
         myfile << endl;
-
     }
     myfile.close();
 

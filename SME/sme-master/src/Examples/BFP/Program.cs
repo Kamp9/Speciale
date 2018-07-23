@@ -12,9 +12,9 @@ namespace BFP
 				.BuildCSVFile()
 				.BuildGraph()
 				.BuildVHDL()
-    			//.BuildCPP()
+    			.BuildCPP()
 				.Run(
-                    new InputSimulator(),
+                    new TopLevelSimulator(),
                     new CarryCalculator(),
                     new AdderWithCarry()
                 );

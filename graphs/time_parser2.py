@@ -16,6 +16,8 @@ idx = 0
 for line in input_file:
     m = re.search(pattern, line)
     if m:
+        print m.group('time')
+
         time = m.group('time')
         if idx % 3 == 0:
             if idx != 0:

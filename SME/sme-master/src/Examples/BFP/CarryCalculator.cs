@@ -11,76 +11,81 @@ using System.Linq;
 
 namespace BFP
 {
-    [ClockedProcess]
-	public class CarryCalculator : Process
+	public class CarryCalculator : SimpleProcess
 	{
 
-		[TopLevelInputBus]
 		public interface CarryLine : IBus
 		{
 			// [InitialValue]
 			// bool IsValid { get; set; }
 
-			[FixedArrayLength(100)]
+            [FixedArrayLength(sizeof(int))]
 			IFixedArray<byte> Elem { get; set; }
-		}
+		}   
 
 
 		[InputBus]
-        private readonly InputSimulator.InputLine1 DataA = Scope.CreateOrLoadBus<InputSimulator.InputLine1>();
-        private readonly InputSimulator.InputLine2 DataB = Scope.CreateOrLoadBus<InputSimulator.InputLine2>();
+        private readonly TopLevelSimulator.InputLine1 DataA = Scope.CreateOrLoadBus<TopLevelSimulator.InputLine1>();
+        [InputBus]
+        private readonly TopLevelSimulator.InputLine2 DataB = Scope.CreateOrLoadBus<TopLevelSimulator.InputLine2>();
+ 
+        [InputBus]
+        private readonly TopLevelSimulator.InputLine5 CountLine1 = Scope.CreateOrLoadBus<TopLevelSimulator.InputLine5>();
 
 		[OutputBus]
         private readonly CarryLine DataC = Scope.CreateOrLoadBus<CarryLine>();
 
         //  public override async Task Run()
+        int exp_diff2 = 0;
+        int size = 0;
 
-        public override async Task Run()
+        protected override void OnTick()
         {
-            await ClockAsync();
+            // UInt17 my_int = 16;
+            int count = CountLine1.Elem[0];
 
-            await ClockAsync();
-            await ClockAsync();
+            if (count == 0)
+            {
+                int arrayLength = DataA.Elem[0];
+                int arrayLength2 = DataB.Elem[0];
+                DataC.Elem[0] = 0;
+            }
 
-			// UInt17 my_int = 16;
-            Console.WriteLine("CARRY CALCULATOR222");
-			int arrayLength = DataA.Elem[0];
-			int arrayLength2 = DataB.Elem[0];
-			DataC.Elem[0] = DataA.Elem[0];
+            if (count == 1)
+            {
+                size = DataA.Elem[0];
+                int size2 = DataB.Elem[0];
+                DataC.Elem[0] = 0;
+            }
 
-			await ClockAsync();
-			int size = DataA.Elem[1];
-			int size2 = DataB.Elem[1];
-			DataC.Elem[1] = DataA.Elem[1];
+            if (count == 2)
+            {
+                int Aexp = DataA.Elem[0];
+                int Bexp = DataB.Elem[0];
+                int exp_diff = Aexp - Bexp;
+                exp_diff2 = size ^ ((exp_diff ^ size) & -((exp_diff < size) ? 1 : 0));
+                DataC.Elem[0] = 0;
+            }
 
-			await ClockAsync();
-			int Aexp = DataA.Elem[2];
-			int Bexp = DataB.Elem[2];
-			int exp_diff = Aexp - Bexp;
-            int exp_diff2 = size ^ ((exp_diff ^ size) & - ((exp_diff < size) ? 1 : 0)); // min(x, y)
+            bool carry = false;
+            if (count > 2)
+            {
+                int A = DataA.Elem[0];
+                int B = DataB.Elem[0];
 
-			DataC.Elem[2] = (byte) exp_diff2;
+                long ABi = (((long) A) << exp_diff2) + (long) B;
 
-			await ClockAsync();
-	        // bool carry = false;
+                ABi = (ABi >> (exp_diff2));
 
-			for(int i = 3; i < 3 + arrayLength; i++){
-				int A = DataA.Elem[i];
-				int B = DataB.Elem[i];
-				// This can maybe be done only once!
+                long ABi2 = ((long)(ABi >> (exp_diff2 - 1)));
+                long ABi3 = ABi2 & 1;
+                ABi = ABi + ABi3;
+                int abi = (Int32)ABi;
+                //carry = (((A >> (size - 1)) != 0) ^ (abi >> (size - 1)) != 0) && (((B >> (size - 1)) != 0) ^ ((abi >> (size - 1)) != 0));
+                carry = ((((A >> (size - 1))) ^ (abi >> (size - 1))) & (((B >> (size - 1))) ^ ((abi >> (size - 1))))) != 0;
 
-		        long ABi = (((long) A) << exp_diff2) + (long) B;
-
-		        ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
-                int abi = (Int32) ABi;
-                // carry = (Convert.ToBoolean(A >> (size - 1)) ^ Convert.ToBoolean(abi >> (size - 1))) & (Convert.ToBoolean(B >> (size - 1)) ^ Convert.ToBoolean(abi >> (size - 1)));
-                // carry = 0;
-                DataC.Elem[i] = 0; //Convert.ToByte(carry);
-				await ClockAsync();
-			}
-
-			await ClockAsync();
-
+                DataC.Elem[0] = (byte)(carry ? 1 : 0);
+            }
 		}
 	}
 }
