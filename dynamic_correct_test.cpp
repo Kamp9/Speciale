@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp<int8_t>(rng, 10);
-    auto B = gen_bfp<int8_t>(rng, 10);
+    auto A = gen_bfp_pos<int32_t>(rng, 10);
+    auto B = gen_bfp_pos<int32_t>(rng, 10);
 
     // auto a = vector<int16_t>{0x7999};
     // // auto b = vector<int16_t>{-26,-101,-115,-36,-45};
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
 
     // cout << _sin(0x8000) << endl;
 
-    check_div(A, B);
+    check_sqrt(A);
     
     // check_sin(A);
 

@@ -15,8 +15,8 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
     boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         auto re = rand_elem(rng);
-        //while(re == 0)
-        //    re = rand_elem(rng);
+            //while(re == 0)
+            //    re = rand_elem(rng);
         elems[i] = re;
     }
     boost::random::uniform_int_distribution<T> rand_exp(0, 0);
@@ -177,8 +177,8 @@ int main(int argc, char *argv[]){
         double elapsed_secs = 0.0;
 
         // these should get inside the computations;
-        BFPDynamic<int8_t> A8(0, 0);
-        BFPDynamic<int16_t> A16(0, 0);
+        BFPDynamic<uint8_t>   A8(0, 0);
+        BFPDynamic<uint16_t> A16(0, 0);
         BFPDynamic<int32_t> A32(0, 0);
         BFPDynamic<int64_t> A64(0, 0);
 
@@ -187,11 +187,11 @@ int main(int argc, char *argv[]){
         if(comp){
             switch(test_type){
                 case 8:
-                    A8 = gen_bfp<int8_t>(rng, N);
+                    A8 = gen_bfp<uint8_t>(rng, N);
 
                     begin = clock();
                     
-                    cout << call_op_comp<int8_t>(op_type, A8) << endl;
+                    cout << int(call_op_comp(op_type, A8)) << endl;
                     
                     end = clock();
 
@@ -200,11 +200,11 @@ int main(int argc, char *argv[]){
                     break;  
 
                 case 16:
-                    A16 = gen_bfp<int16_t>(rng, N);
+                    A16 = gen_bfp<uint16_t>(rng, N);
 
                     begin = clock();
                     
-                    cout << call_op_comp<int16_t>(op_type, A16) << endl;
+                    cout << int(call_op_comp(op_type, A16)) << endl;
                     
                     end = clock();
 
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]){
 
                     begin = clock();
                     
-                    cout << call_op_comp<int32_t>(op_type, A32) << endl;
+                    cout << int(call_op_comp<int32_t>(op_type, A32)) << endl;
                     
                     end = clock();
 
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]){
  
                     begin = clock();
                     
-                    cout << call_op_comp<int64_t>(op_type, A64) << endl;
+                    cout << int(call_op_comp<int64_t>(op_type, A64)) << endl;
                     
                     end = clock();
 
@@ -248,7 +248,7 @@ int main(int argc, char *argv[]){
 
                     begin = clock();
 
-                    cout << call_op_float(op_type, A) << endl;
+                    cout << int(call_op_float(op_type, A)) << endl;
 
                     end = clock();
 
@@ -257,10 +257,11 @@ int main(int argc, char *argv[]){
                     break;
 
                 case 8 :
-                    A8 = gen_bfp<int8_t>(rng, N);
+                    A8 = gen_bfp<uint8_t>(rng, N);
+
                     begin = clock();
-                    
-                    cout << call_op<int8_t>(op_type, A8) << endl;
+
+                    cout << int(call_op(op_type, A8)) << endl;
                     
                     end = clock();
 
@@ -270,22 +271,22 @@ int main(int argc, char *argv[]){
 
 
                 case 16 :
-                    A16 = gen_bfp<int16_t>(rng, N);
+                    A16 = gen_bfp<uint16_t>(rng, N);
                     begin = clock();
-                    
-                    cout << call_op<int16_t>(op_type, A16) << endl;
+                    cout << int(call_op(op_type, A16)) << endl;
                     
                     end = clock();
 
             		// cerr << "Block size: " << (sizeof(decltype(A16)::value_type) * A16.size()) << endl;		
                     elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+
                     break;
 
                 case 32 :
                     A32 = gen_bfp<int32_t>(rng, N);
                     begin = clock();
                     
-                    cout << call_op<int32_t>(op_type, A32) << endl;
+                    cout << int(call_op<int32_t>(op_type, A32)) << endl;
                     
                     end = clock();
 
@@ -297,7 +298,7 @@ int main(int argc, char *argv[]){
                     A64 = gen_bfp<int64_t>(rng, N);
                     begin = clock();
                     
-                    cout << call_op<int64_t>(op_type, A64) << endl;
+                    cout << int(call_op<int64_t>(op_type, A64)) << endl;
                     
                     end = clock();
 
