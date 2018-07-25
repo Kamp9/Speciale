@@ -32,9 +32,20 @@ template <int N> ostream &operator<<(ostream &s, const bitset<N> &bits){
   return s;
 }
 
-// TODO: Derive double-length type automatically or pass as template parameter.
-typedef int64_t Tx2;
-typedef uint64_t uTx2;
+typedef unsigned int uint128_t __attribute__((mode(TI)));
+
+template<typename T> struct tx2 {typedef T type;};
+template<> struct tx2<int8_t>   {typedef int16_t type;};
+template<> struct tx2<int16_t>  {typedef int32_t type;};
+template<> struct tx2<int32_t>  {typedef int64_t type;};
+template<> struct tx2<int64_t> {typedef __int128 type;};
+
+template<typename T> struct utx2 {typedef T type;};
+template<> struct utx2<int8_t>  {typedef uint16_t type;};
+template<> struct utx2<int16_t> {typedef uint32_t type;};
+template<> struct utx2<int32_t> {typedef uint64_t type;};
+template<> struct utx2<int64_t> {typedef uint128_t type;};
+
 
 
 // BFPStatic definition
@@ -101,7 +112,7 @@ struct BFPStatic: public std::array<T,N>{
 
 //     int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
 //     for(size_t i=0;i<N;i++){
-//         Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+//         tx2 ABi = (tx2(A[i]) << exp_diff2) + (B[i]);
 //         ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
 //         T abi  = ABi;
 //         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
@@ -109,15 +120,15 @@ struct BFPStatic: public std::array<T,N>{
 //     // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
 //     if(carry){
 //         for(size_t i=0;i<N;i++){
-//             bool sign = signbit((Tx2(A[i]) << exp_diff2) + B[i]);
-//             Tx2 ABi = abs((Tx2(A[i]) << exp_diff2) + B[i]);
+//             bool sign = signbit((tx2(A[i]) << exp_diff2) + B[i]);
+//             tx2 ABi = abs((tx2(A[i]) << exp_diff2) + B[i]);
 //             ABi = -sign ^ (ABi >> exp_diff2);
 //             bool rounding = (ABi & 1);
 //             AB[i] = (ABi >> 1) + rounding;
 //         }
 //     }else{
 //         for(size_t i=0;i<N;i++){
-//             Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+//             tx2 ABi = (tx2(A[i]) << exp_diff2) + (B[i]);
 //             bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
 //             bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
 //             AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
@@ -131,6 +142,7 @@ struct BFPStatic: public std::array<T,N>{
 template <typename T, size_t N>
 BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
     if(A.exponent < B.exponent) return B+A;
+    typedef typename tx2<T>::type tx2;
 
     BFPStatic<T, N> AB;
 
@@ -139,7 +151,7 @@ BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
 
     int exp_diff2 = min(exp_diff, numeric_limits<T>::digits + 1);
     for(size_t i=0;i<N;i++){
-        Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+        tx2 ABi = (tx2(A[i]) << exp_diff2) + (B[i]);
         ABi = (ABi >> (exp_diff2)) + ((ABi >> (exp_diff2 - 1)) & 1);
         T abi  = ABi;
         carry |= (signbit(A[i]) ^ signbit(abi)) & (signbit(B[i]) ^ signbit(abi));
@@ -147,15 +159,15 @@ BFPStatic<T, N> operator+(const BFPStatic<T, N> &A, const BFPStatic<T, N> &B){
     // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
     if(carry){
         for(size_t i=0;i<N;i++){
-            bool sign = signbit((Tx2(A[i]) << exp_diff2) + B[i]);
-            Tx2 ABi = abs((Tx2(A[i]) << exp_diff2) + B[i]);
+            bool sign = signbit((tx2(A[i]) << exp_diff2) + B[i]);
+            tx2 ABi = abs((tx2(A[i]) << exp_diff2) + B[i]);
             ABi = -sign ^ (ABi >> exp_diff2);
             bool rounding = (ABi & 1);
             AB[i] = (ABi >> 1) + rounding;
         }
     }else{
         for(size_t i=0;i<N;i++){
-            Tx2 ABi = (Tx2(A[i]) << exp_diff2) + (B[i]);
+            tx2 ABi = (tx2(A[i]) << exp_diff2) + (B[i]);
             bool rounding = ((ABi >> (exp_diff2 - 1)) & 1) && (exp_diff2 > 0);
             bool rounding2 = ((ABi & ((1 << exp_diff2) -1)) == (1 << (exp_diff2 - 1))) && signbit(ABi);
             AB[i] = (ABi >> exp_diff2) + rounding - rounding2;
@@ -180,19 +192,22 @@ BFPStatic<T,N> operator-(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 template <typename T,size_t N>
 BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> AB;
-    Tx2 max_value = 0;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
+    tx2 max_value = 0;
 
     for (size_t i = 0; i < N; i++) {
-        Tx2 ABi = Tx2(A[i]) * B[i];
-        max_value = max(max_value, ABi ^ Tx2(-1 * signbit(ABi)));
+        tx2 ABi = tx2(A[i]) * B[i];
+        max_value = max(max_value, ABi ^ tx2(-1 * signbit(ABi)));
     }
 
-    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
     if (shifts < 0)
         shifts = 0;
 
     for (size_t i = 0; i < N; i++){
-        Tx2 ABi = Tx2(A[i]) * B[i];
+        tx2 ABi = tx2(A[i]) * B[i];
         bool rounding = (ABi >> (shifts - 1)) & 1;
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
         AB[i] = (ABi >> shifts) + rounding - rounding2;
@@ -205,20 +220,23 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 template <typename T,size_t N>
 BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
     BFPStatic<T,N> AB;
-    Tx2 max_value = 0;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
+    tx2 max_value = 0;
 
     for (size_t i = 0; i < N; i++) {
-        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        max_value = max(max_value, ABi ^ Tx2(-1 * signbit(ABi)));
+        tx2 ABi = (tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+        max_value = max(max_value, ABi ^ tx2(-1 * signbit(ABi)));
     }
 
-    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
+    int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
 
     if (shifts < 0)
         shifts = 0;
 
     for (size_t i = 0; i < N; i++){
-        Tx2 ABi = (Tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
+        tx2 ABi = (tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
         bool rounding = ((ABi >> (shifts - 1)) & 1);
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) && signbit(ABi);
 
@@ -234,15 +252,18 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 template <typename T, size_t N>
 BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
     BFPStatic<T,N> Ap;
-    Tx2 max_value = 0;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
+    tx2 max_value = 0;
     for (size_t i = 0; i < N; i++){
-        Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
+        tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
         max_value = max(max_value, Api);
     }
     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
 
     for (size_t i = 0; i < N; i++){
-        Tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
+        tx2 Api = exp((p[0] << p.exponent) * log(A[i] << A.exponent));
         Ap[i] = Api >> shifts;
     }
 
@@ -255,13 +276,16 @@ BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
 template <typename T, size_t N >
 BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
     BFPStatic<T,N> sqrtA;
-    uTx2 max_value = 0;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
+    utx2 max_value = 0;
 
     for (size_t i=0; i < N; i++){
-        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-        uTx2 y = (sqrtAi >> 1);
-        uTx2 z = 0;
-        uTx2 y1;
+        utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+        utx2 y = (sqrtAi >> 1);
+        utx2 z = 0;
+        utx2 y1;
 
         while (y != z) {
             z = y;
@@ -277,10 +301,10 @@ BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
       shifts = 0;
     }
     for (size_t i=0; i < N; i++){
-        uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-        uTx2 y = (sqrtAi >> 1);
-        uTx2 z = 0;
-        uTx2 y1;
+        utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+        utx2 y = (sqrtAi >> 1);
+        utx2 z = 0;
+        utx2 y1;
         while (y != z) {
             z = y;
             y1 = (y + sqrtAi / y);
@@ -361,7 +385,10 @@ struct int_sqrt {
 template <typename T, size_t N >
 BFPStatic<T, N> bfp_sqrt2(const BFPStatic<T, N> &A) {
     BFPStatic<T,N> sqrtA;
-    uTx2 max_value = 0;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
+    utx2 max_value = 0;
 
     for (size_t i=0; i < N; i++){
         unsigned long x = A[i] << (A.exponent & 1);
@@ -441,7 +468,9 @@ BFPStatic<T, N> bfp_sqrt2(const BFPStatic<T, N> &A) {
 template <typename T, size_t N >
 BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
     BFPStatic<T,N> invsqrtA;
-    
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
     auto half = BFPStatic<T, N>{{1}, -1};
     auto x2 = A * half;
     auto threehalfs = BFPStatic<T, N>{{3}, -1};
@@ -460,6 +489,9 @@ BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
 
 template <typename T, size_t N>
 BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
     vector<double> invsqrtAfloat(A.size());
     for (size_t i=0; i < N; i++){
         int32_t j;
@@ -482,24 +514,27 @@ BFPStatic<T, N> bfp_invsqrtfloat(const BFPStatic<T, N> &A) {
 template <typename T, size_t N>
 BFPStatic<T, N> bfp_mul_scalar(const BFPStatic<T, N> &A, const double scalar){
     BFPStatic<T,N> Ab;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
     vector<double> V;
     V.push_back(scalar);
 
     BFPStatic<T, 1> B = BFPStatic<T, 1>(V);
     auto Bi = B[0];
     // should be able to avoid going through A two times with max value for BFP struct in metadata.
-    Tx2 max_value = 0;
+    tx2 max_value = 0;
     for (size_t i = 0; i < N; i++) {
-        Tx2 ABi = Tx2(A[i]) * Bi;
-        max_value = max(max_value, ABi ^ Tx2(-1 * signbit(ABi)));
+        tx2 ABi = tx2(A[i]) * Bi;
+        max_value = max(max_value, ABi ^ tx2(-1 * signbit(ABi)));
     }
 
-    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
     if (shifts < 0)
         shifts = 0;
 
     for (size_t i=0; i < N; i++){
-        Tx2 ABi = Tx2(A[i]) * Bi;
+        tx2 ABi = tx2(A[i]) * Bi;
         bool rounding = (ABi >> (shifts - 1)) & 1;
         bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
         Ab[i] = (ABi >> shifts) + rounding - rounding2;
@@ -519,29 +554,32 @@ struct heat_result {
 template <typename T, size_t N>
 heat_result<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size_t xdim){
     BFPStatic<T, N> iteration;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
 
     vector<double> V;
     V.push_back(0.2);
 
     BFPStatic<T, 1> B = BFPStatic<T, 1>(V);
     auto Bi = B[0];
-    Tx2 max_value = 0;
+    tx2 max_value = 0;
     
     for(size_t i=1; i<ydim-1; i++){
         for(size_t j=1; j<xdim-1; j++){
-            Tx2 Ai = (Tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]) * Bi;
-            max_value = max(max_value, Ai ^ Tx2(-1 * signbit(Ai)));
+            tx2 Ai = (tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]) * Bi;
+            max_value = max(max_value, Ai ^ tx2(-1 * signbit(Ai)));
         }
     }
 
-    int shifts = 1 + floor_log2(uTx2(max_value ^ Tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
+    int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
     if (shifts < 0)
         shifts = 0;
     
-    Tx2 accumulator = 0;
+    tx2 accumulator = 0;
     for(size_t i=1; i<ydim-1; i++){
         for(size_t j=1; j<xdim-1; j++){
-            Tx2 Ai = (Tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]) * Bi;
+            tx2 Ai = (tx2(A[(i-1)*ydim+j]) + A[(i+1)*ydim+j] + A[i*ydim+j] + A[i*ydim+j-1] + A[i*ydim+j+1]) * Bi;
             accumulator += abs(Ai - A[i*ydim+j]);
             iteration[i] = Ai >> shifts;
         }
@@ -566,6 +604,9 @@ heat_result<T, N> bfp_heat_iteration(const BFPStatic<T, N> &A, size_t ydim, size
 template <typename T, size_t N>
 BFPStatic<T, N> bfp_abs(const BFPStatic<T, N> &A){
     BFPStatic<T, N> absA;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
 
     for (size_t i=0; i < N; i++){
         absA[i] = abs(A[i]);
@@ -579,7 +620,10 @@ template <typename T, size_t N>
 double bfp_sum_abs(const BFPStatic<T, N> &A, const size_t ydim, const size_t xdim){
     BFPStatic<T, N> sumA;
     // How much do we need???
-    Tx2 accumulator = 0;
+    typedef typename tx2<T>::type tx2;
+    typedef typename utx2<T>::type utx2;
+
+    tx2 accumulator = 0;
     
     for(size_t i=1; i<ydim-1; i++){
         for(size_t j=1; j<xdim-1; j++){

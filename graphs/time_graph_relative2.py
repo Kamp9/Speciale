@@ -67,25 +67,26 @@ rects1 = ax.bar(index, native[0:4], bar_width,
 	        color=sns.xkcd_rgb["black"],
 	        error_kw=error_config,
 	        alpha=0.9,
-	        label='64 bit BFP')
+	        label='32 bit BFP')
 
 rects2 = ax.bar(index + bar_width,  means[0:size] /  means[size:2*size], bar_width,
 	        color=sns.xkcd_rgb["lightish purple"],
 	        error_kw=error_config,
 	        alpha=0.9,
-	        label='64 bit BFP - optimized')
+	        label='32 bit BFP - optimized')
 
 ax.plot([-1, 4], [1, 1], "k--", linewidth=1.0)
 
-ax.set_ylim(ymin=0.0, ymax=max(means) + 0.5)
+ax.set_ylim(ymin=0.0, ymax= max(means[0:size] / means[size:2*size]) + 0.5)
 ax.set_xlim(xmin=-0.25,xmax=3.5)
 
 plt.title(title)
 ax.set_xlabel('Number of elements')
-ax.set_ylabel(r'Speedup relative to 64 bit Floating Point') 	
+ax.set_ylabel(r'Speedup relative to non-optimized version')
 
-plt.xticks(index + (bar_width*0.5), ["50.000.000", "100.000.000", "150.000.000", "200.000.000"])
-ax.legend(loc=1)
+# plt.xticks(index + (bar_width*0.5), ["100.000.000", "200.000.000", "300.000.000", "400.000.000"])
+plt.xticks(index + (bar_width*0.5), ["10.000.000", "20.000.000", "30.000.000", "40.000.000"])
+ax.legend(loc=2)
 
 plt.tight_layout()
 

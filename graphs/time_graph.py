@@ -48,11 +48,11 @@ native4 = np.mean(native[3*size:4*size], axis=1)
 native5 = np.mean(native[4*size:], axis=1)
 
 
-rects1 = ax.plot(index, native1, alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["denim blue"], label='8 bit BFP')
-rects2 = ax.plot(index, native2, alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["orange"], label='16 bit BFP')
-rects3 = ax.plot(index, native3, alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["green"], label='32 bit BFP')
-rects4 = ax.plot(index, native4, alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["red"], label='64 bit BFP')
-rects5 = ax.plot(index, native5, alpha=0.9, path_effects=[outline], linewidth=3, linestyle='dashdot', color=sns.xkcd_rgb["grey"], label='64 bit Floating Point')
+rects1 = ax.plot(index, native1, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["denim blue"], label='8 bit BFP')
+rects2 = ax.plot(index, native2, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["orange"], label='16 bit BFP')
+rects3 = ax.plot(index, native3, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["green"], label='32 bit BFP')
+rects4 = ax.plot(index, native4, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["red"], label='64 bit BFP')
+rects5 = ax.plot(index, native5, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, linestyle='dashdot', color=sns.xkcd_rgb["grey"], label='64 bit Floating Point')
 
 # rects2 = ax.plot(index, dw, alpha=0.9, path_effects=[outline], color=sns.xkcd_rgb["pale red"], label='do_while with iterator')
 

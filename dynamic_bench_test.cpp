@@ -15,11 +15,11 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
     boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
     for(size_t i = 0; i < N; i++){
         auto re = rand_elem(rng);
-        while(re == 0)
-            re = rand_elem(rng);
+        //while(re == 0)
+        //    re = rand_elem(rng);
         elems[i] = re;
     }
-    boost::random::uniform_int_distribution<T> rand_exp(-10, 10);
+    boost::random::uniform_int_distribution<T> rand_exp(0, 0);
     BFPDynamic<T> A(elems, rand_exp(rng));
     return A;
 }
@@ -54,24 +54,24 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
 // 5 : sqrt
 // 6 : inv sqrt
 template <typename T>
-void call_op(const int op, const BFPDynamic<T> &A){
+T call_op(const int op, const BFPDynamic<T> &A){
+    BFPDynamic<T> C(0,0);
      switch(op){
         case 1 :
-            A + A;
-            break;
+            C = A + A;
+            return C[C.size()-1];
         case 2 :
-            A - A;
-            break;
+            C = A - A;
+            return C[C.size()-1];
         case 3 :
-            A * A;
-            break;
+            C = A * A;
+            return C[C.size()-1];
         case 4 :
-            A / A;
-            break;
-
-        // case 5 :
-        //     bfp_sqrt(A);
-        //     break;
+            C = A / A;
+            return C[C.size()-1];
+        case 5 :
+            C = bfp_sqrt(A);
+            return C[C.size()-1];
         // case 6 :
         //     bfp_invsqrt(A);
         //     break;
@@ -80,23 +80,24 @@ void call_op(const int op, const BFPDynamic<T> &A){
     }
 }
 
-void call_op_float(const int op, const vector<double> &A){
+double call_op_float(const int op, const vector<double> &A){
+     vector<double> C;
      switch(op){
         case 1 :
-            A + A;
-            break;
+            C = A + A;
+            return C[C.size()-1];
         case 2 :
-            A - A;
-            break;
+            C = A - A;
+            return C[C.size()-1];
         case 3 :
-            A * A;
-            break;
+            C = A * A;
+            return C[C.size()-1];
         case 4 :
-            A / A;
-            break;
-        // case 5 :
-        //     Vsqrt(A);
-        //     break;
+            C = A / A;
+            return C[C.size()-1];
+        case 5 :
+            C = Vsqrt(A);
+            return C[C.size()-1];
         // case 6 :
         //     bfp_invsqrt(A);
         //     break;
@@ -106,14 +107,15 @@ void call_op_float(const int op, const vector<double> &A){
 }
 
 template <typename T>
-void call_op_comp(const int op, const BFPDynamic<T> &A){
+T call_op_comp(const int op, const BFPDynamic<T> &A){
+    BFPDynamic<T> C(0,0);
      switch(op){
         case 1 :
-            plus2(A, A);
-            break;
+            C = plus2(A, A);
+            return C[C.size()-1];
         case 2 :
-            minus2(A, A);
-            break;
+            C = minus2(A, A);
+            return C[C.size()-1];
         // case 3 :
         //     A * A;
         //     break;
@@ -121,9 +123,10 @@ void call_op_comp(const int op, const BFPDynamic<T> &A){
         //     A / A;
         //     break;
 
-        // case 5 :
-        //     bfp_sqrt(A);
-        //     break;
+        case 5 :
+            // This is the not optimized one!!!
+            C = bfp_sqrt2(A);
+            return C[C.size()-1];
         // case 6 :
         //     bfp_invsqrt(A);
         //     break;
@@ -138,16 +141,11 @@ int main(int argc, char *argv[]){
     struct timeval tv;
     gettimeofday(&tv, 0);
     boost::random::mt19937 rng;    
-    // rng.seed(tv.tv_usec);
+    rng.seed(tv.tv_usec);
 
-    rng.seed(42);
+    // rng.seed(42);
     //int rng = 42; 		// Eller brug tv.tv_usec, hvis determinisme ikke oenskes
       
-    // We need three arguments
-    // if (argc != 5){
-    //     cout << "3 arguments needed: test_type, op_type, and size!" << endl;
-    //     return 0;
-    // }else{
         int test_type = atoi(argv[1]);
         int op_type   = atoi(argv[2]);
         size_t N      = atoi(argv[3]);
@@ -172,7 +170,7 @@ int main(int argc, char *argv[]){
 
                     begin = clock();
                     
-                    call_op_comp<int8_t>(op_type, A8);
+                    cout << call_op_comp<int8_t>(op_type, A8) << endl;
                     
                     end = clock();
 
@@ -185,7 +183,7 @@ int main(int argc, char *argv[]){
 
                     begin = clock();
                     
-                    call_op_comp<int16_t>(op_type, A16);
+                    cout << call_op_comp<int16_t>(op_type, A16) << endl;
                     
                     end = clock();
 
@@ -198,7 +196,7 @@ int main(int argc, char *argv[]){
 
                     begin = clock();
                     
-                    call_op_comp<int32_t>(op_type, A32);
+                    cout << call_op_comp<int32_t>(op_type, A32) << endl;
                     
                     end = clock();
 
@@ -211,7 +209,7 @@ int main(int argc, char *argv[]){
  
                     begin = clock();
                     
-                    call_op_comp<int64_t>(op_type, A64);
+                    cout << call_op_comp<int64_t>(op_type, A64) << endl;
                     
                     end = clock();
 
@@ -229,7 +227,7 @@ int main(int argc, char *argv[]){
 
                     begin = clock();
 
-                    call_op_float(op_type, A);
+                    cout << call_op_float(op_type, A) << endl;
 
                     end = clock();
 
@@ -241,7 +239,7 @@ int main(int argc, char *argv[]){
                     A8 = gen_bfp<int8_t>(rng, N);
                     begin = clock();
                     
-                    call_op<int8_t>(op_type, A8);
+                    cout << call_op<int8_t>(op_type, A8) << endl;
                     
                     end = clock();
 
@@ -254,7 +252,7 @@ int main(int argc, char *argv[]){
                     A16 = gen_bfp<int16_t>(rng, N);
                     begin = clock();
                     
-                    call_op<int16_t>(op_type, A16);
+                    cout << call_op<int16_t>(op_type, A16) << endl;
                     
                     end = clock();
 
@@ -266,7 +264,7 @@ int main(int argc, char *argv[]){
                     A32 = gen_bfp<int32_t>(rng, N);
                     begin = clock();
                     
-                    call_op<int32_t>(op_type, A32);
+                    cout << call_op<int32_t>(op_type, A32) << endl;
                     
                     end = clock();
 
@@ -278,7 +276,7 @@ int main(int argc, char *argv[]){
                     A64 = gen_bfp<int64_t>(rng, N);
                     begin = clock();
                     
-                    call_op<int64_t>(op_type, A64);
+                    cout << call_op<int64_t>(op_type, A64) << endl;
                     
                     end = clock();
 

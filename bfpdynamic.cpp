@@ -452,7 +452,7 @@ BFPDynamic<T> operator*(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
   // assert(N==B.size());
   BFPDynamic<T> AB(N);
   typedef typename Tx2<T>::type tx2;
-  typedef typename uTx2<T>::type utx2;    
+  typedef typename uTx2<T>::type utx2;
   tx2 max_value = 0;
 
   for (size_t i = 0; i < N; i++) {
@@ -574,53 +574,36 @@ BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 // //Denne bruger floating point
 // //https://stackoverflow.com/questions/19611198/finding-square-root-without-using-sqrt-function
 
-// //...nok bedre at basere loesningen paa denne:
-// //https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
-// template <typename T>
-// BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
-//     size_t N = A.size();
-//     // assert(N==B.size());
+//...nok bedre at basere loesningen paa denne:
+//https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
+template <typename T>
+BFPDynamic<T> bfp_sqrt2(const BFPDynamic<T> &A) {
+    size_t N = A.size();
     
-//     BFPDynamic<T> sqrtA;
-//     uTx2 max_value = 0;
+    BFPDynamic<T> sqrtA(N);
 
-//     for (size_t i=0; i < N; i++){
-//       uTx2 sqrtAi = uTx2(A[i]) << (sizeof(T)*8 + (A.exponent & 1));
-//       uTx2 y = (sqrtAi >> 1);
-//       uTx2 z = 0;
-//       uTx2 y1;
+    typedef typename Tx2<T>::type tx2;
+    typedef typename uTx2<T>::type utx2;    
 
-//       while (y != z) {
-//         	z = y;
-//         	y1 = (y + sqrtAi / y);
-//         	y = (y1 >> 1) + (y1 & 1);
-//       }
-//       max_value = max(max_value, y - (y1 & 1));
-//     }
+    for (size_t i=0; i < N; i++){
+        utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+        utx2 y = (sqrtAi >> 1);
+        utx2 z = 0;
+        utx2 y1;
+        while (y != z) {
+            z = y;
+            y1 = (y + sqrtAi / y);
+            y = (y1 >> 1) + (y1 & 1);
+        }
+        y -= (y1 & 1);
+//        sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
+        sqrtA[i] = y >> 1;
+    }
 
-//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+    sqrtA.exponent = 1 + ((A.exponent - numeric_limits<T>::digits) >> 1)  - (A.exponent & 1);  // - signbit(shifts); // (A.exponent & 1);
 
-//     if (shifts < 0){
-//       shifts = 0;
-//     }
-//     for (size_t i=0; i < N; i++){
-//         uTx2 sqrtAi = uTx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-//         uTx2 y = (sqrtAi >> 1);
-//         uTx2 z = 0;
-//         uTx2 y1;
-//         while (y != z) {
-//             z = y;
-//             y1 = (y + sqrtAi / y);
-//             y = (y1 >> 1) + (y1 & 1);
-//         }
-//         y -= (y1 & 1);
-
-//         sqrtA.push_back((y >> shifts) + ((y >> (shifts - 1) & 1)));
-//         }
-//     sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
-
-//     return sqrtA;
-// }
+    return sqrtA;
+}
 
 
 // #define BITSPERLONG 32
@@ -699,6 +682,47 @@ BFPDynamic<T> operator/(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
 // }
 
 
+template <typename T>
+BFPDynamic<T> bfp_sqrt(const BFPDynamic<T> &A) {
+    size_t N = A.size();
+    BFPDynamic<T> sqrtA(N);
+    
+    typedef typename Tx2<T>::type tx2;
+    typedef typename uTx2<T>::type utx2;    
+
+    int bitsdouble = (numeric_limits<T>::digits + 1) * 2;
+    int bits = bitsdouble >> 1;
+
+    utx2 a;
+    utx2 root;
+    utx2 rem;
+
+    for (size_t i=0; i < N; i++){
+        a = utx2(A[i]) << (bits - 2 + (A.exponent & 1));
+        rem = 0;
+        root = 0;
+        for(int j=0; j<bits; j++){
+            root <<= 1;
+            rem = ((rem << 2) + (a >> (bitsdouble - 2)));
+            a <<= 2;
+            root++;
+            if(root <= rem){
+                rem -= root;
+                root++;
+            }else
+                root--;
+        }
+        root >>= 1;
+
+        bool rounding = root < rem;
+        root += rounding;
+        // max_shifts = (bits - floor_log2(root) - 2, max_shifts);
+        sqrtA[i] = root;
+    }
+    sqrtA.exponent = 1 + (A.exponent >> 1) - (bits >> 1);
+
+    return sqrtA;
+}
 
 
 // // https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf

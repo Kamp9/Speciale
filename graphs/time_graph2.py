@@ -33,7 +33,6 @@ fig, ax = plt.subplots()
 #diff_arr = native/dw
 ones = np.ones(n_groups)
 index = np.arange(0,200,50)
-print native
 bar_width = 0.35
 error_config = {'ecolor': '0.3'}
 
@@ -43,9 +42,12 @@ size = 4
 
 native1 = np.mean(native[0:size], axis=1)
 native2 = np.mean(native[size:2*size], axis=1)
+print native1
 
-rects1 = ax.plot(index, native1, alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["black"], label='64 bit BFP')
-rects2 = ax.plot(index, native2, alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["lightish purple"], label='64 bit BFP - optimized')
+print native2
+
+rects1 = ax.plot(index, native1, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["black"], label='32 bit BFP')
+rects2 = ax.plot(index, native2, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["lightish purple"], label='32 bit BFP - optimized')
 
 # rects2 = ax.plot(index, dw, alpha=0.9, path_effects=[outline], color=sns.xkcd_rgb["pale red"], label='do_while with iterator')
 
@@ -56,8 +58,9 @@ plt.title(title)
 ax.set_xlabel('Number of elements')
 ax.set_ylabel(r'Total elapsed time (in seconds)')
 
-plt.xticks(index + (bar_width ), ["50.000.000", "100.000.000", "150.000.000", "200.000.000"])
+plt.xticks(index + (bar_width ), ["10.000.000", "20.000.000", "30.000.000", "40.000.000"])
 ax.legend(loc=0)
+
 
 plt.tight_layout()
 
