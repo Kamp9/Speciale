@@ -5,9 +5,9 @@ import benchpress as bp
 
 scripts = [
     # ('Addition', 'BFP', [32], [100000000, 200000000, 300000000, 400000000], [0, 1]),
-      ('', '', [32], [10000000, 20000000, 30000000, 40000000], [0, 1])
+      ('', '', [32], [100000000, 200000000, 300000000, 400000000], [1, 0])
 ]
-op_type = 5
+op_type = 1
 
 cmd_list = []
 for label, name, int_sizes, num_elems, comp in scripts:

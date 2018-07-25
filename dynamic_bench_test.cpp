@@ -24,6 +24,21 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
     return A;
 }
 
+
+template <typename T>
+BFPDynamic<T> gen_bfp2(boost::random::mt19937 &rng, const size_t N) {
+    vector<T> elems(N);
+    boost::random::uniform_int_distribution<T> rand_elem(-1, 1);
+    for(size_t i = 0; i < N-1; i++){
+        elems[i] = rand_elem(rng);
+    }
+    elems[N-1] = numeric_limits<T>::max();
+    boost::random::uniform_int_distribution<T> rand_exp(0, 0);
+    BFPDynamic<T> A(elems, rand_exp(rng));
+    return A;
+}
+
+
 // template <typename T>
 // BFPDynamic<T> gen_bfp(size_t seed, const size_t N) {
 //     vector<T> elems(N);
@@ -55,9 +70,12 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
 // 6 : inv sqrt
 template <typename T>
 T call_op(const int op, const BFPDynamic<T> &A){
+    BFPDynamic<T> B(0,0);
     BFPDynamic<T> C(0,0);
-     switch(op){
+    switch(op){
         case 1 :
+            // B = A;
+            // B.exponent = -100;
             C = A + A;
             return C[C.size()-1];
         case 2 :
@@ -108,10 +126,13 @@ double call_op_float(const int op, const vector<double> &A){
 
 template <typename T>
 T call_op_comp(const int op, const BFPDynamic<T> &A){
+    BFPDynamic<T> B(0,0);
     BFPDynamic<T> C(0,0);
      switch(op){
         case 1 :
-            C = plus2(A, A);
+            // B = A;
+            // B.exponent = -20;
+            C = plus3(A, A);
             return C[C.size()-1];
         case 2 :
             C = minus2(A, A);
