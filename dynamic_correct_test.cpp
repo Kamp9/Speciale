@@ -18,7 +18,7 @@ BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
         elems.push_back(rand_elem(rng));
     }
     boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
-    BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
+        BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
 }
@@ -31,7 +31,7 @@ BFPDynamic<T> gen_bfp_pos(boost::random::mt19937 &rng, const size_t N) {
     for(size_t i = 0; i < N; i++){
         elems.push_back(rand_elem(rng));
     }
-    boost::random::uniform_int_distribution<T> rand_exp(-10, 10); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
+    boost::random::uniform_int_distribution<T> rand_exp(0, 0); //rand_exp(numeric_limits<T>::min(), numeric_limits<T>::max());
     BFPDynamic<T> A(elems, rand_exp(rng)); //rand_exp(rng)
     // BFPStatic<T,N> A(elems, 0);
     return A; //BFPStatic<T,N>(A.to_float());
@@ -51,6 +51,22 @@ BFPDynamic<T> gen_bfp_neg(boost::random::mt19937 &rng, const size_t N) {
     return A; //BFPStatic<T,N>(A.to_float());
 }
 
+template <typename T>
+BFPDynamic<T> gen_bfp_no0(boost::random::mt19937 &rng, const size_t N) {
+    vector<T> elems(N);
+    boost::random::uniform_int_distribution<T> rand_elem(0, 30);
+    // boost::random::uniform_int_distribution<T> rand_elem(numeric_limits<T>::min()+1, numeric_limits<T>::max());
+    for(size_t i = 0; i < N; i++){
+        auto re = rand_elem(rng);
+        while(re == 0)
+           re = rand_elem(rng);
+        elems[i] = re;
+    }
+    boost::random::uniform_int_distribution<T> rand_exp(0, 0);
+    BFPDynamic<T> A(elems, rand_exp(rng));
+    return A;
+}
+
 // std::vector<T>(A)
 
 int main(int argc, char *argv[]){
@@ -60,8 +76,14 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp_pos<int32_t>(rng, 10);
-    auto B = gen_bfp_pos<int32_t>(rng, 10);
+    auto A = gen_bfp_no0<int8_t>(rng, 10);
+    // auto B = gen_bfp_pos<int32_t>(rng, 100);
+
+    typedef std::chrono::high_resolution_clock Clock;
+
+    auto t1 = Clock::now();
+    auto t2 = Clock::now();
+    auto nano = (t2 - t1).count();
 
     // auto a = vector<int16_t>{0x7999};
     // // auto b = vector<int16_t>{-26,-101,-115,-36,-45};
@@ -76,8 +98,13 @@ int main(int argc, char *argv[]){
 
     // cout << _sin(0x8000) << endl;
 
-    check_sqrt(A);
-    
+    t1 = Clock::now();
+
+    check_exp(A);
+
+    t2 = Clock::now();
+
+    nano = (t2 - t1).count();
     // check_sin(A);
 
 

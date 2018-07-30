@@ -1,0 +1,1733 @@
+{
+    "creation_date_utc": "2018-07-25T12:57:51.607702", 
+    "cmd_list": [
+        {
+            "cmd": "./dynamic_bench_test 32 1 100000000 0", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 100000000 / 0'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 100000000 0 ./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.727288\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.693225\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.682696\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.693772\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.85218\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.899128\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.07719\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.846285\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.831543\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.827975\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.817809\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.96999\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.712009\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.723911\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.744983\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.778185\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 0.689069\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.21879\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22677\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.26682\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.2803\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.25878\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22443\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22563\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.28479\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.24002\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.2616\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22297\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.28475\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.25727\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22945\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.21965\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.23158\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.23693\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.25633\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.2134\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22575\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.25504\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.22979\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 1.24676\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-af5c7b95-ea35-4dc8-98eb-f6d4ca206da6.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 100000000 / 0"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 200000000 0", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 200000000 / 0'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 200000000 0 ./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.49078\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.49245\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.51695\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.49759\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.48442\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.46802\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.98499\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.84903\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.79379\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.5964\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.61373\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.84516\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.74383\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.992\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.87623\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.4456\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.51189\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.71954\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.59738\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.77474\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.63517\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.04363\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.67083\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.64225\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.62985\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.62631\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.63275\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.63279\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.65777\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.50417\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.42533\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.43725\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.41983\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.4893\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.47906\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.58202\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.50862\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.44237\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.49057\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 2.49361\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-e1a6b83c-4e6a-4903-9009-ee5f774e2a46.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 200000000 / 0"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 300000000 0", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 300000000 / 0'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 300000000 0 ./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.65396\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.65216\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.7412\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.69179\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.63906\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.72424\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.76497\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.72626\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.66109\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.62996\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.72515\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.70406\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.68132\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.67766\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.76357\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.75887\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.6379\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.72749\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.77257\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.73178\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.67104\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.79254\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.92065\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.69295\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.66258\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.75867\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.71414\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.63219\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.70028\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.64044\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.74727\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.71264\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.75365\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.68332\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.65277\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.97387\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.67166\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.67753\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.77042\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 3.74461\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-b504c475-f556-490b-b311-b0bb37009de5.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 300000000 / 0"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 400000000 0", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 400000000 / 0'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 400000000 0 ./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 0 > >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.12317\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.97755\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.86186\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.92515\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.91543\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.25005\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.18647\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.00127\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.8905\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.99286\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.01816\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.02562\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.99107\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.89035\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.98879\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.91272\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.97321\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.10294\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.99872\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.9072\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.71338\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.85024\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.86057\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.84703\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.05259\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.11382\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.94588\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.2717\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.82785\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.21157\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.20577\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.38041\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.90375\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.86477\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.85389\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.95423\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.89889\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.99415\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 4.87039\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "2147483647\nelapsed-time: 5.03191\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-ab173acd-9c27-4648-9338-03a783169499.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 400000000 / 0"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 100000000 1", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 100000000 / 1'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 100000000 1 ./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 100000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.26165\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.2971\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29316\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.26879\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.32539\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.3263\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.30205\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.3029\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29248\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.38208\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.27152\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.28451\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.34098\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.28383\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.26343\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29168\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.28482\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.2736\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.26226\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.27689\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.32091\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29359\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.2679\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.30168\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29185\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.27159\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.5719\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.30075\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29683\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.25959\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.27734\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.29519\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.31117\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.33246\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.25977\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.31104\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.314\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.31613\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.26091\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 1.25976\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-c0fa7c7e-0759-46bc-8440-7e15803cb49b.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 100000000 / 1"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 200000000 1", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 200000000 / 1'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 200000000 1 ./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 200000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.57107\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.60107\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.52327\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.61389\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.58069\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.89779\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.1909\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.94179\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.9104\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.99305\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.54768\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.74083\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.91128\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.57536\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.5593\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.54459\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.54113\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.57359\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.5175\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.5749\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.60805\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.94098\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.74496\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.85647\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.87113\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.51738\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.68173\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.59268\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.58392\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.7267\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.7887\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.54443\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.73771\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.83261\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.00831\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.04246\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.53185\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.50042\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.52289\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 2.53237\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-5f8221db-1933-42f4-a45a-f99c53f1159e.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 200000000 / 1"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 300000000 1", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 300000000 / 1'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 300000000 1 ./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 300000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.8546\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.83806\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.83281\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.78489\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.84472\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.86408\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.24748\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.07893\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.88712\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.13962\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.03575\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.78218\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.77151\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.75014\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.7879\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.78418\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.79824\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.85956\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.17454\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.3989\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.26539\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.34709\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.00824\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.19896\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.87025\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.84243\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.41623\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.91589\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.8952\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 3.92836\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.02734\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.16273\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.15319\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.38643\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.60149\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.55708\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.26523\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.58172\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.3533\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.43725\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-77642b31-aa89-45a6-938a-303f2f129f66.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 300000000 / 1"
+        }, 
+        {
+            "cmd": "./dynamic_bench_test 32 1 400000000 1", 
+            "jobs": [
+                {
+                    "status": "finished", 
+                    "warmup": false, 
+                    "script": "#!/bin/bash\n\n#SBATCH -J '1 / 32 / 400000000 / 1'\n#SBATCH -o /tmp/bh-slurm-%%j.out\n#SBATCH -e /tmp/bh-slurm-%%j.err\n#SBATCH --nice=0\n\n\n# The runs \n./dynamic_bench_test 32 1 400000000 1 ./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-0.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-0.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-1.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-1.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-2.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-2.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-3.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-3.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-4.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-4.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-5.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-5.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-6.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-6.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-7.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-7.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-8.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-8.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-9.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-9.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-10.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-10.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-11.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-11.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-12.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-12.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-13.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-13.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-14.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-14.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-15.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-15.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-16.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-16.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-17.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-17.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-18.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-18.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-19.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-19.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-20.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-20.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-21.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-21.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-22.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-22.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-23.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-23.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-24.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-24.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-25.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-25.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-26.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-26.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-27.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-27.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-28.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-28.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-29.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-29.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-30.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-30.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-31.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-31.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-32.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-32.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-33.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-33.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-34.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-34.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-35.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-35.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-36.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-36.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-37.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-37.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-38.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-38.err >&2)\nsync\n./dynamic_bench_test 32 1 400000000 1 > >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-39.out) 2> >(tee /home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh-39.err >&2)\nsync\n", 
+                    "results": [
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 6.03662\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.46777\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.45247\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.98223\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97258\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96772\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95604\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96532\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.00753\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96848\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.01971\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97292\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95412\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95884\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.9622\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95889\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.80988\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.39774\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.16732\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.04041\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97122\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97461\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95821\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96635\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96073\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97131\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.01738\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97649\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.49285\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 5.47837\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.98552\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96165\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.9525\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96737\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.94617\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.94867\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95337\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.96188\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.97358\n"
+                        }, 
+                        {
+                            "stderr": "", 
+                            "success": true, 
+                            "stdout": "1073742847\nelapsed-time: 4.95986\n"
+                        }
+                    ], 
+                    "filename": "/home/troels/diku/speciale/Speciale/bh-job-087e8d5d-0048-4ace-8aad-12f72e1a5b5e.sh", 
+                    "nruns": 40
+                }
+            ], 
+            "env": {}, 
+            "label": "1 / 32 / 400000000 / 1"
+        }
+    ]
+}

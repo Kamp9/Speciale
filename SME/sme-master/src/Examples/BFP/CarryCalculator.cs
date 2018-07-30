@@ -11,26 +11,26 @@ using System.Linq;
 
 namespace BFP
 {
+    [ClockedProcess]
 	public class CarryCalculator : SimpleProcess
 	{
-
+        [InitializedBus]
 		public interface CarryLine : IBus
 		{
 			// [InitialValue]
 			// bool IsValid { get; set; }
 
-            [FixedArrayLength(sizeof(int))]
-			IFixedArray<byte> Elem { get; set; }
-		}   
+            bool Elem { get; set; }
+      		}
 
 
 		[InputBus]
-        private readonly TopLevelSimulator.InputLine1 DataA = Scope.CreateOrLoadBus<TopLevelSimulator.InputLine1>();
+        private readonly InputLine1 DataA = Scope.CreateOrLoadBus<InputLine1>();
         [InputBus]
-        private readonly TopLevelSimulator.InputLine2 DataB = Scope.CreateOrLoadBus<TopLevelSimulator.InputLine2>();
+        private readonly InputLine2 DataB = Scope.CreateOrLoadBus<InputLine2>();
  
         [InputBus]
-        private readonly TopLevelSimulator.InputLine5 CountLine1 = Scope.CreateOrLoadBus<TopLevelSimulator.InputLine5>();
+        private readonly InputLine5 CountLine1 = Scope.CreateOrLoadBus<InputLine5>();
 
 		[OutputBus]
         private readonly CarryLine DataC = Scope.CreateOrLoadBus<CarryLine>();
@@ -41,37 +41,37 @@ namespace BFP
 
         protected override void OnTick()
         {
-            // UInt17 my_int = 16;
-            int count = CountLine1.Elem[0];
+            //UInt17 my_int = 16;
+            uint count = CountLine1.Elem;
 
             if (count == 0)
             {
-                int arrayLength = DataA.Elem[0];
-                int arrayLength2 = DataB.Elem[0];
-                DataC.Elem[0] = 0;
+                uint arrayLength = DataA.Elem;
+                uint arrayLength2 = DataB.Elem;
+                DataC.Elem = false;
             }
 
             if (count == 1)
             {
-                size = DataA.Elem[0];
-                int size2 = DataB.Elem[0];
-                DataC.Elem[0] = 0;
+                size = (int) DataA.Elem;
+                uint size2 = DataB.Elem;
+                DataC.Elem = false;
             }
 
             if (count == 2)
             {
-                int Aexp = DataA.Elem[0];
-                int Bexp = DataB.Elem[0];
-                int exp_diff = Aexp - Bexp;
-                exp_diff2 = size ^ ((exp_diff ^ size) & -((exp_diff < size) ? 1 : 0));
-                DataC.Elem[0] = 0;
+                uint Aexp = DataA.Elem;
+                uint Bexp = DataB.Elem;
+                uint exp_diff = Aexp - Bexp;
+                exp_diff2 = (int) (size ^ ((exp_diff ^ size) & -((exp_diff < size) ? 1 : 0)));
+                DataC.Elem = false;
             }
 
             bool carry = false;
             if (count > 2)
             {
-                int A = DataA.Elem[0];
-                int B = DataB.Elem[0];
+                uint A = DataA.Elem;
+                uint B = DataB.Elem;
 
                 long ABi = (((long) A) << exp_diff2) + (long) B;
 
@@ -80,11 +80,10 @@ namespace BFP
                 long ABi2 = ((long)(ABi >> (exp_diff2 - 1)));
                 long ABi3 = ABi2 & 1;
                 ABi = ABi + ABi3;
-                int abi = (Int32)ABi;
-                //carry = (((A >> (size - 1)) != 0) ^ (abi >> (size - 1)) != 0) && (((B >> (size - 1)) != 0) ^ ((abi >> (size - 1)) != 0));
+                int abi = (int)ABi;
                 carry = ((((A >> (size - 1))) ^ (abi >> (size - 1))) & (((B >> (size - 1))) ^ ((abi >> (size - 1))))) != 0;
 
-                DataC.Elem[0] = (byte)(carry ? 1 : 0);
+                DataC.Elem = carry;
             }
 		}
 	}

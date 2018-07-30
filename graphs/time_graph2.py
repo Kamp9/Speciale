@@ -47,7 +47,7 @@ print native1
 print native2
 
 rects1 = ax.plot(index, native1, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["black"], label='32 bit BFP')
-rects2 = ax.plot(index, native2, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["lightish purple"], label='32 bit BFP - optimized')
+rects2 = ax.plot(index, native2, 'o-', alpha=0.9, path_effects=[outline], linewidth=3, color=sns.xkcd_rgb["red"], label='32 bit BFP - optimized')
 
 # rects2 = ax.plot(index, dw, alpha=0.9, path_effects=[outline], color=sns.xkcd_rgb["pale red"], label='do_while with iterator')
 
@@ -58,7 +58,7 @@ plt.title(title)
 ax.set_xlabel('Number of elements')
 ax.set_ylabel(r'Total elapsed time (in seconds)')
 
-plt.xticks(index + (bar_width ), ["10.000.000", "20.000.000", "30.000.000", "40.000.000"])
+plt.xticks(index + (bar_width ), ["100.000.000", "200.000.000", "300.000.000", "400.000.000"])
 ax.legend(loc=0)
 
 

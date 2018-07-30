@@ -48,7 +48,7 @@ index = np.arange(0,4,1)
 
 bar_width = 0.15
 error_config = {'ecolor': '0.3'}
-
+	
 plt.grid()
 # print(numpy_mean)
 # print(dw_mean)
@@ -58,10 +58,6 @@ plt.grid()
 # native3 = np.mean(means[2*size:3*size], axis=1)
 # native4 = np.mean(means[3*size:4*size], axis=1)
 # native5 = np.mean(means[4*size:], axis=1)
-
-print means[0:size]
-print means[4*size:]
-print means[4*size:] / means[0:size]
 
 rects1 = ax.bar(index, means[4*size:] / means[0:size], bar_width,
 	        color=sns.xkcd_rgb["denim blue"],
@@ -93,16 +89,17 @@ rects5 = ax.bar(index + 4*bar_width,  native[0:4] , bar_width,
 	        alpha=0.9,
 	        label='64 bit Floating Point')
 
+
 ax.plot([-1, 4.5], [1, 1], "k--", linewidth=1.0)
 
-ax.set_ylim(ymin=0.0, ymax=4)
+ax.set_ylim(ymin=0.0, ymax=1.5)
 ax.set_xlim(xmin=-0.25,xmax=3.75)
 
 plt.title(title)
 ax.set_xlabel('Number of elements')
 ax.set_ylabel(r'Speedup relative to 64 bit Floating Point') 	
 
-plt.xticks(index + (bar_width * 2), ["50.000.000", "100.000.000", "150.000.000", "200.000.000"])
+plt.xticks(index + (bar_width * 2), ["10.000.000", "20.000.000", "30.000.000", "40.000.000"])
 ax.legend(loc=1)
 
 plt.tight_layout()

@@ -8,6 +8,7 @@
     <RootNamespace>BFP</RootNamespace>
     <AssemblyName>BFP</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <ReleaseVersion>0.3.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +36,7 @@
     <Compile Include="AdderWithCarry.cs" />
     <Compile Include="TopLevelSimulator.cs" />
     <Compile Include="CarryCalculator.cs" />
+    <Compile Include="Pipe.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SME.VHDL\SME.VHDL.csproj">

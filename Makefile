@@ -1,8 +1,9 @@
 CXX=g++ -O3 -march=native 
+# -O3
 #-std=c++11
 
 # all: deterministic_correct_test dynamic_bench_test random_correct_test
-all: dynamic_bench_test random_correct_test
+all: dynamic_bench_test random_correct_test 
 
 # deterministic_correct_test: deterministic_correct_test.cpp
 # 	$(CXX) -o deterministic_correct_test deterministic_correct_test.cpp
@@ -15,6 +16,9 @@ dynamic_correct_test: bfpdynamic.cpp dynamic_correct_test.cpp
 
 random_correct_test: random_correct_test.cpp
 	$(CXX) -o random_correct_test random_correct_test.cpp
+
+# static_bench_test: bfpstatic2.cpp static_bench_test.cpp
+# 	$(CXX) -o static_bench_test static_bench_test.cpp
 
 %: %.cpp
 	$(CXX) -o $@ $^ 

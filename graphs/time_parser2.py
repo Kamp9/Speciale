@@ -19,7 +19,7 @@ for line in input_file:
         print m.group('time')
 
         time = m.group('time')
-        if idx % 5 == 0:
+        if idx % 40 == 0:
             if idx != 0:
                 result.append(temp)
             temp = [float(time)]

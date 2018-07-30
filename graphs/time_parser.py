@@ -17,7 +17,7 @@ for line in input_file:
     m = re.search(pattern, line)
     if m:
         time = m.group('time')
-        if idx % 3 == 0:
+        if idx % 10 == 0:
             if idx != 0:
                 result.append(temp)
             temp = [float(time)]

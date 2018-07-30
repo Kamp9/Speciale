@@ -8,15 +8,16 @@ namespace BFP
 	{
 		public static void Main(string[] args)
 		{
-			new Simulation()
-				.BuildCSVFile()
-				.BuildGraph()
-				.BuildVHDL()
-    			.BuildCPP()
-				.Run(
+            new Simulation()
+                .BuildCSVFile()
+                .BuildGraph()
+                .BuildVHDL()
+                .BuildCPP()
+                .Run(
                     new TopLevelSimulator(),
                     new CarryCalculator(),
-                    new AdderWithCarry()
+                    new AdderWithCarry(),
+                    new Pipe()
                 );
 		}
 	}
