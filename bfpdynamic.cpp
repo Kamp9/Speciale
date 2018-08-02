@@ -251,9 +251,9 @@ BFPDynamic<T> operator+(const BFPDynamic<T> &A, const BFPDynamic<T> &B){
     // Everytime we shift something negative odd number, we have to add one in order to simulate the positive numbers
     if(carry){
         for(size_t i=0;i<N;i++){
-            bool sign = signbit((tx2(A[i]) << max_diff) + B[i]);
+            bool sign = signbit(tx2((tx2(A[i]) << max_diff) + B[i]));
             tx2 ABi   = abs((tx2(A[i]) << max_diff) + B[i]);
-            ABi       = -sign ^ (ABi >> max_diff);
+            ABi = (-sign) ^ (tx2(ABi >> max_diff));
             bool rounding = (ABi & 1);
             AB[i] = (ABi >> 1) + rounding;
         }
@@ -1000,7 +1000,6 @@ BFPDynamic<T> bfp_sin(const BFPDynamic<T> &A){
         sum = s1 - prod;
 
         long john = (short) ((y * sum) >> 13);
-        cout << john << endl;
         sinA[i] = john;
     }
 

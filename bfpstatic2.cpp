@@ -199,7 +199,7 @@ BFPStatic<T,N> operator*(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
     for (size_t i = 0; i < N; i++) {
         tx2 ABi = tx2(A[i]) * B[i];
-        max_value = max(max_value, ABi ^ tx2(-1 * signbit(ABi)));
+        max_value = max(max_value, tx2(ABi ^ tx2(-1 * signbit(ABi))));
     }
 
     int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
@@ -227,7 +227,7 @@ BFPStatic<T,N> operator/(const BFPStatic<T,N> &A, const BFPStatic<T,N> &B){
 
     for (size_t i = 0; i < N; i++) {
         tx2 ABi = (tx2(A[i]) << (numeric_limits<T>::digits + 1)) / B[i];
-        max_value = max(max_value, ABi ^ tx2(-1 * signbit(ABi)));
+        max_value = max(max_value, tx2(ABi ^ tx2(-1 * signbit(ABi))));
     }
 
     int shifts = 1 + floor_log2(utx2(max_value ^ tx2(-1 * signbit(max_value)))) - numeric_limits<T>::digits;
@@ -273,52 +273,52 @@ BFPStatic<T, N> bfp_pow(const BFPStatic<T, N> &A, const BFPStatic<T, N> &p) {
 
 //https://stackoverflow.com/questions/19611198/finding-square-root-without-using-sqrt-function
 
-template <typename T, size_t N >
-BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
-    BFPStatic<T,N> sqrtA;
-    typedef typename tx2<T>::type tx2;
-    typedef typename utx2<T>::type utx2;
+// template <typename T, size_t N >
+// BFPStatic<T, N> bfp_sqrt(const BFPStatic<T, N> &A) {
+//     BFPStatic<T,N> sqrtA;
+//     typedef typename tx2<T>::type tx2;
+//     typedef typename utx2<T>::type utx2;
 
-    utx2 max_value = 0;
+//     utx2 max_value = 0;
 
-    for (size_t i=0; i < N; i++){
-        utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-        utx2 y = (sqrtAi >> 1);
-        utx2 z = 0;
-        utx2 y1;
+//     for (size_t i=0; i < N; i++){
+//         utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+//         utx2 y = (sqrtAi >> 1);
+//         utx2 z = 0;
+//         utx2 y1;
 
-        while (y != z) {
-            z = y;
-            y1 = (y + sqrtAi / y);
-            y = (y1 >> 1) + (y1 & 1);
-        }
-        max_value = max(max_value, y - (y1 & 1));
-    }
+//         while (y != z) {
+//             z = y;
+//             y1 = (y + sqrtAi / y);
+//             y = (y1 >> 1) + (y1 & 1);
+//         }
+//         max_value = max(max_value, y - (y1 & 1));
+//     }
 
-    int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
+//     int shifts = 1 + floor_log2(max_value) - numeric_limits<T>::digits;
 
-    if (shifts < 0){
-      shifts = 0;
-    }
-    for (size_t i=0; i < N; i++){
-        utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
-        utx2 y = (sqrtAi >> 1);
-        utx2 z = 0;
-        utx2 y1;
-        while (y != z) {
-            z = y;
-            y1 = (y + sqrtAi / y);
-            y = (y1 >> 1) + (y1 & 1);
-        }
-        y -= (y1 & 1);
+//     if (shifts < 0){
+//       shifts = 0;
+//     }
+//     for (size_t i=0; i < N; i++){
+//         utx2 sqrtAi = utx2(A[i]) << (numeric_limits<T>::digits + 1 + (A.exponent & 1));
+//         utx2 y = (sqrtAi >> 1);
+//         utx2 z = 0;
+//         utx2 y1;
+//         while (y != z) {
+//             z = y;
+//             y1 = (y + sqrtAi / y);
+//             y = (y1 >> 1) + (y1 & 1);
+//         }
+//         y -= (y1 & 1);
 
-        sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
+//         sqrtA[i] = (y >> shifts) + ((y >> (shifts - 1) & 1));
 
-        }
-    sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
+//         }
+//     sqrtA.exponent = ((A.exponent + shifts - numeric_limits<T>::digits) >> 1) - signbit(shifts); // (A.exponent & 1);
 
-    return sqrtA;
-}
+//     return sqrtA;
+// }
 
 
 /**
@@ -464,27 +464,27 @@ BFPStatic<T, N> bfp_sqrt2(const BFPStatic<T, N> &A) {
 
 
 
-// https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
-template <typename T, size_t N >
-BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
-    BFPStatic<T,N> invsqrtA;
-    typedef typename tx2<T>::type tx2;
-    typedef typename utx2<T>::type utx2;
+// // https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
+// template <typename T, size_t N >
+// BFPStatic<T, N> bfp_invsqrt(const BFPStatic<T, N> &A){
+//     BFPStatic<T,N> invsqrtA;
+//     typedef typename tx2<T>::type tx2;
+//     typedef typename utx2<T>::type utx2;
 
-    auto half = BFPStatic<T, N>{{1}, -1};
-    auto x2 = A * half;
-    auto threehalfs = BFPStatic<T, N>{{3}, -1};
-    auto y = A;
+//     auto half = BFPStatic<T, N>{{1}, -1};
+//     auto x2 = A * half;
+//     auto threehalfs = BFPStatic<T, N>{{3}, -1};
+//     auto y = A;
 
-    y.exponent++;
-    auto i = (BFPStatic<T, N>{{0x5f3759df}, 0}) - y;
+//     y.exponent++;
+//     auto i = (BFPStatic<T, N>{{0x5f3759df}, 0}) - y;
     
-    // cout << (i[0] >> 20) << endl;
-    // i.exponent = i[0] >> 25;
+//     // cout << (i[0] >> 20) << endl;
+//     // i.exponent = i[0] >> 25;
 
-    i = i * (threehalfs - (x2 * i * i));
-    return i;
-}
+//     i = i * (threehalfs - (x2 * i * i));
+//     return i;
+// }
 
 
 template <typename T, size_t N>

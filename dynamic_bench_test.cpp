@@ -8,6 +8,7 @@
 
 #include "bfpdynamic.cpp"
 
+int NUM_REP = 10;
 
 template <typename T>
 BFPDynamic<T> gen_bfp(boost::random::mt19937 &rng, const size_t N) {
@@ -54,7 +55,6 @@ BFPDynamic<T> gen_bfp_pos(boost::random::mt19937 &rng, const size_t N) {
     return A; //BFPStatic<T,N>(A.to_float());
 }
 
-
 // template <typename T>
 // BFPDynamic<T> gen_bfp(size_t seed, const size_t N) {
 //     vector<T> elems(N);
@@ -86,61 +86,94 @@ BFPDynamic<T> gen_bfp_pos(boost::random::mt19937 &rng, const size_t N) {
 // 6 : inv sqrt
 template <typename T>
 T call_op(const int op, const BFPDynamic<T> &A, const BFPDynamic<T> &B){
+
+    clock_t begin;
+    clock_t end;
+    double elapsed_secs;
+
     BFPDynamic<T> C(0,0);
     size_t i = random() % A.size();
 
-    switch(op){
-        case 1 :
-            C = A + A;
-            return C[i];
-        case 2 :
-            C = A - B;
-            return C[i];
-        case 3 :
-            C = A * A;
-            return C[i];
-        case 4 :
-            C = A / A;
-            return C[i];
-        case 5 :
-            C = bfp_sqrt(A);
-            return C[i];
-        case 6 :
-            C = bfp_invsqrt(A);
-            return C[i];
-        default :
-            cout << "Wrong op type! Must be 1, 2, 3, 4, 5, or 6 in second argument" << endl;
-            return C[0];
+    begin = clock();
+
+    for(int j = 0; j < NUM_REP; j++){
+        switch(op){
+            case 1 :
+                C = A + A;
+                break;
+            case 2 :
+                C = A - B;
+                break;
+            case 3 :
+                C = A * A;
+                break;
+            case 4 :
+                C = A / A;
+                break;
+            case 5 :
+                C = bfp_sqrt(A);
+                break;
+            case 6 :
+                C = bfp_invsqrt(A);
+                break;
+            case 7 :
+                C = bfp_sin(A);
+                break;
+
+            default :
+                cout << "Wrong op type! Must be 1, 2, 3, 4, 5, or 6 in second argument" << endl;
+        }
     }
+    end = clock();
+    elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC) /  double(NUM_REP);
+    cout << "elapsed-time: " << elapsed_secs << endl;
+    return C[i];
 }
 
 double call_op_float(const int op, const vector<double> &A, const vector<double> &B){
 
     vector<double> C;
     size_t i = rand() % A.size();
-    switch(op){
-        case 1 :
-            C = A + B;
-            return C[i];
-        case 2 :
-            C = A - B;
-            return C[i];
-        case 3 :
-            C = A * B;
-            return C[i];
-        case 4 :
-            C = A / B;
-            return C[i];
-        case 5 :
-            C = Vsqrt(A);
-            return C[i];
-        case 6 :
-            C = Vinvsqrt(A);
-            return C[i];
-        default :
-            cout << "Wrong op type! Must be 1, 2, 3, 4, 5, or 6 in second argument" << endl;
-            return C[0];
+
+    clock_t begin;
+    clock_t end;
+    double elapsed_secs;
+
+    begin = clock();
+
+    for(int j = 0; j < NUM_REP; j++){
+        switch(op){
+            case 1 :
+                C = A + B;
+                break;
+            case 2 :
+                C = A - B;
+                break;
+            case 3 :
+                C = A * B;
+                break;
+            case 4 :
+                C = A / B;
+                break;
+            case 5 :
+                C = Vsqrt(A);
+                break;
+            case 6 :
+                C = Vinvsqrt(A);
+                break;
+            case 7 :
+                C = Vsin(A);
+                break;
+            default :
+                cout << "Wrong op type! Must be 1, 2, 3, 4, 5, or 6 in second argument" << endl;
+        }
     }
+
+    end = clock();
+    elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC) / double(NUM_REP);
+
+    cout << "elapsed-time: " << elapsed_secs << endl;
+    return C[i];
 }
 
 template <typename T>
@@ -197,7 +230,8 @@ T call_op_micro(const int op, const BFPDynamic<T> &A){
 
 int main(int argc, char *argv[]){
     struct timeval tv;
-    gettimeofday(&tv, 0);
+    gettimeofday(&tv, 0); 
+
     boost::random::mt19937 rng;
     rng.seed(tv.tv_usec);
     srand(clock());
@@ -235,6 +269,10 @@ int main(int argc, char *argv[]){
         BFPDynamic<uint32_t> uA32(0, 0);
         BFPDynamic<uint64_t> uA64(0, 0);
 
+        BFPDynamic<uint8_t>  uB8(0,0);
+        BFPDynamic<uint16_t> uB16(0,0);
+        BFPDynamic<uint32_t> uB32(0,0);
+        BFPDynamic<uint64_t> uB64(0,0);
 
         vector<double> A;
         vector<double> B;
@@ -304,78 +342,41 @@ int main(int argc, char *argv[]){
         }else if (comp == 0){
             switch(test_type){
                 case 0 :
-                    A = gen_bfp<int64_t>(rng, N).to_float();
-                    B = gen_bfp<int64_t>(rng, N).to_float();
-                    cout << A << endl;
-                    cout << B << endl;
-                    cout << A / B << endl;
-                    begin = clock();
+                    A = gen_bfp_pos<int64_t>(rng, N).to_float();
+                    B = gen_bfp_pos<int64_t>(rng, N).to_float();
 
-                    cout << double(call_op_float(op_type, A, B)) << endl;
+                    call_op_float(op_type, A, B);
 
-                    end = clock();
-
-    		        // cerr << "Block size: " << (sizeof(decltype(Afloat)::value_type) * Afloat.size()) << endl;		
-                    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-                    cout << "elapsed-time: " << elapsed_secs << endl;
                     break;
 
                 case 8 :
-                    A8 = gen_bfp<int8_t>(rng, N);
-                    B8 = gen_bfp<int8_t>(rng, N);
+                    A8 = gen_bfp_pos<int8_t>(rng, N);
+                    B8 = gen_bfp_pos<int8_t>(rng, N);
 
-                    begin = clock();
+                    call_op(op_type, A8, B8);
 
-                    cout << int(call_op(op_type, A8, B8)) << endl;
-
-                    end = clock();
-
-                    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-                    cout << "elapsed-time: " << elapsed_secs << endl;
                     break;
 
                 case 16 :
                     A16 = gen_bfp_pos<int16_t>(rng, N);
                     B16 = gen_bfp_pos<int16_t>(rng, N);
 
-                    begin = clock();
-
-                    cout << int(call_op(op_type, A16, B16)) << endl;
+                    call_op(op_type, A16, B16);
                     
-                    end = clock();
-
-            		// cerr << "Block size: " << (sizeof(decltype(A16)::value_type) * A16.size()) << endl;		
-                    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-                    cout << "elapsed-time: " << elapsed_secs << endl;
                     break;
 
                 case 32 :
                     A32 = gen_bfp_pos<int32_t>(rng, N);
                     B32 = gen_bfp_pos<int32_t>(rng, N);
 
-                    begin = clock();
+                    call_op<int32_t>(op_type, A32, B32);
                     
-                    cout << int(call_op<int32_t>(op_type, A32, B32)) << endl;
-                    
-                    end = clock();
-
-            		// cerr << "Block size: " << (sizeof(decltype(A32)::value_type) * A32.size()) << endl;				
-                    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-                    cout << "elapsed-time: " << elapsed_secs << endl;
                     break;
 
                 case 64 :
                     A64 = gen_bfp_pos<int64_t>(rng, N);
                     B64 = gen_bfp_pos<int64_t>(rng, N);
-                    begin = clock();
-                    
-                    cout << int(call_op<int64_t>(op_type, A64, B64)) << endl;
-                    
-                    end = clock();
-
-                    // cerr << "Block size: " << (sizeof(decltype(A32)::value_type) * A32.size()) << endl;              
-                    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-                    cout << "elapsed-time: " << elapsed_secs << endl;
+                    call_op<int64_t>(op_type, A64, B64);
                     break;
 
                 default :

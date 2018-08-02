@@ -13,6 +13,7 @@
 #include <typeinfo>
 
 #include <fstream>
+#include <chrono>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,63 +109,8 @@ BFPDynamic<T> operator+(const View<T> &A, const View<T> &B){
     return AB;
 }
 
-
-// template <typename T, size_t N>
-// double bfp_sum_abs(const BFPStatic<T, N> &A, const size_t ydim, const size_t xdim){
-//     BFPStatic<T, N> sumA;
-//     // How much do we need???
-//     Tx2 accumulator = 0;
-
-//     for(size_t i=1; i<ydim-1; i++){
-//         for(size_t j=1; j<xdim-1; j++){
-//             accumulator += abs(A[i*ydim+j]);
-//         }
-//     }
-//     return pow(2.0, A.exponent) * accumulator;
-// }
-
-
-
-// template <typename T>
-// BFPDynamic<T> bfp_mul_scalar(const View<T> &A, const double scalar){
-//     BFPDynamic<T> Ab;
-//     vector<double> V;
-//     V.push_back(scalar);
-
-//     BFPDynamic<T> B = BFPDynamic<T>(V);
-//     auto Bi = B[0];
-//     // should be able to avoid going through A two times with max value for BFP struct in metadata.
-//     typename Tx2<T>::type max_value = 0;
-//     for(size_t i=0;i<A.ydim;i++){
-//         for (size_t j=0;j<A.xdim;j++){
-//             typename Tx2<T>::type ABi = typename Tx2<T>::type(A(i,j)) * Bi;
-//             max_value = max(max_value, ABi ^ typename Tx2<T>::type(-1 * signbit(ABi)));
-//         }
-//     }
-
-//     int shifts = 1 + floor_log2(typename uTx2<T>::type(max_value ^ typename Tx2<T>::type(-1 * signbit(max_value)))) - (numeric_limits<T>::digits);
-//     if (shifts < 0)
-//         shifts = 0;
-
-//     for(size_t i=0;i<A.ydim;i++){
-//         for (size_t j=0;j<A.xdim;j++){
-//             typename Tx2<T>::type ABi = typename Tx2<T>::type(A(i,j)) * Bi;
-//             bool rounding = (ABi >> (shifts - 1)) & 1;
-//             bool rounding2 = ((ABi & ((1 << shifts) -1)) == (1 << (shifts - 1))) & signbit(ABi);
-//             Ab.push_back((ABi >> shifts) + rounding - rounding2);
-//         }
-//     }
-//     Ab.exponent = A.exponent + B.exponent + shifts;
-//     return Ab;
-// }
-
-//vector<double> make_grid(const size_t ydim, const size_t xdim){
-vector<double> make_grid(){
-
-    size_t const ydim = 50;
-    size_t const xdim = 50;
-    // double grid[ydim][xdim];
-    auto grid = new double[ydim][xdim];
+vector<double> make_grid(const size_t ydim, const size_t xdim){
+    double grid[ydim][xdim];
 
     for (int i=0; i<ydim; i++) {      // Initialize the grid
         for (int j=0;j<xdim;j++) {
@@ -190,21 +136,6 @@ vector<double> make_grid(){
     }
     return grid_1d;
 }
-
-
-// extern "C" //This is important to get the function from the -lblas library you will use when compiling
-// {
-//     double daxpy_(int *n, double *a, double *A, int *incA, double *B, int *incB);
-// //The daxpy fortran function shown above multiplies a first matrix 'A' by a constant 'a'
-// //and adds the result to a second matrix 'B.' Both matrices are of size 'n.'
-// }
-
-// // void daxpy(int n, double a, double *A, int incA, double *B, int incB);
-// void daxpy(int n, double a, double *A, int incA, double *B, int incB)
-// {
-//     daxpy_(&n, &a, A, &incA, B, &incB); //Once again, note the call notation. Important!
-// }
-
     
 
 template <typename T>
@@ -254,7 +185,6 @@ void bfp_update(BFPDynamic<T> &A, const View<T> &V){
     if (shifts < 0)
         shifts = 0;
 
-    // int shifts = numeric_limits<T>::digits + 1;
     size_t ydim = V.ydim + 2;
     for(size_t i=1;i<V.ydim+1;i++){
         for (size_t j=1;j<V.xdim+1;j++){
@@ -264,29 +194,26 @@ void bfp_update(BFPDynamic<T> &A, const View<T> &V){
             A[i*ydim+j] = (ABi >> shifts) + rounding - rounding2;
         }
     }
-  //  A.exponent = A.exponent + shifts - numeric_limits<T>::digits;// + B.exponent + shifts;
 }
 
 
-int main(){
+void heat_equation(const size_t ydim, const size_t xdim){
+
     // remember to change the other one
-    const size_t ydim = 50;
-    const size_t xdim = 50;
-
     // auto grid_1d = make_grid(ydim, xdim);
-    auto grid_1d = make_grid();
+    auto grid_1d = make_grid(ydim, xdim);
 
-    auto A = BFPDynamic<int32_t>(grid_1d);
+    auto A = BFPDynamic<int8_t>(grid_1d);
     // print_grid(A, ydim, xdim);
     // xdim??
-    auto center = View<int32_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
-    auto north  = View<int32_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
-    auto south  = View<int32_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
-    auto west   = View<int32_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
-    auto east   = View<int32_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
-
+    auto center = View<int8_t>(&A, ydim-2, xdim-2, 1, 1, ydim, 1);
+    auto north  = View<int8_t>(&A, ydim-2, xdim-2, 0, 1, ydim, 1);
+    auto south  = View<int8_t>(&A, ydim-2, xdim-2, 2, 1, ydim, 1);
+    auto west   = View<int8_t>(&A, ydim-2, xdim-2, 1, 0, ydim, 1);
+    auto east   = View<int8_t>(&A, ydim-2, xdim-2, 1, 2, ydim, 1);
+    typedef std::chrono::high_resolution_clock Clock;
     int iterations = 0;
-    int max_iterations = 200;
+    int max_iterations = 100;
 
     double delta = 1.0;
     double epsilon = 0.005; //1e-10;
@@ -294,26 +221,35 @@ int main(){
     ofstream myfile;
     myfile.open ("heateq.csv");
 
-    while (iterations < max_iterations && delta > epsilon){
-        cout << iterations << endl;
-        iterations++;
+    auto t1 = Clock::now();
+    auto t2 = Clock::now();
+    auto nano = (t2 - t1).count();
 
+    // check_sin(A);
+    t1 = Clock::now();
+
+    while (iterations < max_iterations && delta > epsilon){
+        iterations++;
         auto bfp_cn    = center + north;
-        auto view_cn   = View<int32_t>(&bfp_cn, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_cn   = View<int8_t>(&bfp_cn, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         auto bfp_cne   = view_cn + east;
-        auto view_cne  = View<int32_t>(&bfp_cne, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_cne  = View<int8_t>(&bfp_cne, ydim-2, xdim-2, 0, 0, ydim-2, 1);
         
         auto bfp_sw    = south + west;
-        auto view_sw   = View<int32_t>(&bfp_sw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_sw   = View<int8_t>(&bfp_sw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
         auto bfp_cnesw = view_cne + view_sw;
 
-        auto view_cnesw = View<int32_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
+        auto view_cnesw = View<int8_t>(&bfp_cnesw, ydim-2, xdim-2, 0, 0, ydim-2, 1);
 
-        bfp_update<int32_t>(A, view_cnesw);
-
+        bfp_update<int8_t>(A, view_cnesw);
     }
+
+    t2 = Clock::now();
+
+    nano = (t2 - t1).count();
+    cout << nano << endl;
     for(int i = 0; i < ydim; i++){
         for(int j = 0; j < xdim; j++){
             myfile << (A[i*ydim + j] * pow(2.0, A.exponent)) << ",";
@@ -322,5 +258,14 @@ int main(){
     }
     myfile.close();
 
+}
+
+
+int main(){
+
+    const size_t ydim = 500;
+    const size_t xdim = 500;
+
+    heat_equation(ydim, xdim);
 	return 0;
 }

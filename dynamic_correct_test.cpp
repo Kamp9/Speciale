@@ -76,9 +76,9 @@ int main(int argc, char *argv[]){
 
     rng.seed(tv.tv_usec);
 
-    auto A = gen_bfp_no0<int8_t>(rng, 10);
-    // auto B = gen_bfp_pos<int32_t>(rng, 100);
-
+    auto A = gen_bfp_no0<uint8_t>(rng, 10);
+    auto B = gen_bfp_no0<uint8_t>(rng, 10);
+    
     typedef std::chrono::high_resolution_clock Clock;
 
     auto t1 = Clock::now();
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]){
 
     t1 = Clock::now();
 
-    check_exp(A);
+    check_add(A, B);
 
     t2 = Clock::now();
 
